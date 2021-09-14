@@ -10,4 +10,8 @@ class Texts:
     temp_legend_filename = "temp_legend.svg"
 
     plot_item_bivariate_renderer = "Plot item Bivariate Renderer"
-    plot_item_bivariate_renderer_legend = QgsLayoutItemRegistry.PluginItem + 123 + 1
+
+
+class IDS:
+
+    plot_item_bivariate_renderer_legend = QgsLayoutItemRegistry.PluginItem + 123

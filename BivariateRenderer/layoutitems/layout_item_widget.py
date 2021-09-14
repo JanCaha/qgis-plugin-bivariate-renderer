@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFormLayout, QComboBox, QPushButton
+from PyQt5.QtWidgets import QFormLayout, QComboBox, QPushButton, QLineEdit, QVBoxLayout, QLabel
 
 from qgis.core import (QgsLayoutItem,
                        QgsProject,
@@ -16,7 +16,7 @@ from qgis.gui import (QgsLayoutItemBaseWidget,
                       QgsSymbolButton)
 
 from ..renderer.bivariate_renderer import BivariateRenderer
-from ..text_constants import Texts
+from ..text_constants import Texts, IDS
 from ..utils import log
 from .layout_item import BivariateRendererLayoutItem
 
@@ -24,6 +24,8 @@ from .layout_item import BivariateRendererLayoutItem
 class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     pb_update_legend: QPushButton
+    axis_x_name: QLineEdit
+    axis_y_name: QLineEdit
 
     layout_item: BivariateRendererLayoutItem
 
@@ -37,7 +39,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.b_font = QgsFontButton()
 
         self.b_line_symbol = QgsSymbolButton(self, "Arrows")
-        # self.b_line_symbol.setDialogTitle("Arrows")
         self.b_line_symbol.setSymbolType(QgsSymbol.Line)
         self.b_line_symbol.setMinimumWidth(100)
 
@@ -68,12 +69,41 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.pb_update_legend = QPushButton("Render Legend")
         self.pb_update_legend.pressed.connect(self.update_item)
 
-        self.form_layout = QFormLayout()
-        self.form_layout.addRow("Select layer to obtain the renderer from:", self.cb_layers)
-        self.form_layout.addRow("Update legend:", self.pb_update_legend)
-        self.form_layout.addRow("Font:", self.b_font)
-        self.form_layout.addRow("Arrow:", self.b_line_symbol)
+        self.axis_x_name = QLineEdit()
+        if self.layout_item.axis_x_name:
+            self.axis_x_name.setText(self.layout_item.axis_x_name)
+        self.axis_x_name.textChanged.connect(self.update_axis_x)
+        self.axis_y_name = QLineEdit()
+        if self.layout_item.axis_y_name:
+            self.axis_y_name.setText(self.layout_item.axis_y_name)
+        self.axis_y_name.textChanged.connect(self.update_axis_y)
+
+        self.form_layout = QVBoxLayout()
+        self.form_layout.addWidget(QLabel("Select layer to obtainthe renderer from"))
+        self.form_layout.addWidget(self.cb_layers)
+        self.form_layout.addWidget(QLabel("Update legend"))
+        self.form_layout.addWidget(self.pb_update_legend)
+        self.form_layout.addWidget(QLabel("Font"))
+        self.form_layout.addWidget(self.b_font)
+        self.form_layout.addWidget(QLabel("Arrow"))
+        self.form_layout.addWidget(self.b_line_symbol)
+        self.form_layout.addWidget(QLabel("Axis X name"))
+        self.form_layout.addWidget(self.axis_x_name)
+        self.form_layout.addWidget(QLabel("Axis Y name"))
+        self.form_layout.addWidget(self.axis_y_name)
+        # self.form_layout.addRow("Select layer to obtain\nthe renderer from:", self.cb_layers)
+        # self.form_layout.addRow("Update legend:", self.pb_update_legend)
+        # self.form_layout.addRow("Font:", self.b_font)
+        # self.form_layout.addRow("Arrow:", self.b_line_symbol)
+        # self.form_layout.addRow("Axis X name:", self.axis_x_name)
+        # self.form_layout.addRow("Axis Y name:", self.axis_y_name)
         self.setLayout(self.form_layout)
+
+    def update_axis_x(self, text: str):
+        self.layout_item.set_axis_x_name(text)
+
+    def update_axis_y(self, text: str):
+        self.layout_item.set_axis_y_name(text)
 
     def update_item(self):
         # if self.render:
@@ -96,7 +126,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                     break
 
     def type(self):
-        return Texts.plot_item_bivariate_renderer_legend
+        return IDS.plot_item_bivariate_renderer_legend
 
 
 class BivariateRendererLayoutItemGuiMetadata(QgsLayoutItemAbstractGuiMetadata):
@@ -105,7 +135,7 @@ class BivariateRendererLayoutItemGuiMetadata(QgsLayoutItemAbstractGuiMetadata):
     """
 
     def __init__(self):
-        super().__init__(Texts.plot_item_bivariate_renderer_legend, Texts.plot_item_bivariate_renderer)
+        super().__init__(IDS.plot_item_bivariate_renderer_legend, Texts.plot_item_bivariate_renderer)
 
     def createItemWidget(self, item: QgsLayoutItem):  # pylint: disable=missing-docstring, no-self-use
         return BivariateRendererLayoutItemWidget(None, item)
