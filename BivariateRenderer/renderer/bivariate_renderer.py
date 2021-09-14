@@ -216,7 +216,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         identifier = self.getFeatureValueCombinationHash(value1, value2)
 
         if identifier not in self.cached:
-            feature_symbol = self.getDefaultSymbol()
+            feature_symbol = self.get_default_symbol()
             feature_symbol.setColor(self.getFeatureColor(value1, value2))
 
             self.cached[identifier] = feature_symbol.clone()
@@ -243,10 +243,6 @@ class BivariateRenderer(QgsFeatureRenderer):
         r = BivariateRenderer()
         r.setFieldName1(self.field_name_1)
         r.setFieldName2(self.field_name_2)
-        r.field_1_min = self.field_1_min
-        r.field_1_max = self.field_1_max
-        r.field_2_min = self.field_2_min
-        r.field_2_max = self.field_2_max
         r.classification_method_name = self.classification_method_name
         r.setNumberOfClasses(self.number_classes)
         r.setColorRamp1(self.color_ramp_1.clone())
@@ -308,34 +304,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         return r
 
     @staticmethod
-    def string_2_class_ranges(input_str: str) -> List[QgsClassificationRange]:
-
-        values = input_str.split("|")
-
-        ranges = []
-
-        for value in values:
-
-            vals = value.split(";")
-
-            class_range = QgsClassificationRange(vals[0], float(vals[1]), float(vals[2]))
-
-            ranges.append(class_range)
-
-        return ranges
-
-    @staticmethod
-    def value_classes_2_string(ranges: List[QgsClassificationRange]):
-
-        values = []
-
-        for values_range in ranges:
-
-            values.append(f"{values_range.label()};{values_range.lowerBound()};{values_range.upperBound()}")
-
-        return "|".join(values)
-
-    def getDefaultSymbol(self):
+    def get_default_symbol():
 
         symbol = QgsFillSymbol.createSimple({"color": "#cccccc",
                                              "outline_width": "0.0",
