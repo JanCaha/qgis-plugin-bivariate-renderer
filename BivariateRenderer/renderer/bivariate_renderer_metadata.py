@@ -1,6 +1,4 @@
-from qgis.core import (QgsRendererAbstractMetadata,
-                       QgsSymbolLayerUtils
-                       )
+from qgis.core import (QgsRendererAbstractMetadata)
 
 from PyQt5.QtXml import QDomElement
 
@@ -21,28 +19,7 @@ class BivariateRendererMetadata(QgsRendererAbstractMetadata):
         return Texts.bivariate_renderer_full_name
 
     def createRenderer(self, element: QDomElement, context):
-
-        r = BivariateRenderer()
-
-        r.setFieldName1(element.attribute("field_name_1"))
-        r.setFieldName2(element.attribute("field_name_2"))
-
-        r.setNumberOfClasses(element.attribute("number_of_classes"))
-        r.setClassificationMethodName(element.attribute("classification_method_name "))
-
-        r.setLimitValues(float(element.attribute("field_1_min")), float(element.attribute("field_1_max")),
-                         float(element.attribute("field_2_min")), float(element.attribute("field_2_max")))
-
-        color_ramp_1_elem = element.firstChildElement("colorramp")
-        r.setColorRamp1(QgsSymbolLayerUtils.loadColorRamp(color_ramp_1_elem))
-
-        color_ramp_2_elem = element.lastChildElement("colorramp")
-        r.setColorRamp2(QgsSymbolLayerUtils.loadColorRamp(color_ramp_2_elem))
-
-        r.setField1Classes(BivariateRenderer.string_2_class_ranges(element.attribute("field_1_classes")))
-        r.setField2Classes(BivariateRenderer.string_2_class_ranges(element.attribute("field_2_classes")))
-
-        return r
+        return BivariateRenderer.create_render_from_element(element)
 
     def createRendererWidget(self, layer, style, renderer):
         return BivariateRendererWidget(layer, style, renderer)

@@ -350,26 +350,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         return r
 
     def load(self, symbology_elem: QDomElement, context):
-
-        r = BivariateRenderer()
-
-        r.setFieldName1(symbology_elem.attribute("field_name_1"))
-        r.setFieldName2(symbology_elem.attribute("field_name_2"))
-
-        r.setNumberOfClasses(symbology_elem.attribute("number_of_classes"))
-
-        r.setColorRamp1(QgsSymbolLayerUtils.loadColorRamp(symbology_elem.attribute("color_ramp_1")))
-        r.setColorRamp2(QgsSymbolLayerUtils.loadColorRamp(symbology_elem.attribute("color_ramp_2")))
-
-        r.setField1Classes(self.string_2_class_ranges(symbology_elem.attribute("field_1_classes")))
-        r.setField2Classes(self.string_2_class_ranges(symbology_elem.attribute("field_2_classes")))
-
-        r.field_1_min = symbology_elem.attribute("field_1_min")
-        r.field_1_max = symbology_elem.attribute("field_1_max")
-        r.field_2_min = symbology_elem.attribute("field_2_min")
-        r.field_2_max = symbology_elem.attribute("field_2_max")
-
-        return r
+        return self.create_render_from_element(symbology_elem)
 
     @staticmethod
     def get_default_symbol():
