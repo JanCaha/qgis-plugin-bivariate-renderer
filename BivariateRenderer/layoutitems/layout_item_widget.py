@@ -6,7 +6,8 @@ from qgis.core import (QgsLayoutItem,
                        QgsMapLayer,
                        QgsMapLayerType,
                        QgsLayoutItemPolyline,
-                       QgsSymbol)
+                       QgsSymbol,
+                       QgsTextFormat)
 
 from qgis.gui import (QgsLayoutItemBaseWidget,
                       QgsLayoutItemPropertiesWidget,
@@ -35,12 +36,14 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.layout_item = layout_object
 
-        self.font = None
         self.b_font = QgsFontButton()
+        log(self.layout_item.get_font.pointSize())
+        self.b_font.setTextFormat(QgsTextFormat.fromQFont(self.layout_item.get_font))
+        self.b_font.changed.connect(self.pass_font_to_item)
 
         self.b_line_symbol = QgsSymbolButton(self, "Arrows")
         self.b_line_symbol.setSymbolType(QgsSymbol.Line)
-        self.b_line_symbol.setMinimumWidth(100)
+        self.b_line_symbol.setMinimumWidth(50)
 
         self.layers = QgsProject.instance().mapLayers()
 
@@ -70,12 +73,12 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.pb_update_legend.pressed.connect(self.update_item)
 
         self.axis_x_name = QLineEdit()
-        if self.layout_item.axis_x_name:
-            self.axis_x_name.setText(self.layout_item.axis_x_name)
+        if self.layout_item.text_axis_x.text():
+            self.axis_x_name.setText(self.layout_item.text_axis_x.text())
         self.axis_x_name.textChanged.connect(self.update_axis_x)
         self.axis_y_name = QLineEdit()
-        if self.layout_item.axis_y_name:
-            self.axis_y_name.setText(self.layout_item.axis_y_name)
+        if self.layout_item.text_axis_y.text():
+            self.axis_y_name.setText(self.layout_item.text_axis_y.text())
         self.axis_y_name.textChanged.connect(self.update_axis_y)
 
         self.form_layout = QVBoxLayout()
@@ -98,6 +101,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         # self.form_layout.addRow("Axis X name:", self.axis_x_name)
         # self.form_layout.addRow("Axis Y name:", self.axis_y_name)
         self.setLayout(self.form_layout)
+
+    def pass_font_to_item(self):
+        self.layout_item.set_font(self.b_font.textFormat().toQFont())
 
     def update_axis_x(self, text: str):
         self.layout_item.set_axis_x_name(text)
@@ -124,6 +130,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                     self.layout_item.set_linked_layer(layer)
                     break
+
+        self.axis_x_name.setText(self.layout_item.text_axis_x.text())
+        self.axis_y_name.setText(self.layout_item.text_axis_y.text())
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
