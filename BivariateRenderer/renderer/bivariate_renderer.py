@@ -243,7 +243,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setColorRamp2(self.color_ramp_2.clone())
         r.setField1Classes(self.field_1_classes)
         r.setField2Classes(self.field_2_classes)
-        r.cached = copy.deepcopy(self.cached)
+
         return r
 
     def save(self, doc: QDomDocument, context):
