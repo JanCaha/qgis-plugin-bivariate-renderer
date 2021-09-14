@@ -156,12 +156,6 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.field_2_max = (self.field_2_classes[len(self.field_2_classes) - 1].lowerBound() +
                             self.field_2_classes[len(self.field_2_classes) - 1].upperBound()) / 2
 
-    def setLimitValues(self, f1_min: float, f1_max: float, f2_min: float, f2_max: float) -> NoReturn:
-        self.field_1_min = f1_min
-        self.field_1_max = f1_max
-        self.field_2_min = f2_min
-        self.field_2_max = f2_max
-
     def positionValueField1(self, value: float) -> float:
 
         class_value1 = None
