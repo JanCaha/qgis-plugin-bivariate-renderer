@@ -1,6 +1,6 @@
+from __future__ import annotations
 from typing import NoReturn, List, Dict, Union
 from pathlib import Path
-import copy
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -292,6 +292,62 @@ class BivariateRenderer(QgsFeatureRenderer):
         renderer_elem.appendChild(ranges_elem2)
 
         return renderer_elem
+
+    @staticmethod
+    def create_render_from_element(element: QDomElement) -> BivariateRenderer:
+
+        r = BivariateRenderer()
+
+        r.setFieldName1(element.attribute("field_name_1"))
+        r.setFieldName2(element.attribute("field_name_2"))
+
+        r.setNumberOfClasses(element.attribute("number_of_classes"))
+        r.setClassificationMethodName(element.attribute("classification_method_name "))
+
+        color_ramp_1_elem = element.firstChildElement("colorramp")
+        r.setColorRamp1(QgsSymbolLayerUtils.loadColorRamp(color_ramp_1_elem))
+
+        color_ramp_2_elem = element.lastChildElement("colorramp")
+        r.setColorRamp2(QgsSymbolLayerUtils.loadColorRamp(color_ramp_2_elem))
+
+        ranges_field_1 = element.firstChildElement("ranges_1")
+
+        field_1_classes = []
+
+        range_elem = ranges_field_1.firstChildElement()
+
+        while not range_elem.isNull():
+
+            if range_elem.tagName() == "range_1":
+                lower_value = float(range_elem.attribute("lower"))
+                upper_value = float(range_elem.attribute("upper"))
+                label = range_elem.attribute("label")
+
+                field_1_classes.append(QgsClassificationRange(label, lower_value, upper_value))
+
+            range_elem = range_elem.nextSiblingElement()
+
+        ranges_field_2 = element.firstChildElement("ranges_2")
+
+        field_2_classes = []
+
+        range_elem = ranges_field_2.firstChildElement()
+
+        while not range_elem.isNull():
+
+            if range_elem.tagName() == "range_2":
+                lower_value = float(range_elem.attribute("lower"))
+                upper_value = float(range_elem.attribute("upper"))
+                label = range_elem.attribute("label")
+
+                field_2_classes.append(QgsClassificationRange(label, lower_value, upper_value))
+
+            range_elem = range_elem.nextSiblingElement()
+
+        r.setField1Classes(field_1_classes)
+        r.setField2Classes(field_2_classes)
+
+        return r
 
     def load(self, symbology_elem: QDomElement, context):
 
