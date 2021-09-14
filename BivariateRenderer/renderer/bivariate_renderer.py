@@ -74,7 +74,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return int(size_constant)
 
-    def getLegendCategories(self, coord_start_x: float, coord_start_y: float) -> Dict[int, Dict[str, Union[int, str]]]:
+    def getLegendCategories(self) -> Dict[int, Dict[str, Union[int, str]]]:
 
         position = {}
 
