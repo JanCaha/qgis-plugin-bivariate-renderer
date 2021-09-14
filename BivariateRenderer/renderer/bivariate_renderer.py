@@ -265,13 +265,31 @@ class BivariateRenderer(QgsFeatureRenderer):
         color_ramp_elem = QgsSymbolLayerUtils.saveColorRamp("color_ramp_2", self.color_ramp_2, doc)
         renderer_elem.appendChild(color_ramp_elem)
 
-        renderer_elem.setAttribute('field_1_classes', self.value_classes_2_string(self.field_1_classes))
-        renderer_elem.setAttribute('field_2_classes', self.value_classes_2_string(self.field_2_classes))
+        ranges_elem1 = doc.createElement("ranges_1")
 
-        renderer_elem.setAttribute('field_1_min', self.field_1_min)
-        renderer_elem.setAttribute('field_1_max', self.field_1_max)
-        renderer_elem.setAttribute('field_2_min', self.field_2_min)
-        renderer_elem.setAttribute('field_2_max', self.field_2_max)
+        for class_range in self.field_1_classes:
+            range_elem = doc.createElement("range_1")
+
+            range_elem.setAttribute("lower", str(class_range.lowerBound()))
+            range_elem.setAttribute("upper", str(class_range.upperBound()))
+            range_elem.setAttribute("label", class_range.label())
+
+            ranges_elem1.appendChild(range_elem)
+
+        renderer_elem.appendChild(ranges_elem1)
+
+        ranges_elem2 = doc.createElement("ranges_2")
+
+        for class_range in self.field_2_classes:
+            range_elem = doc.createElement("range_2")
+
+            range_elem.setAttribute("lower", str(class_range.lowerBound()))
+            range_elem.setAttribute("upper", str(class_range.upperBound()))
+            range_elem.setAttribute("label", class_range.label())
+
+            ranges_elem2.appendChild(range_elem)
+
+        renderer_elem.appendChild(ranges_elem2)
 
         return renderer_elem
 
