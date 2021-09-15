@@ -38,6 +38,8 @@ class BivariateRendererLayoutItem(QgsLayoutItemGroup):
     axis_arrow_x: QgsLayoutItemPolyline
     axis_arrow_y: QgsLayoutItemPolyline
 
+    rectangles: List[QgsLayoutItemPolygon] = []
+
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -86,6 +88,32 @@ class BivariateRendererLayoutItem(QgsLayoutItemGroup):
 
         if self.text_axis_y.text() == DEFAULT_AXIS_Y_TEXT:
             self.set_axis_y_name(self.renderer.field_name_2)
+
+        self.draw_polygons()
+
+    def draw_polygons(self):
+
+        if self.rectangles:
+
+            for rect in self.rectangles:
+                self.layout.removeItem(rect)
+
+            self.rectangles = []
+
+        if self.layer:
+
+            polygons = self.renderer.generate_legend_polygons(0, 100, 0, 100)
+
+            for poly in polygons:
+
+                polygon_f = QPolygonF(QRectF(0, 0, poly.size, poly.size))
+
+                polygon = QgsLayoutItemPolygon(polygon_f, self.layout)
+                polygon.setPos(poly.x, poly.y)
+                polygon.setSymbol(poly.symbol)
+
+                self.rectangles.append(polygon)
+                self.layout.addItem(polygon)
 
     def updated(self):
         self.update(self.rect())
