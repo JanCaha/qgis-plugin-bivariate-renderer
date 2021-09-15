@@ -53,7 +53,7 @@ class BivariateRendererLayoutItem(QgsLayoutItemGroup):
         text_size: QRectF = self.text_axis_y.sizeForText()
         self.text_axis_y.setRect(0, 0, text_size.width(), text_size.height())
         self.text_axis_y.setReferencePoint(QgsLayoutItem.Middle)
-        self.text_axis_y.setPos(-10, 50)
+        self.text_axis_y.setPos(-10 - text_size.height(), 50 + text_size.width() / 2)
         self.text_axis_y.rotateItem(-90, self.text_axis_y.positionAtReferencePoint(self.referencePoint()))
 
         self.layout.addItem(self.text_axis_y)
