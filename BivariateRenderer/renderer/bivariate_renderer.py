@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import NoReturn, List, Dict, Union
 from pathlib import Path
+from dataclasses import dataclass
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -361,3 +362,60 @@ class BivariateRenderer(QgsFeatureRenderer):
                                              'outline_style': 'no'})
 
         return symbol
+
+    def get_symbol_for_values(self, value1: float, value2: float) -> QgsFillSymbol:
+
+        return self.symbol_for_values(value1, value2)
+
+    def symbol_for_values(self, value1: float, value2: float) -> QgsFillSymbol:
+
+        identifier = self.getFeatureValueCombinationHash(value1, value2)
+
+        if identifier not in self.cached:
+            feature_symbol = self.get_default_symbol()
+            feature_symbol.setColor(self.getFeatureColor(value1, value2))
+
+            self.cached[identifier] = feature_symbol.clone()
+
+        return self.cached[identifier]
+
+    def legend_polygon_size(self, width: float) -> float:
+
+        size_constant = width / self.number_classes
+
+        return size_constant
+
+    def generate_legend_polygons(self,
+                                 start_x: float, end_x: float,
+                                 start_y: float, end_y: float) -> List[LegendPolygon]:
+
+        polygons = []
+
+        size_constant = self.legend_polygon_size(end_x - start_x)
+
+        x = 0
+        for field_1_cat in self.field_1_classes:
+
+            y = 0
+            for field_2_cat in self.field_2_classes:
+
+                polygons.append(LegendPolygon(x=start_x + size_constant * x,
+                                              y=end_y - size_constant - size_constant * y,
+                                              symbol=self.get_symbol_for_values(
+                                                  (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
+                                                  (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2),
+                                              size=size_constant))
+
+                y += 1
+            x += 1
+
+        return polygons
+
+
+@dataclass
+class LegendPolygon:
+
+    x: float
+    y: float
+    symbol: QgsFillSymbol
+    size: float
