@@ -35,6 +35,9 @@ class BivariateRendererLayoutItem(QgsLayoutItemGroup):
     text_axis_x: QgsLayoutItemLabel
     text_axis_y: QgsLayoutItemLabel
 
+    axis_arrow_x: QgsLayoutItemPolyline
+    axis_arrow_y: QgsLayoutItemPolyline
+
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -56,8 +59,20 @@ class BivariateRendererLayoutItem(QgsLayoutItemGroup):
         self.text_axis_y.setPos(-10 - text_size.height(), 50 + text_size.width() / 2)
         self.text_axis_y.rotateItem(-90, self.text_axis_y.positionAtReferencePoint(self.referencePoint()))
 
+        line_x = QPolygonF([QPointF(-5, 105),
+                            QPointF(100, 105)])
+
+        self.axis_arrow_x = QgsLayoutItemPolyline(line_x, self.layout)
+
+        line_y = QPolygonF([QPointF(-5, 105),
+                            QPointF(-5, 0)])
+
+        self.axis_arrow_y = QgsLayoutItemPolyline(line_y, self.layout)
+
         self.layout.addItem(self.text_axis_y)
         self.layout.addItem(self.text_axis_x)
+        self.layout.addItem(self.axis_arrow_x)
+        self.layout.addItem(self.axis_arrow_y)
 
         # self.addItem(self.text_axis_y)
         # self.addItem(self.text_axis_x)
