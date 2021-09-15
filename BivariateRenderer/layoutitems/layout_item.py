@@ -59,8 +59,8 @@ class BivariateRendererLayoutItem(QgsLayoutItemGroup):
         self.layout.addItem(self.text_axis_y)
         self.layout.addItem(self.text_axis_x)
 
-        self.addItem(self.text_axis_y)
-        self.addItem(self.text_axis_x)
+        # self.addItem(self.text_axis_y)
+        # self.addItem(self.text_axis_x)
         
     def set_linked_layer(self, layer: QgsVectorLayer) -> NoReturn:
         self.layer = layer
