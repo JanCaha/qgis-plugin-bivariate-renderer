@@ -116,7 +116,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         #     self.render.render_legend_to_temp()
         #     self.layout_item.setPicturePath(self.render.temp_folder_legend_file)
 
-        self.layout_item.build_element()
+        # self.layout_item.build_element()
+        pass
 
     def update_layer_to_work_with(self):
 
@@ -130,9 +131,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                     self.layout_item.set_linked_layer(layer)
                     break
-
-        self.axis_x_name.setText(self.layout_item.text_axis_x.text())
-        self.axis_y_name.setText(self.layout_item.text_axis_y.text())
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
