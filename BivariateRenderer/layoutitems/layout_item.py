@@ -45,6 +45,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_axis_y = "Axis Y"
         self.text_format = QgsTextFormat()
 
+        self.renderer = None
+
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
         render_context = context.renderContext()
@@ -58,9 +60,12 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
 
-        legend_render.render(render_context,
-                             item_size.width(),
-                             item_size.height())
+        if self.renderer:
+
+            legend_render.render(render_context,
+                                 item_size.width(),
+                                 item_size.height(),
+                                 self.renderer.generate_legend_polygons())
 
     # def writePropertiesToElement(self, element: QtXml.QDomElement, document: QtXml.QDomDocument, context: QgsReadWriteContext) -> bool:
     #     # todo add
@@ -74,11 +79,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.layer = layer
         self.renderer = layer.renderer().clone()
 
-
     def set_text_format(self, text_format: QgsTextFormat):
-
         self.text_format = text_format
-
         self.refresh()
 
     def set_axis_x_name(self, name: str) -> NoReturn:
