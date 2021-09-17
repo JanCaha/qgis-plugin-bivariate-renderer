@@ -1,3 +1,6 @@
+from typing import List
+import math
+
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
 from qgis.PyQt.QtGui import QPolygonF, QBrush, QColor
 
@@ -5,6 +8,9 @@ from qgis.core import (QgsTextFormat,
                        QgsLineSymbol,
                        QgsRenderContext,
                        QgsTextRenderer)
+
+from ..renderer.bivariate_renderer import LegendPolygon
+from ..utils import log
 
 
 class LegendRenderer:
@@ -24,10 +30,19 @@ class LegendRenderer:
 
         self.axis_line_symbol = QgsLineSymbol.createSimple({})
 
-    def render(self, contex: QgsRenderContext, width: float, height: float):
+    def render(self, contex: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]):
+
+        min_size = min(width, height)
+
+        width = min_size
+        height = min_size
+
+        log(f"Sizes before scale: {width} x {height}.")
 
         width = width * contex.scaleFactor()
         height = height * contex.scaleFactor()
+
+        log(f"Sizes before scale: {width} x {height}.")
 
         painter = contex.painter()
 
@@ -37,22 +52,53 @@ class LegendRenderer:
 
         # TODO do it around each drawing
         painter.save()
-        painter.setBrush(QBrush(QColor(255, 0, 0)))
+
         painter.setPen(Qt.NoPen)
-        painter.drawRect(QRectF(20 * contex.scaleFactor(), 20 * contex.scaleFactor(),
-                                50 * contex.scaleFactor(), 50 * contex.scaleFactor()))
+
+        size_constant = (width * 0.8) / 3
+
+        for polygon in polygons:
+
+            painter.setBrush(QBrush(polygon.symbol.color()))
+
+            painter.drawRect(QRectF(width * 0.2 + polygon.x * size_constant,
+                                    width * 0.8 - (polygon.y + 1) * size_constant,
+                                    size_constant, size_constant))
+
         painter.restore()
 
         self.axis_line_symbol.startRender(contex)
 
-        self.axis_line_symbol.renderPolyline(QPolygonF([QPointF(0 * contex.scaleFactor(), 0 * contex.scaleFactor()),
-                                                        QPointF(60 * contex.scaleFactor(), 60 * contex.scaleFactor())]),
+        self.axis_line_symbol.renderPolyline(QPolygonF([QPointF(width * 0.15, height * 0.85),
+                                                        QPointF(width * 1, height * 0.85)]),
+                                             None, contex)
+
+        self.axis_line_symbol.renderPolyline(QPolygonF([QPointF(width * 0.15, height * 0.85),
+                                                        QPointF(width * 0.15, height * 0)]),
                                              None, contex)
 
         self.axis_line_symbol.stopRender(contex)
 
-        QgsTextRenderer.drawText(QPointF(50 * contex.scaleFactor(), 50 * contex.scaleFactor()), 0, QgsTextRenderer.AlignCenter, [self.axis_title_x], contex, self.text_format)
-        QgsTextRenderer.drawText(QPointF(10 * contex.scaleFactor(), 30 * contex.scaleFactor()), 0, QgsTextRenderer.AlignCenter, [self.axis_title_y], contex, self.text_format)
+        text_height = QgsTextRenderer.textHeight(contex,
+                                                 self.text_format,
+                                                 textLines=[self.axis_title_x])
+
+        QgsTextRenderer.drawText(QPointF(width * 0.6, height * 0.9 + text_height / 2),
+                                 0,
+                                 QgsTextRenderer.AlignCenter,
+                                 [self.axis_title_x],
+                                 contex,
+                                 self.text_format,
+                                 QgsTextRenderer.AlignVCenter)
+
+
+        QgsTextRenderer.drawText(QPointF(width * 0.1, height * 0.4),
+                                 math.radians(90),
+                                 QgsTextRenderer.AlignCenter,
+                                 [self.axis_title_y],
+                                 contex,
+                                 self.text_format,
+                                 QgsTextRenderer.AlignVCenter)
 
         painter.restore()
 
