@@ -37,9 +37,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item = layout_object
 
         self.b_font = QgsFontButton()
-        log(self.layout_item.get_font.pointSize())
-        self.b_font.setTextFormat(QgsTextFormat.fromQFont(self.layout_item.get_font))
-        self.b_font.changed.connect(self.pass_font_to_item)
+        self.b_font.setTextFormat(self.layout_item.text_format)
+        self.b_font.changed.connect(self.pass_textformat_to_item)
 
         self.b_line_symbol = QgsSymbolButton(self, "Arrows")
         self.b_line_symbol.setSymbolType(QgsSymbol.Line)
@@ -73,12 +72,12 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.pb_update_legend.pressed.connect(self.update_item)
 
         self.axis_x_name = QLineEdit()
-        if self.layout_item.text_axis_x.text():
-            self.axis_x_name.setText(self.layout_item.text_axis_x.text())
+        if self.layout_item.text_axis_x:
+            self.axis_x_name.setText(self.layout_item.text_axis_x)
         self.axis_x_name.textChanged.connect(self.update_axis_x)
         self.axis_y_name = QLineEdit()
-        if self.layout_item.text_axis_y.text():
-            self.axis_y_name.setText(self.layout_item.text_axis_y.text())
+        if self.layout_item.text_axis_y:
+            self.axis_y_name.setText(self.layout_item.text_axis_y)
         self.axis_y_name.textChanged.connect(self.update_axis_y)
 
         self.form_layout = QVBoxLayout()
@@ -102,22 +101,15 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         # self.form_layout.addRow("Axis Y name:", self.axis_y_name)
         self.setLayout(self.form_layout)
 
-    def pass_font_to_item(self):
-        self.layout_item.set_font(self.b_font.textFormat().toQFont())
+    def pass_textformat_to_item(self):
+        self.layout_item.text_format = self.b_font.textFormat()
+        self.layout_item.refresh()
 
     def update_axis_x(self, text: str):
         self.layout_item.set_axis_x_name(text)
 
     def update_axis_y(self, text: str):
         self.layout_item.set_axis_y_name(text)
-
-    def update_item(self):
-        # if self.render:
-        #     self.render.render_legend_to_temp()
-        #     self.layout_item.setPicturePath(self.render.temp_folder_legend_file)
-
-        # self.layout_item.build_element()
-        pass
 
     def update_layer_to_work_with(self):
 
