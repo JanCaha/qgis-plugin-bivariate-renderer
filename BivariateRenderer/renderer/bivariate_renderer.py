@@ -385,13 +385,9 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return size_constant
 
-    def generate_legend_polygons(self,
-                                 start_x: float, end_x: float,
-                                 start_y: float, end_y: float) -> List[LegendPolygon]:
+    def generate_legend_polygons(self) -> List[LegendPolygon]:
 
         polygons = []
-
-        size_constant = self.legend_polygon_size(end_x - start_x)
 
         x = 0
         for field_1_cat in self.field_1_classes:
@@ -399,13 +395,12 @@ class BivariateRenderer(QgsFeatureRenderer):
             y = 0
             for field_2_cat in self.field_2_classes:
 
-                polygons.append(LegendPolygon(x=start_x + size_constant * x,
-                                              y=end_y - size_constant - size_constant * y,
+                polygons.append(LegendPolygon(x=x,
+                                              y=y,
                                               symbol=self.get_symbol_for_values(
                                                   (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
-                                                  (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2),
-                                              size=size_constant))
-
+                                                  (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
+                                              ))
                 y += 1
             x += 1
 
@@ -418,4 +413,3 @@ class LegendPolygon:
     x: float
     y: float
     symbol: QgsFillSymbol
-    size: float
