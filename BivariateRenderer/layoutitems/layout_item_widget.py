@@ -68,9 +68,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         if self.layout_item.linked_layer_name:
             self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
 
-        self.pb_update_legend = QPushButton("Render Legend")
-        self.pb_update_legend.pressed.connect(self.update_item)
-
         self.axis_x_name = QLineEdit()
         if self.layout_item.text_axis_x:
             self.axis_x_name.setText(self.layout_item.text_axis_x)
@@ -83,8 +80,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.form_layout = QVBoxLayout()
         self.form_layout.addWidget(QLabel("Select layer to obtainthe renderer from"))
         self.form_layout.addWidget(self.cb_layers)
-        self.form_layout.addWidget(QLabel("Update legend"))
-        self.form_layout.addWidget(self.pb_update_legend)
         self.form_layout.addWidget(QLabel("Font"))
         self.form_layout.addWidget(self.b_font)
         self.form_layout.addWidget(QLabel("Arrow"))
@@ -93,12 +88,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.form_layout.addWidget(self.axis_x_name)
         self.form_layout.addWidget(QLabel("Axis Y name"))
         self.form_layout.addWidget(self.axis_y_name)
-        # self.form_layout.addRow("Select layer to obtain\nthe renderer from:", self.cb_layers)
-        # self.form_layout.addRow("Update legend:", self.pb_update_legend)
-        # self.form_layout.addRow("Font:", self.b_font)
-        # self.form_layout.addRow("Arrow:", self.b_line_symbol)
-        # self.form_layout.addRow("Axis X name:", self.axis_x_name)
-        # self.form_layout.addRow("Axis Y name:", self.axis_y_name)
         self.setLayout(self.form_layout)
 
     def pass_textformat_to_item(self):
