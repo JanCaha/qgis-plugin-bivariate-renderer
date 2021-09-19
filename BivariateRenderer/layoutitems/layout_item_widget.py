@@ -18,7 +18,7 @@ from qgis.gui import (QgsLayoutItemBaseWidget,
                       QgsSymbolButton)
 
 from ..text_constants import Texts, IDS
-from ..utils import log
+from ..utils import log, get_symbol_dict
 from .layout_item import BivariateRendererLayoutItem
 
 
@@ -92,12 +92,11 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.setLayout(self.form_layout)
 
     def pass_linesymbol(self):
-        symbol = QgsLineSymbol(self.b_line_symbol.symbol().clone())
-        self.layout_item.set_line_format(symbol)
+        self.layout_item.set_line_format(self.b_line_symbol.symbol().clone())
+        # log(get_symbol_dict(self.b_line_symbol.symbol().clone()))
 
     def pass_textformat_to_item(self):
-        self.layout_item.text_format = self.b_font.textFormat()
-        self.layout_item.refresh()
+        self.layout_item.set_text_format(self.b_font.textFormat())
 
     def update_axis_x(self, text: str):
         self.layout_item.set_axis_x_name(text)
