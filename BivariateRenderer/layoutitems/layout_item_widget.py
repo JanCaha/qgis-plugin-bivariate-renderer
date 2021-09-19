@@ -43,6 +43,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.b_line_symbol = QgsSymbolButton(self, "Arrows")
         self.b_line_symbol.setSymbolType(QgsSymbol.Line)
         self.b_line_symbol.setMinimumWidth(50)
+        self.b_line_symbol.changed.connect(self.pass_linesymbol)
 
         self.layers = QgsProject.instance().mapLayers()
 
@@ -89,6 +90,10 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.form_layout.addWidget(QLabel("Axis Y name"))
         self.form_layout.addWidget(self.axis_y_name)
         self.setLayout(self.form_layout)
+
+    def pass_linesymbol(self):
+        symbol = QgsLineSymbol(self.b_line_symbol.symbol().clone())
+        self.layout_item.set_line_format(symbol)
 
     def pass_textformat_to_item(self):
         self.layout_item.text_format = self.b_font.textFormat()
