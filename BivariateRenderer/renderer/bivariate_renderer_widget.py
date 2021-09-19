@@ -55,11 +55,15 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     bivariate_renderer: BivariateRenderer
 
+    legend_renderer: LegendRenderer
+
     classification_methods = {QgsClassificationEqualInterval().name(): QgsClassificationEqualInterval(),
                               QgsClassificationJenks().name(): QgsClassificationJenks(),
                               QgsClassificationQuantile().name(): QgsClassificationQuantile(),
                               QgsClassificationPrettyBreaks().name(): QgsClassificationPrettyBreaks(),
                               QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic()}
+
+    image: QImage
 
     def __init__(self, layer, style, renderer: BivariateRenderer):
 
@@ -69,6 +73,8 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.bivariate_renderer = BivariateRenderer()
         else:
             self.bivariate_renderer = renderer.clone()
+
+        self.legend_renderer = LegendRenderer()
 
         # objects
         self.classification_method = QgsClassificationEqualInterval()
@@ -141,12 +147,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         else:
             self.bt_color_ramp2.setColorRamp(self.default_color_ramp_2)
 
-        svg_path = path_to_legend_svg()
-        write_text_to_file(svg_path, "")
-        self.svg_pixmap = QIcon(svg_path.absolute().as_posix()).pixmap(QtCore.QSize(200, 200))
-
-        self.svg_label = QLabel()
-        self.svg_label.setPixmap(self.svg_pixmap)
+        self.label_legend = QLabel()
 
         self.pb_render_legend = QPushButton("Render Legend")
         self.pb_render_legend.pressed.connect(self.updateLegend)
@@ -159,26 +160,36 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout.addRow("Select field 2:", self.cb_field2)
         self.form_layout.addRow("Select color ramp 2:", self.bt_color_ramp2)
         self.form_layout.addRow("", self.pb_render_legend)
-        self.form_layout.addRow("Example of legend:", self.svg_label)
+        self.form_layout.addRow("Example of legend:", self.label_legend)
         self.setLayout(self.form_layout)
 
-        # log(self.bivariate_renderer.getLegendCategories())
-
     def updateLegend(self):
-        self.renderLegend()
-        self.loadSVG()
 
-    def renderLegend(self):
-        self.bivariate_renderer.renderLegend()
+        scale_factor = 1
 
-    def loadSVG(self):
-        svg_path = path_to_legend_svg()
+        size = 300
 
-        self.svg_pixmap = QIcon(svg_path.absolute().as_posix()).pixmap(QtCore.QSize(200, 200))
+        self.image = QImage(size, size, QImage.Format_ARGB32)
+        self.image.fill(QColor(0, 0, 0, 0))
 
-        self.svg_label.clear()
-        self.svg_label.setPixmap(self.svg_pixmap)
-        self.svg_label.repaint()
+        painter = QPainter(self.image)
+
+        context = QgsRenderContext.fromQPainter(painter)
+        context.setScaleFactor(scale_factor)
+
+        text_format = QgsTextFormat()
+        text_format.setSize(60)
+
+        axis_line_symbol = QgsLineSymbol.createSimple({'line_width': 3})
+
+        self.legend_renderer.text_format = text_format
+        self.legend_renderer.axis_line_symbol = axis_line_symbol
+
+        self.legend_renderer.render(context, size, size, self.bivariate_renderer.generate_legend_polygons())
+
+        painter.end()
+
+        self.label_legend.setPixmap(QPixmap.fromImage(self.image))
 
     def setNumberOfClasses(self) -> NoReturn:
 
