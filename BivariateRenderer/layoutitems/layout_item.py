@@ -1,26 +1,12 @@
 from typing import NoReturn, List
-from pathlib import Path
 
-from PyQt5.QtCore import QSize, Qt, QCoreApplication, QRectF, QPoint, QPointF
-from PyQt5.QtWebKitWidgets import QWebPage
-from PyQt5.QtGui import QPalette, QPolygonF, QColor, QTransform, QFont
-
-from qgis.core import (QgsLayoutItemHtml,
-                       QgsNetworkAccessManager,
-QgsLayoutSize,
-                       QgsLayoutItem,
-                    QgsLayoutItemPicture,
-QgsLayoutItemGroup,
-QgsLayoutItemPolygon,
-QgsLayoutItemPolyline,
-QgsLayoutItemLabel,
-QgsLayout,
-QgsLayoutItemShape,
+from qgis.core import (QgsLayoutItem,
+                       QgsLayout,
                        QgsLayoutItemAbstractMetadata,
                        QgsVectorLayer,
                        QgsTextFormat,
                        QgsLayoutItemRenderContext,
-                       QgsUnitTypes)
+                       QgsLineSymbol)
 
 from ..text_constants import Texts, IDS
 from ..utils import log
