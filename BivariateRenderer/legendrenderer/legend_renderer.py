@@ -37,12 +37,8 @@ class LegendRenderer:
         width = min_size
         height = min_size
 
-        log(f"Sizes before scale: {width} x {height}.")
-
         width = width * contex.scaleFactor()
         height = height * contex.scaleFactor()
-
-        log(f"Sizes before scale: {width} x {height}.")
 
         painter = contex.painter()
 
