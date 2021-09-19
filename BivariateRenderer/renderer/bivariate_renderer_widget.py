@@ -180,10 +180,9 @@ class BivariateRendererWidget(QgsRendererWidget):
         text_format = QgsTextFormat()
         text_format.setSize(60)
 
-        axis_line_symbol = QgsLineSymbol.createSimple({'line_width': 3})
-
         self.legend_renderer.text_format = text_format
-        self.legend_renderer.axis_line_symbol = axis_line_symbol
+        self.legend_renderer.axis_title_x = self.cb_field1.currentText()
+        self.legend_renderer.axis_title_y = self.cb_field2.currentText()
 
         self.legend_renderer.render(context, size, size, self.bivariate_renderer.generate_legend_polygons())
 
