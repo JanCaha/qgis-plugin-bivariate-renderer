@@ -1,22 +1,22 @@
-from PyQt5.QtWidgets import QFormLayout, QComboBox, QPushButton, QLineEdit, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import (QComboBox,
+                             QPushButton,
+                             QLineEdit,
+                             QVBoxLayout,
+                             QLabel)
 
 from qgis.core import (QgsLayoutItem,
                        QgsProject,
                        QgsVectorLayer,
                        QgsMapLayer,
                        QgsMapLayerType,
-                       QgsLayoutItemPolyline,
                        QgsSymbol,
-                       QgsTextFormat)
+                       QgsLineSymbol)
 
 from qgis.gui import (QgsLayoutItemBaseWidget,
-                      QgsLayoutItemPropertiesWidget,
                       QgsLayoutItemAbstractGuiMetadata,
-                      QgsDoubleSpinBox,
                       QgsFontButton,
                       QgsSymbolButton)
 
-from ..renderer.bivariate_renderer import BivariateRenderer
 from ..text_constants import Texts, IDS
 from ..utils import log
 from .layout_item import BivariateRendererLayoutItem
