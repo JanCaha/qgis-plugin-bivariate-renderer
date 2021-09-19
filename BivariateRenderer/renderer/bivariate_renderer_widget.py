@@ -1,25 +1,38 @@
 from typing import NoReturn
 
-from PyQt5.QtWidgets import QFormLayout, QLabel, QComboBox, QPushButton
-from PyQt5.QtGui import QColor, QIcon
-from PyQt5 import QtCore
+from qgis.PyQt.QtGui import (QImage,
+                             QColor,
+                             QPainter,
+                             QPixmap)
 
-from qgis.gui import (QgsRendererWidget, QgsColorRampButton, QgsFieldComboBox,
+from qgis.PyQt.QtWidgets import (QLabel,
+                                 QFormLayout,
+                                 QLabel,
+                                 QComboBox,
+                                 QPushButton)
+
+from qgis.gui import (QgsRendererWidget,
+                      QgsColorRampButton,
+                      QgsFieldComboBox,
                       QgsDoubleSpinBox)
 
-from qgis.core import (QgsGradientColorRamp, QgsClassificationMethod,
+from qgis.core import (QgsGradientColorRamp,
+                       QgsClassificationMethod,
                        QgsClassificationJenks,
                        QgsClassificationEqualInterval,
                        QgsClassificationQuantile,
                        QgsClassificationPrettyBreaks,
                        QgsClassificationLogarithmic,
-                       QgsFieldProxyModel)
+                       QgsFieldProxyModel,
+                       QgsRenderContext,
+                       QgsTextFormat,
+                       QgsLineSymbol)
 
 
 from .bivariate_renderer import BivariateRenderer
-from ..utils import (log,
-                     path_to_legend_svg,
-                     write_text_to_file)
+from ..legendrenderer.legend_renderer import LegendRenderer
+
+from ..utils import (log)
 
 from ..text_constants import Texts
 
