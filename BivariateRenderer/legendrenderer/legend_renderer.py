@@ -10,7 +10,7 @@ from qgis.core import (QgsTextFormat,
                        QgsTextRenderer)
 
 from ..renderer.bivariate_renderer import LegendPolygon
-from ..utils import log
+from ..utils import log, get_symbol_object
 
 
 class LegendRenderer:
@@ -28,7 +28,8 @@ class LegendRenderer:
 
         self.text_format = QgsTextFormat()
 
-        self.axis_line_symbol = QgsLineSymbol.createSimple({})
+        self.axis_line_symbol = get_symbol_object("{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '3', 'arrow_start_width_unit': 'Pixel', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '3', 'arrow_width_unit': 'Pixel', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '20', 'head_length_unit': 'Pixel', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '10', 'head_thickness_unit': 'Pixel', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'Pixel', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}")
+        self.axis_line_symbol.setColor(QColor(0, 0, 0))
 
     def render(self, contex: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]):
 
@@ -86,7 +87,6 @@ class LegendRenderer:
                                  contex,
                                  self.text_format,
                                  QgsTextRenderer.AlignVCenter)
-
 
         QgsTextRenderer.drawText(QPointF(width * 0.1, height * 0.4),
                                  math.radians(90),
