@@ -31,6 +31,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_axis_y = "Axis Y"
         self.text_format = QgsTextFormat()
 
+        self.line_format = QgsLineSymbol.createSimple({})
+
         self.renderer = None
 
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
@@ -43,6 +45,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.axis_title_y = self.text_axis_y
 
         legend_render.text_format = self.text_format
+
+        legend_render.axis_line_symbol = self.line_format
 
         item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
 
@@ -64,6 +68,11 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def set_linked_layer(self, layer: QgsVectorLayer) -> NoReturn:
         self.layer = layer
         self.renderer = layer.renderer().clone()
+        self.refresh()
+
+    def set_line_format(self, line_format: QgsLineSymbol):
+        self.line_format = line_format
+        self.refresh()
 
     def set_text_format(self, text_format: QgsTextFormat):
         self.text_format = text_format
