@@ -10,7 +10,7 @@ from qgis.core import (QgsMessageLog,
 from .text_constants import Texts
 
 
-def log(text):
+def log(text: str) -> NoReturn:
     QgsMessageLog.logMessage(str(text),
                              Texts.plugin_name,
                              Qgis.Info)
