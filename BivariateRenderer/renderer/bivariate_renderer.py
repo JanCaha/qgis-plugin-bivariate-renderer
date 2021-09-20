@@ -48,8 +48,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         self.cached = {}
 
-        self.setUpJinjaTemplates()
-
     def __repr__(self) -> str:
         return f"BivariateRenderer with {self.number_classes} classes for each attribute, " \
                f"for fields {self.field_name_1} and {self.field_name_2}, " \
