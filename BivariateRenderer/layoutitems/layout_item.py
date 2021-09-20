@@ -1,6 +1,7 @@
 from typing import NoReturn, List
 
 from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from qgis.core import (QgsLayoutItem,
                        QgsLayout,
@@ -8,7 +9,8 @@ from qgis.core import (QgsLayoutItem,
                        QgsVectorLayer,
                        QgsTextFormat,
                        QgsLayoutItemRenderContext,
-                       QgsLineSymbol)
+                       QgsLineSymbol,
+                       QgsReadWriteContext)
 
 from ..text_constants import Texts, IDS
 from ..utils import log, get_symbol_object, get_symbol_dict
@@ -60,12 +62,27 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
                                  item_size.height(),
                                  self.renderer.generate_legend_polygons())
 
-    # def writePropertiesToElement(self, element: QtXml.QDomElement, document: QtXml.QDomDocument, context: QgsReadWriteContext) -> bool:
-    #     # todo add
-    #     pass
+    def writePropertiesToElement(self, element: QDomElement, document: QDomDocument, context: QgsReadWriteContext) -> bool:
+
+        # line
+        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L831
+
+        # text
+        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L765
+
+        # todo add
+        pass
 
     # def readPropertiesFromElement(self, element: QtXml.QDomElement, document: QtXml.QDomDocument, context: QgsReadWriteContext) -> bool:
     #     # todo add
+
+        # line
+        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L894
+
+        # text
+        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L979
+
+
     #     pass
 
     def set_linked_layer(self, layer: QgsVectorLayer) -> NoReturn:
