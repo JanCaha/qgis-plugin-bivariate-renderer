@@ -30,6 +30,7 @@ from .renderer.bivariate_renderer_metadata import BivariateRendererMetadata
 from .layoutitems.layout_item import BivariateRendererLayoutItemMetadata
 from .layoutitems.layout_item_widget import BivariateRendererLayoutItemGuiMetadata
 
+
 class BivariateRendererPlugin:
     """QGIS Plugin Implementation."""
 
@@ -42,6 +43,7 @@ class BivariateRendererPlugin:
 
         self.bivariate_renderer_layout_item_metadata = BivariateRendererLayoutItemMetadata()
 
+        # TODO disconnect
         QgsApplication.layoutItemRegistry().addLayoutItemType(self.bivariate_renderer_layout_item_metadata)
 
     def initGui(self):
@@ -49,6 +51,7 @@ class BivariateRendererPlugin:
 
         QgsApplication.rendererRegistry().addRenderer(self.bivariate_renderer_metadata)
 
+        # TODO disconnect
         QgsGui.layoutItemGuiRegistry().addLayoutItemGuiMetadata(self.bivariate_renderer_layout_item_gui_metadata)
 
         # # TODO to remove after
