@@ -1,3 +1,4 @@
 /.idea
 __pycache__
 /BivariateRenderer/layoutitems/*.tmp
+/BivariateRenderer/zip_build/
