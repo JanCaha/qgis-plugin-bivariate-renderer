@@ -1,6 +1,5 @@
 from typing import Union, NoReturn, Dict
 import json
-from pathlib import Path
 
 from qgis.core import (QgsMessageLog,
                        Qgis,
@@ -17,18 +16,9 @@ def log(text):
                              Qgis.Info)
 
 
-def write_text_to_file(file: Union[Path, str], text: str) -> NoReturn:
-
-    with open(file, "w") as file_to_write:
-        file_to_write.writelines(text)
-        file_to_write.close()
-
-
-def path_to_legend_svg():
-    return Path(__file__).parent / Texts.temp_legend_filename
-
-
-def get_symbol_object(symbol_srt) -> QgsLineSymbol:
+# these two functions are taken from
+# https://github.com/TomasdelaBarra/QTRANUS/blob/c32c11f02faec561b1825479b3251c096c5f36ea/add_linktype_dialog.py
+def get_symbol_object(symbol_srt: str) -> QgsLineSymbol:
     """ Return dictionary with objects of symbol"""
 
     from qgis.core import (QgsArrowSymbolLayer,
