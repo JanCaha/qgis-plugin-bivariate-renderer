@@ -3,7 +3,6 @@ from typing import NoReturn, List, Dict, Union
 from pathlib import Path
 from dataclasses import dataclass
 
-from jinja2 import Environment, FileSystemLoader
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtXml import QDomDocument, QDomElement
@@ -14,9 +13,6 @@ from qgis.core import (QgsFeatureRenderer, QgsClassificationRange,
                        QgsFillSymbol,
                        QgsSymbolLayerUtils,
                        QgsProcessingUtils)
-
-from BivariateRenderer.utils import (write_text_to_file,
-                                     path_to_legend_svg)
 
 from BivariateRenderer.text_constants import Texts
 
@@ -61,14 +57,6 @@ class BivariateRenderer(QgsFeatureRenderer):
                f"field 1 vals {self.field_1_min};{self.field_1_max} " \
                f"field 2 vals {self.field_2_min};{self.field_2_max} "
 
-    def setUpJinjaTemplates(self):
-
-        path = Path(__file__).parent.parent / "svg_templates"
-
-        self.file_loader = FileSystemLoader(path.absolute().as_posix())
-        self.env = Environment(loader=self.file_loader)
-        self.legend_template = self.env.get_template("legend_template.svg")
-
     def getLegendCategorySize(self) -> int:
 
         size_constant = 250 / self.number_classes
@@ -104,26 +92,6 @@ class BivariateRenderer(QgsFeatureRenderer):
             x += 1
 
         return position
-
-    @property
-    def temp_folder_legend_file(self) -> str:
-        p = Path(QgsProcessingUtils.tempFolder()) / "bivariate_legend.svg"
-        return str(p.absolute().as_posix())
-
-    def render_legend_to_temp(self) -> NoReturn:
-
-        write_text_to_file(self.temp_folder_legend_file, self.legend_svg)
-
-    def renderLegend(self) -> NoReturn:
-
-        write_text_to_file(path_to_legend_svg(), self.legend_svg)
-
-    @property
-    def legend_svg(self) -> str:
-        return self.legend_template.render(rectangles=self.getLegendCategories(),
-                                           xy=self.getLegendCategorySize(),
-                                           field_name_x=self.field_name_1,
-                                           field_name_y=self.field_name_2)
 
     def setClassificationMethodName(self, name: str) -> NoReturn:
         self.classification_method_name = name
