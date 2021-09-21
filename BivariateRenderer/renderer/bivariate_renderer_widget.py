@@ -162,7 +162,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.form_layout = QFormLayout()
         self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
-        self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
+        # self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
         self.form_layout.addRow("Select field 1:", self.cb_field1)
         self.form_layout.addRow("Select color ramp 1:", self.bt_color_ramp1)
         self.form_layout.addRow("Select field 2:", self.cb_field2)
