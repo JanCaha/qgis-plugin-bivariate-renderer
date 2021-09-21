@@ -52,7 +52,7 @@ class LegendRenderer:
 
         painter.setPen(Qt.NoPen)
 
-        size_constant = (width * 0.8) / 3
+        size_constant = (width * 0.8) / math.sqrt(len(polygons))
 
         for polygon in polygons:
 
