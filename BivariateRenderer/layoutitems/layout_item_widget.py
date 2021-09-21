@@ -1,8 +1,12 @@
-from PyQt5.QtWidgets import (QComboBox,
-                             QPushButton,
-                             QLineEdit,
-                             QVBoxLayout,
-                             QLabel)
+from pathlib import Path
+
+from qgis.PyQt.QtWidgets import (QComboBox,
+                                 QPushButton,
+                                 QLineEdit,
+                                 QVBoxLayout,
+                                 QLabel)
+
+from qgis.PyQt.QtGui import QIcon
 
 from qgis.core import (QgsLayoutItem,
                        QgsProject,
@@ -135,3 +139,6 @@ class BivariateRendererLayoutItemGuiMetadata(QgsLayoutItemAbstractGuiMetadata):
     def createItemWidget(self, item: QgsLayoutItem):  # pylint: disable=missing-docstring, no-self-use
         return BivariateRendererLayoutItemWidget(None, item)
 
+    def creationIcon(self) -> QIcon:
+        path = Path(__file__).parent.parent / "icons" / "legend_icon.png"
+        return QIcon(path.absolute().as_posix())
