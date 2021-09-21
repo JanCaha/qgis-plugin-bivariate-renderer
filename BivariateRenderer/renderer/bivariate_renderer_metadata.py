@@ -1,10 +1,13 @@
+from pathlib import Path
+
 from qgis.core import (QgsRendererAbstractMetadata)
 
-from PyQt5.QtXml import QDomElement
+from qgis.PyQt.QtXml import QDomElement
+from qgis.PyQt.QtGui import QIcon
 
 from .bivariate_renderer import BivariateRenderer
 from .bivariate_renderer_widget import BivariateRendererWidget
-from BivariateRenderer.text_constants import Texts
+from ..text_constants import Texts
 
 
 class BivariateRendererMetadata(QgsRendererAbstractMetadata):
@@ -26,3 +29,7 @@ class BivariateRendererMetadata(QgsRendererAbstractMetadata):
 
     def compatibleLayerTypes(self):
         return QgsRendererAbstractMetadata.PolygonLayer
+
+    def icon(self) -> QIcon:
+        path = Path(__file__).parent.parent / "icons" / "legend_icon.png"
+        return QIcon(path.absolute().as_posix())
