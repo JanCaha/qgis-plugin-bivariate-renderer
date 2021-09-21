@@ -41,6 +41,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         super().__init__(layout)
 
+        super().setBackgroundEnabled(False)
+
         self.text_axis_x = "Axis X"
         self.text_axis_y = "Axis Y"
         self.text_format = QgsTextFormat()
