@@ -79,7 +79,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.axis_y_name.textChanged.connect(self.update_axis_y)
 
         self.form_layout = QVBoxLayout()
-        self.form_layout.addWidget(QLabel("Select layer to obtainthe renderer from"))
+        self.form_layout.addWidget(QLabel("Select layer to obtain the renderer from"))
         self.form_layout.addWidget(self.cb_layers)
         self.form_layout.addWidget(QLabel("Font"))
         self.form_layout.addWidget(self.b_font)
