@@ -15,7 +15,7 @@ tags=renderer
 
 homepage=http://homepage
 # category=Plugins
-# icon=icon.png
+icon=icons/main_icon.png
 experimental=True
 deprecated=False
 category=Vector
