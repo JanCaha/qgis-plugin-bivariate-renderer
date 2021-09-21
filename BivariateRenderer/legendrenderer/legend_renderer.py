@@ -2,7 +2,7 @@ from typing import List
 import math
 
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
-from qgis.PyQt.QtGui import QPolygonF, QBrush, QColor
+from qgis.PyQt.QtGui import QPolygonF, QBrush, QColor, QPainter
 
 from qgis.core import (QgsTextFormat,
                        QgsLineSymbol,
@@ -41,7 +41,7 @@ class LegendRenderer:
         width = width * contex.scaleFactor()
         height = height * contex.scaleFactor()
 
-        painter = contex.painter()
+        painter: QPainter = contex.painter()
 
         painter.save()
 
