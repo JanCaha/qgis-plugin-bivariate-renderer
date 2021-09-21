@@ -11,6 +11,8 @@ from qgis.PyQt.QtWidgets import (QLabel,
                                  QComboBox,
                                  QPushButton)
 
+from qgis.PyQt.QtCore import pyqtSignal
+
 from qgis.gui import (QgsRendererWidget,
                       QgsColorRampButton,
                       QgsFieldComboBox,
@@ -63,7 +65,14 @@ class BivariateRendererWidget(QgsRendererWidget):
                               QgsClassificationPrettyBreaks().name(): QgsClassificationPrettyBreaks(),
                               QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic()}
 
-    image: QImage
+    scale_factor = 1
+
+    size = 300
+
+    text_format = QgsTextFormat()
+    text_format.setSize(60)
+
+    legend_changed = pyqtSignal()
 
     def __init__(self, layer, style, renderer: BivariateRenderer):
 
@@ -149,8 +158,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.label_legend = QLabel()
 
-        self.pb_render_legend = QPushButton("Render Legend")
-        self.pb_render_legend.pressed.connect(self.updateLegend)
+        self.legend_changed.connect(self.update_legend)
 
         self.form_layout = QFormLayout()
         self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
@@ -159,36 +167,32 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout.addRow("Select color ramp 1:", self.bt_color_ramp1)
         self.form_layout.addRow("Select field 2:", self.cb_field2)
         self.form_layout.addRow("Select color ramp 2:", self.bt_color_ramp2)
-        self.form_layout.addRow("", self.pb_render_legend)
         self.form_layout.addRow("Example of legend:", self.label_legend)
         self.setLayout(self.form_layout)
 
-    def updateLegend(self):
+        self.update_legend()
 
-        scale_factor = 1
+    def update_legend(self):
 
-        size = 300
+        self.label_legend.clear()
 
-        self.image = QImage(size, size, QImage.Format_ARGB32)
-        self.image.fill(QColor(0, 0, 0, 0))
+        image = QImage(self.size, self.size, QImage.Format_ARGB32)
+        image.fill(QColor(0, 0, 0, 0))
 
-        painter = QPainter(self.image)
+        painter = QPainter(image)
 
         context = QgsRenderContext.fromQPainter(painter)
-        context.setScaleFactor(scale_factor)
+        context.setScaleFactor(self.scale_factor)
 
-        text_format = QgsTextFormat()
-        text_format.setSize(60)
-
-        self.legend_renderer.text_format = text_format
+        self.legend_renderer.text_format = self.text_format
         self.legend_renderer.axis_title_x = self.cb_field1.currentText()
         self.legend_renderer.axis_title_y = self.cb_field2.currentText()
 
-        self.legend_renderer.render(context, size, size, self.bivariate_renderer.generate_legend_polygons())
+        self.legend_renderer.render(context, self.size, self.size, self.bivariate_renderer.generate_legend_polygons())
 
         painter.end()
 
-        self.label_legend.setPixmap(QPixmap.fromImage(self.image))
+        self.label_legend.setPixmap(QPixmap.fromImage(image))
 
     def setNumberOfClasses(self) -> NoReturn:
 
@@ -201,6 +205,8 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.setField1Classes()
         self.setField2Classes()
 
+        self.legend_changed.emit()
+
     def setClassificationMethod(self) -> NoReturn:
 
         self.classification_method = self.classification_methods[self.cb_classification_methods.currentText()]
@@ -210,17 +216,23 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.setField1Classes()
         self.setField2Classes()
 
+        self.legend_changed.emit()
+
     def setColorRamp1(self) -> NoReturn:
 
         self.bivariate_renderer.setColorRamp1(
             self.bt_color_ramp1.colorRamp()
         )
 
+        self.legend_changed.emit()
+
     def setColorRamp2(self) -> NoReturn:
 
         self.bivariate_renderer.setColorRamp2(
             self.bt_color_ramp2.colorRamp()
         )
+
+        self.legend_changed.emit()
 
     def setFieldName1(self) -> NoReturn:
 
@@ -232,6 +244,8 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.setField1Classes()
 
+        self.legend_changed.emit()
+
     def setFieldName2(self) -> NoReturn:
 
         self.field_name_2 = self.cb_field2.currentText()
@@ -241,6 +255,8 @@ class BivariateRendererWidget(QgsRendererWidget):
         )
 
         self.setField2Classes()
+
+        self.legend_changed.emit()
 
     def setField1Classes(self):
 
