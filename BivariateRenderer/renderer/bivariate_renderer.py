@@ -162,9 +162,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return position_value2
 
-    def create_legend_example(self):
-        pass
-
     def getFeatureValueCombinationHash(self, value1: float, value2: float) -> int:
         return hash(f"{value1}-{value2}")
 
