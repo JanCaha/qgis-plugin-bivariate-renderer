@@ -42,6 +42,7 @@ class LegendRenderer:
         height = height * contex.scaleFactor()
 
         painter: QPainter = contex.painter()
+        # painter.setBackground(Qt.transparent)
 
         painter.save()
 
@@ -64,6 +65,8 @@ class LegendRenderer:
 
         painter.restore()
 
+        painter.save()
+
         self.axis_line_symbol.startRender(contex)
 
         self.axis_line_symbol.renderPolyline(QPolygonF([QPointF(width * 0.15, height * 0.85),
@@ -75,6 +78,10 @@ class LegendRenderer:
                                              None, contex)
 
         self.axis_line_symbol.stopRender(contex)
+
+        painter.restore()
+
+        painter.save()
 
         text_height = QgsTextRenderer.textHeight(contex,
                                                  self.text_format,
