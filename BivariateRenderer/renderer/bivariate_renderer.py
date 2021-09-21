@@ -55,6 +55,9 @@ class BivariateRenderer(QgsFeatureRenderer):
                f"field 1 vals {self.field_1_min};{self.field_1_max} " \
                f"field 2 vals {self.field_2_min};{self.field_2_max} "
 
+    def _reset_cache(self):
+        self.cached = {}
+
     def getLegendCategorySize(self) -> int:
 
         size_constant = 250 / self.number_classes
@@ -93,21 +96,27 @@ class BivariateRenderer(QgsFeatureRenderer):
 
     def setClassificationMethodName(self, name: str) -> NoReturn:
         self.classification_method_name = name
+        self._reset_cache()
 
     def setNumberOfClasses(self, number: int) -> NoReturn:
         self.number_classes = int(number)
+        self._reset_cache()
 
     def setColorRamp1(self, color_ramp: QgsColorRamp) -> NoReturn:
         self.color_ramp_1 = color_ramp
+        self._reset_cache()
 
     def setColorRamp2(self, color_ramp: QgsColorRamp) -> NoReturn:
         self.color_ramp_2 = color_ramp
+        self._reset_cache()
 
     def setFieldName1(self, field_name: str) -> NoReturn:
         self.field_name_1 = field_name
+        self._reset_cache()
 
     def setFieldName2(self, field_name: str) -> NoReturn:
         self.field_name_2 = field_name
+        self._reset_cache()
 
     def setField1Classes(self, classes: List[QgsClassificationRange]) -> NoReturn:
         self.field_1_classes = classes
@@ -116,12 +125,16 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.field_1_max = (self.field_1_classes[len(self.field_1_classes)-1].lowerBound() +
                             self.field_1_classes[len(self.field_1_classes)-1].upperBound()) / 2
 
+        self._reset_cache()
+
     def setField2Classes(self, classes: List[QgsClassificationRange]) -> NoReturn:
         self.field_2_classes = classes
 
         self.field_2_min = (self.field_2_classes[0].lowerBound() + self.field_2_classes[0].upperBound()) / 2
         self.field_2_max = (self.field_2_classes[len(self.field_2_classes) - 1].lowerBound() +
                             self.field_2_classes[len(self.field_2_classes) - 1].upperBound()) / 2
+
+        self._reset_cache()
 
     def positionValueField1(self, value: float) -> float:
 
