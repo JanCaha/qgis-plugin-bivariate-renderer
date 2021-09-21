@@ -176,9 +176,9 @@ class BivariateRenderer(QgsFeatureRenderer):
         color1 = self.color_ramp_1.color(position_value1)
         color2 = self.color_ramp_2.color(position_value2)
 
-        result_color = QColor((color1.red() + color2.red())/2,
-                              (color1.green() + color2.green())/2,
-                              (color1.blue() + color2.blue())/2)
+        result_color = QColor(int((color1.red() + color2.red())/2),
+                              int((color1.green() + color2.green())/2),
+                              int((color1.blue() + color2.blue())/2))
 
         return result_color
 
