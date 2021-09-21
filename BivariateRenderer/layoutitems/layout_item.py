@@ -1,6 +1,7 @@
 from typing import NoReturn, List, Optional
+from pathlib import Path
 
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from qgis.core import (QgsLayoutItem,
@@ -203,6 +204,12 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def type(self) -> int:
         return IDS.plot_item_bivariate_renderer_legend
+
+    def icon(self) -> QIcon:
+
+        path = Path(__file__).parent.parent / "icons" / "legend_icon.png"
+
+        return QIcon(path.absolute().as_posix())
 
 
 class BivariateRendererLayoutItemMetadata(QgsLayoutItemAbstractMetadata):
