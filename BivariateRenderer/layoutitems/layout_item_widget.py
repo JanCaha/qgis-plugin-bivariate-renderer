@@ -60,15 +60,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                 if layer.renderer().type() == Texts.bivariate_renderer_short_name:
                     usable_layers.append(layer.name())
 
-        self.cb_layers = QComboBox()
-        self.cb_layers.addItem("")
-        self.cb_layers.addItems(usable_layers)
-        self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
-        self.cb_layers.setCurrentIndex(0)
-
-        if self.layout_item.linked_layer_name:
-            self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
-
         self.axis_x_name = QLineEdit()
         if self.layout_item.text_axis_x:
             self.axis_x_name.setText(self.layout_item.text_axis_x)
@@ -77,6 +68,15 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         if self.layout_item.text_axis_y:
             self.axis_y_name.setText(self.layout_item.text_axis_y)
         self.axis_y_name.textChanged.connect(self.update_axis_y)
+
+        self.cb_layers = QComboBox()
+        self.cb_layers.addItem("")
+        self.cb_layers.addItems(usable_layers)
+        self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
+        self.cb_layers.setCurrentIndex(0)
+
+        if self.layout_item.linked_layer_name:
+            self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
 
         self.form_layout = QVBoxLayout()
         self.form_layout.addWidget(QLabel("Select layer to obtain the renderer from"))
