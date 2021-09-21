@@ -117,6 +117,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                     self.layout_item.set_linked_layer(layer)
                     break
 
+        self.axis_x_name.setText(self.layout_item.renderer.field_name_1)
+        self.axis_y_name.setText(self.layout_item.renderer.field_name_2)
+
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
 
