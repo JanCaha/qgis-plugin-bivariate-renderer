@@ -14,7 +14,7 @@ from qgis.core import (QgsFeatureRenderer, QgsClassificationRange,
                        QgsSymbolLayerUtils,
                        QgsProcessingUtils)
 
-from BivariateRenderer.text_constants import Texts
+from ..text_constants import Texts
 
 
 class BivariateRenderer(QgsFeatureRenderer):
