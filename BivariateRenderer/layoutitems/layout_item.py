@@ -139,19 +139,19 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
                         self.layer = layer
                         self.renderer = layer.renderer()
 
-        lineSymbolElem = element.firstChildElement("lineSymbol")
+        line_symbol_elem = element.firstChildElement("lineSymbol")
 
-        if not lineSymbolElem.isNull():
+        if not line_symbol_elem.isNull():
 
-            symbolElem = lineSymbolElem.firstChildElement("symbol")
+            symbolElem = line_symbol_elem.firstChildElement("symbol")
             self.line_format = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
 
-        textFormatNodeList = element.elementsByTagName("text-style")
+        text_format_node_list = element.elementsByTagName("text-style")
 
-        if not textFormatNodeList.isEmpty():
+        if not text_format_node_list.isEmpty():
 
-            textFormatElem = textFormatNodeList.at(0).toElement()
-            self.text_format.readXml(textFormatElem, context)
+            text_format_elem = text_format_node_list.at(0).toElement()
+            self.text_format.readXml(text_format_elem, context)
 
         return True
 
