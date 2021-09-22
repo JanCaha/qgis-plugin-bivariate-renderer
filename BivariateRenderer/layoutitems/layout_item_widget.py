@@ -82,6 +82,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         if self.layout_item.linked_layer_name:
             self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
 
+        if self.layout_item.line_format:
+            self.b_line_symbol.setSymbol(self.layout_item.line_format)
+
         self.form_layout = QVBoxLayout()
         self.form_layout.addWidget(QLabel("Select layer to obtain the renderer from"))
         self.form_layout.addWidget(self.cb_layers)
