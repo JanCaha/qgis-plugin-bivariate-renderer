@@ -13,7 +13,7 @@ repository=https://github.com/JanCaha/qgis-plugin-bivariate-renderer
 
 tags=renderer
 
-homepage=http://homepage
+homepage=https://github.com/JanCaha/qgis-plugin-bivariate-renderer
 # category=Plugins
 icon=icons/main_icon.png
 experimental=True
