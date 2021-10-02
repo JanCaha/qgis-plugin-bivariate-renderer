@@ -15,6 +15,8 @@ from qgis.core import (QgsFeatureRenderer, QgsClassificationRange,
                        QgsProcessingUtils)
 
 from ..text_constants import Texts
+from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
+from ..colormixing.color_mixing_method import ColorMixingMethod, ColorMixingMethodDirect
 
 
 class BivariateRenderer(QgsFeatureRenderer):
@@ -32,11 +34,15 @@ class BivariateRenderer(QgsFeatureRenderer):
     field_2_min: float
     field_2_max: float
 
+    color_mixing_method: ColorMixingMethod
+
     def __init__(self, syms=None):
 
         super().__init__(Texts.bivariate_renderer_short_name)
 
         self.number_classes = 3
+
+        self.color_mixing_method = ColorMixingMethodDirect()
 
         self.field_name_1 = None
         self.field_name_2 = None
@@ -93,6 +99,10 @@ class BivariateRenderer(QgsFeatureRenderer):
             x += 1
 
         return position
+
+    def setColorMixingMethod(self, method: ColorMixingMethod) -> NoReturn:
+        self.color_mixing_method = method
+        self._reset_cache()
 
     def setClassificationMethodName(self, name: str) -> NoReturn:
         self.classification_method_name = name
@@ -173,9 +183,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         color1 = self.color_ramp_1.color(position_value1)
         color2 = self.color_ramp_2.color(position_value2)
 
-        result_color = QColor(int((color1.red() + color2.red())/2),
-                              int((color1.green() + color2.green())/2),
-                              int((color1.blue() + color2.blue())/2))
+        result_color = self.color_mixing_method.mix_colors(color1, color2)
 
         return result_color
 
@@ -220,6 +228,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setColorRamp2(self.color_ramp_2.clone())
         r.setField1Classes(self.field_1_classes)
         r.setField2Classes(self.field_2_classes)
+        r.setColorMixingMethod(self.color_mixing_method)
 
         return r
 
@@ -267,6 +276,8 @@ class BivariateRenderer(QgsFeatureRenderer):
             ranges_elem2.appendChild(range_elem)
 
         renderer_elem.appendChild(ranges_elem2)
+
+        renderer_elem.setAttribute('color_mixing_method', self.color_mixing_method.name())
 
         return renderer_elem
 
@@ -323,6 +334,11 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         r.setField1Classes(field_1_classes)
         r.setField2Classes(field_2_classes)
+
+        if element.hasAttribute('color_mixing_method'):
+            r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(element.attribute('color_mixing_method')))
+        else:
+            r.setColorMixingMethod(ColorMixingMethodDirect())
 
         return r
 
