@@ -16,7 +16,7 @@ from qgis.core import (QgsFeatureRenderer, QgsClassificationRange,
 
 from ..text_constants import Texts
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
-from ..colormixing.color_mixing_method import ColorMixingMethod, ColorMixingMethodDirect
+from ..colormixing.color_mixing_method import ColorMixingMethod, ColorMixingMethodDarken
 
 
 class BivariateRenderer(QgsFeatureRenderer):
@@ -42,7 +42,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         self.number_classes = 3
 
-        self.color_mixing_method = ColorMixingMethodDirect()
+        self.color_mixing_method = ColorMixingMethodDarken()
 
         self.field_name_1 = None
         self.field_name_2 = None
@@ -338,7 +338,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         if element.hasAttribute('color_mixing_method'):
             r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(element.attribute('color_mixing_method')))
         else:
-            r.setColorMixingMethod(ColorMixingMethodDirect())
+            r.setColorMixingMethod(ColorMixingMethodDarken())
 
         return r
 

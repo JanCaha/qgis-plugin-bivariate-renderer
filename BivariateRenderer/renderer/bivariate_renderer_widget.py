@@ -151,7 +151,6 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.cb_colormixing_methods.setCurrentText(self.bivariate_renderer.color_mixing_method.name())
         else:
             self.cb_colormixing_methods.setCurrentIndex(1)
-            self.cb_colormixing_methods.setCurrentIndex(0)
 
         self.bt_color_ramp1 = QgsColorRampButton()
         self.bt_color_ramp1.colorRampChanged.connect(self.setColorRamp1)
