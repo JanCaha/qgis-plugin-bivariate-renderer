@@ -15,6 +15,9 @@ theme:
 
 nav:
     - Home: index.md
+    - Descriptions:
+        - Color mixing methods: color_mixing.md
+        - Color ramp examples: color_ramps_examples.md
     - Changelog: changelog.md
     - Github: https://github.com/JanCaha/qgis-plugin-bivariate-renderer
 
