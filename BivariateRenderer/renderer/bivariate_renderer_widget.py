@@ -33,6 +33,7 @@ from qgis.core import (QgsGradientColorRamp,
 
 from .bivariate_renderer import BivariateRenderer
 from ..legendrenderer.legend_renderer import LegendRenderer
+from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
 
 from ..utils import (log)
 
@@ -48,6 +49,8 @@ class BivariateRendererWidget(QgsRendererWidget):
     number_of_classes: int
     field_name_1: str
     field_name_2: str
+
+    register_color_mixing = ColorMixingMethodsRegister()
 
     default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255),
                                                 QColor(255, 0, 0))
@@ -140,6 +143,16 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.cb_classification_methods.setCurrentIndex(1)
             self.cb_classification_methods.setCurrentIndex(0)
 
+        self.cb_colormixing_methods = QComboBox()
+        self.cb_colormixing_methods.addItems(self.register_color_mixing.names)
+        self.cb_colormixing_methods.currentIndexChanged.connect(self.setColorMixingMethod)
+
+        if self.bivariate_renderer.color_mixing_method:
+            self.cb_colormixing_methods.setCurrentText(self.bivariate_renderer.color_mixing_method.name())
+        else:
+            self.cb_colormixing_methods.setCurrentIndex(1)
+            self.cb_colormixing_methods.setCurrentIndex(0)
+
         self.bt_color_ramp1 = QgsColorRampButton()
         self.bt_color_ramp1.colorRampChanged.connect(self.setColorRamp1)
 
@@ -163,6 +176,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout = QFormLayout()
         self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
         # self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
+        self.form_layout.addRow("Select color mixing method:", self.cb_colormixing_methods)
         self.form_layout.addRow("Select field 1:", self.cb_field1)
         self.form_layout.addRow("Select color ramp 1:", self.bt_color_ramp1)
         self.form_layout.addRow("Select field 2:", self.cb_field2)
@@ -204,6 +218,14 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.setField1Classes()
         self.setField2Classes()
+
+        self.legend_changed.emit()
+
+    def setColorMixingMethod(self) -> NoReturn:
+
+        self.bivariate_renderer.setColorMixingMethod(
+            self.register_color_mixing.get_by_name(self.cb_colormixing_methods.currentText())
+        )
 
         self.legend_changed.emit()
 
