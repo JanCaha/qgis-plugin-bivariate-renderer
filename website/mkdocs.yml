@@ -1,0 +1,22 @@
+site_name: Bivariate color polygon renderer
+site_url: https://jancaha.github.io/qgis-plugin-bivariate-renderer/
+site_description: Plugin for QGIS for providing bivariate rendering
+site_author: Jan Caha
+
+copyright: Copyright &copy; 2021 <a href="https://twitter.com/cahik13">Jan Caha</a>.
+
+docs_dir: pages
+site_dir: docs
+
+lang: en
+
+theme:
+    name: bootstrap
+
+nav:
+    - Home: index.md
+    - Changelog: changelog.md
+    - Github: https://github.com/JanCaha/qgis-plugin-bivariate-renderer
+
+plugins:
+    - search
