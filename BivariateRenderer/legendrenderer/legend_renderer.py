@@ -42,11 +42,8 @@ class LegendRenderer:
         height = height * contex.scaleFactor()
 
         painter: QPainter = contex.painter()
-        # painter.setBackground(Qt.transparent)
 
         painter.save()
-
-        # painter.scale(contex.scaleFactor(), contex.scaleFactor())
 
         # TODO do it around each drawing
         painter.save()
