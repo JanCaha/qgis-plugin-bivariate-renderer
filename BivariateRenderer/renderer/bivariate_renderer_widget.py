@@ -34,6 +34,7 @@ from qgis.core import (QgsGradientColorRamp,
 from .bivariate_renderer import BivariateRenderer
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
+from ..colorramps.color_ramps_register import BivariateColorRampsRegister
 
 from ..utils import (log)
 
@@ -51,6 +52,8 @@ class BivariateRendererWidget(QgsRendererWidget):
     field_name_2: str
 
     register_color_mixing = ColorMixingMethodsRegister()
+
+    register_color_ramps = BivariateColorRampsRegister()
 
     default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255),
                                                 QColor(255, 0, 0))
@@ -152,6 +155,21 @@ class BivariateRendererWidget(QgsRendererWidget):
         else:
             self.cb_colormixing_methods.setCurrentIndex(1)
 
+        self.cb_color_ramps = QComboBox()
+
+        self.cb_color_ramps.addItem("")
+
+        self.cb_color_ramps.setEditable(True)
+
+        for color_ramp in self.register_color_ramps.color_ramps:
+            index = self.cb_color_ramps.count()
+            self.cb_color_ramps.addItem(color_ramp.name)
+            self.cb_color_ramps.setItemIcon(index, color_ramp.icon)
+
+        self.cb_color_ramps.setEditable(False)
+
+        self.cb_color_ramps.currentIndexChanged.connect(self.change_color_ramps)
+
         self.bt_color_ramp1 = QgsColorRampButton()
         self.bt_color_ramp1.colorRampChanged.connect(self.setColorRamp1)
 
@@ -173,6 +191,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.legend_changed.connect(self.update_legend)
 
         self.form_layout = QFormLayout()
+        self.form_layout.addRow("Predefined color ramps:", self.cb_color_ramps)
         self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
         # self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
         self.form_layout.addRow("Select color mixing method:", self.cb_colormixing_methods)
@@ -301,3 +320,11 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     def renderer(self):
         return self.bivariate_renderer
+
+    def change_color_ramps(self):
+        name = self.cb_color_ramps.currentText()
+
+        if name != "":
+            bivariate_color_ramp = self.register_color_ramps.get_by_name(name)
+            self.bt_color_ramp1.setColorRamp(bivariate_color_ramp.color_ramp_1)
+            self.bt_color_ramp2.setColorRamp(bivariate_color_ramp.color_ramp_2)
