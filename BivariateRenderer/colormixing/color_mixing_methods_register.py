@@ -1,7 +1,9 @@
 from typing import List
 
 from ..utils import Singleton
-from .color_mixing_method import ColorMixingMethodDirect, ColorMixingMethodDarken, ColorMixingMethod
+from .color_mixing_method import (ColorMixingMethodDirect,
+                                  ColorMixingMethodDarken,
+                                  ColorMixingMethod)
 
 
 class ColorMixingMethodsRegister(metaclass=Singleton):
