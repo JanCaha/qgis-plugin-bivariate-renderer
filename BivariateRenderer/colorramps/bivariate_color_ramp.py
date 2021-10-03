@@ -128,3 +128,22 @@ class BivariateColorRampGreenPink(BivariateColorRamp):
     @property
     def icon(self) -> QIcon:
         return QIcon(self.get_icon_path("cp_green_pink.png"))
+
+
+class BivariateColorRampOrangeBlue(BivariateColorRamp):
+
+    @property
+    def name(self) -> str:
+        return "Orange - Blue"
+
+    @property
+    def color_ramp_1(self) -> QgsGradientColorRamp:
+        return QgsGradientColorRamp(QColor("#f3f3f3"), QColor("#cc8855"))
+
+    @property
+    def color_ramp_2(self) -> QgsGradientColorRamp:
+        return QgsGradientColorRamp(QColor("#f3f3f3"), QColor("#64acbe"))
+
+    @property
+    def icon(self) -> QIcon:
+        return QIcon(self.get_icon_path("cp_orange_blue.png"))

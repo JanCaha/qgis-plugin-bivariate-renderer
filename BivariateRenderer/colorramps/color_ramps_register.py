@@ -8,7 +8,8 @@ from .bivariate_color_ramp import (BivariateColorRamp,
                                    BivariateColorRampAquamarinePink,
                                    BivariateColorRampYellowPink,
                                    BivariateColorRampBlueGreen,
-                                   BivariateColorRampGreenPink)
+                                   BivariateColorRampGreenPink,
+                                   BivariateColorRampOrangeBlue)
 
 
 class BivariateColorRampsRegister(metaclass=Singleton):
@@ -17,7 +18,8 @@ class BivariateColorRampsRegister(metaclass=Singleton):
                    BivariateColorRampAquamarinePink(),
                    BivariateColorRampYellowPink(),
                    BivariateColorRampBlueGreen(),
-                   BivariateColorRampGreenPink()]
+                   BivariateColorRampGreenPink(),
+                   BivariateColorRampOrangeBlue()]
 
     @property
     def names(self) -> List[str]:
