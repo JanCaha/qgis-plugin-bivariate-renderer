@@ -2,7 +2,9 @@ name: github pages
 
 on:
   push:
-    paths: BivariateRenderer/metadata.txt
+    paths:
+     - BivariateRenderer/metadata.txt
+     - .github/workflows/mkdocs_build_deploy.yaml
 
 jobs:
 
@@ -32,8 +34,8 @@ jobs:
         touch website/docs/.nojekyll
 
     - name: Deploy
-      uses: peaceiris/actions-gh-pages@v2.5.1
-      env:
-        ACTIONS_DEPLOY_KEY: ${{ secrets.GITHUB_TOKEN }}
-        PUBLISH_BRANCH: gh-pages
-        PUBLISH_DIR: ./website/docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./website/docs
+        publish_branch: gh-pages
