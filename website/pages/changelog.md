@@ -1,6 +1,8 @@
 # Changelog
 
-- 0.3 Major improvements
+## 0.3
+
+  - Major improvements
   
   - Add option to change color mixing method. Replacing default Direct color mixing wit Darken blend color mixing.
     
@@ -9,6 +11,8 @@
   - Legend does not have background anymore.   
   
   - Website created.
+
+## 0.2 
 
 - 0.2.2 Bugfixing making the plugin finally usable.
   
