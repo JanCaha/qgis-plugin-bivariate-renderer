@@ -8,16 +8,8 @@ on:
 
 jobs:
 
-  build-deploy:
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - uses: actions/checkout@v2.3.4
-
   call-workflow-mkdocs:
-    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@71cfd7d8b2a021bb96573fc01d5016663e540c90
+    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@fe4b2c81e28815b61113d344e3b841e28c75b1c8
     with:
       mkdocs_config_location: ./website/mkdocs.yml
       nojekyll_location: ./website/docs/.nojekyll
