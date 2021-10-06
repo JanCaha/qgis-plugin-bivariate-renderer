@@ -19,7 +19,7 @@ jobs:
   call-workflow-mkdocs:
     uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml
       with:
-        mkdocs_config_location: './website/mkdocs.yml'
-        nojekyll_location: './website/docs/.nojekyll'
+        mkdocs_config_location: ./website/mkdocs.yml
+        nojekyll_location: ./website/docs/.nojekyll
       secrets:
         github_token: ${{ secrets.GITHUB_TOKEN }}
