@@ -14,4 +14,4 @@ jobs:
       mkdocs_config_location: ./website/mkdocs.yml
       nojekyll_location: ./website/docs/.nojekyll
     secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+      github_token: ${{ secrets.git_pat }}
