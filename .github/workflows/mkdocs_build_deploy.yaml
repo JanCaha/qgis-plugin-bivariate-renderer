@@ -32,7 +32,7 @@ jobs:
         run: echo "$ {{ github.event.repo.id }}"
 
       - name: Echo
-        run: echo "$ {{ github.event.repo.url }}"
+        run: echo "$GITHUB_REPOSITORY"
 
 
 #  call-workflow-mkdocs:
