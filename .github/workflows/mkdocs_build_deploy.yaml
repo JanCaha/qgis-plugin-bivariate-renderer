@@ -9,9 +9,9 @@ on:
 jobs:
 
   call-workflow-mkdocs:
-    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@fe4b2c81e28815b61113d344e3b841e28c75b1c8
+    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@e25d2e605b137e8946c06770fcaf6609ba3c0789
     with:
       mkdocs_config_location: ./website/mkdocs.yml
       nojekyll_location: ./website/docs/.nojekyll
     secrets:
-      github_token: ${{ secrets.git_pat }}
+      github_token: ${{ secrets.GITHUB_TOKEN }}
