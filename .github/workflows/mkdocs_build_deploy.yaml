@@ -11,7 +11,7 @@ jobs:
   call-workflow-mkdocs:
     uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@e25d2e605b137e8946c06770fcaf6609ba3c0789
     with:
-      deploy_repo: "$GITHUB_REPOSITORY"
+      deploy_repo: ${{ env.GITHUB_REPOSITORY }}
       mkdocs_config_location: ./website/mkdocs.yml
       nojekyll_location: ./website/docs/.nojekyll
     secrets:
