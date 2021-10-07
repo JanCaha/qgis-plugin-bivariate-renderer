@@ -17,13 +17,23 @@ jobs:
     steps:
 
       - name: Echo
-        run: |
-          echo "${{ github.event.owner.login }}/${{ github.event.repository.name }}"
-          echo "$ {{ github.event.actor.login }}"
-          echo "$ {{ github.event.actor.display_login }}"
-          echo "$ {{ github.event.repo }}"
-          echo "$ {{ github.event.repo.id }}"
-          echo "$ {{ github.event.repo.url }}"
+        run: echo "${{ github.event.owner.login }}/${{ github.event.repository.name }}"
+
+      - name: Echo
+        run: echo "$ {{ github.event.actor.login }}"
+
+      - name: Echo
+        run: echo "$ {{ github.event.actor.display_login }}"
+
+      - name: Echo
+        run: echo "$ {{ github.event.repo }}"
+
+      - name: Echo
+        run: echo "$ {{ github.event.repo.id }}"
+
+      - name: Echo
+        run: echo "$ {{ github.event.repo.url }}"
+
 
 #  call-workflow-mkdocs:
 #    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@e25d2e605b137e8946c06770fcaf6609ba3c0789
