@@ -17,7 +17,7 @@ jobs:
     steps:
 
       - name: Echo
-        run: echo "${{ github.event.repository.name }}"
+        run: echo "${{ github.event.actor.login }}/${{ github.event.repository.name }}"
 
 #  call-workflow-mkdocs:
 #    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@e25d2e605b137e8946c06770fcaf6609ba3c0789
