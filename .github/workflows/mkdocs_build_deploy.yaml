@@ -9,7 +9,7 @@ on:
 jobs:
 
   call-workflow-mkdocs:
-    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@4e30ae14990ac6658f7414052adf0c86b0e1ff6c
+    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@8db0e6e005750801f1a6c0f767e7a635a34596fa
     with:
       deploy_repo: $GITHUB_REPOSITORY
       mkdocs_config_location: ./website/mkdocs.yml
