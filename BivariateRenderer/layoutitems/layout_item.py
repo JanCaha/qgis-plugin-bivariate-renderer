@@ -153,6 +153,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
             text_format_elem = text_format_node_list.at(0).toElement()
             self.text_format.readXml(text_format_elem, context)
 
+        self.text_axis_x = element.attribute("axis_x_name")
+        self.text_axis_y = element.attribute("axis_y_name")
+        
         return True
 
         # line
