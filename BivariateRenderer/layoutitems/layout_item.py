@@ -52,7 +52,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.line_format.setColor(QColor(0, 0, 0))
 
         self.renderer = None
-
+            
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
         render_context = context.renderContext()
@@ -120,9 +120,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         if self.linked_layer:
             self.layer = None
 
-        self.axis_x_name = element.attribute("axis_x_name")
-        self.axis_y_name = element.attribute("axis_y_name")
-
         if element.hasAttribute("vectorLayerId"):
 
             layerId = element.attribute("vectorLayerId")
@@ -176,15 +173,15 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def set_text_format(self, text_format: QgsTextFormat) -> None:
         self.text_format = text_format
         self.refresh()
-
+                
     def set_axis_x_name(self, name: str) -> None:
         self.text_axis_x = name
         self.refresh()
-
+        
     def set_axis_y_name(self, name: str) -> None:
         self.text_axis_y = name
         self.refresh()
-
+        
     def are_labels_default(self) -> bool:
 
         return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
