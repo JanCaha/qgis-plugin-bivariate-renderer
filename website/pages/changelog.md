@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+  - Fix bug, where texts were not preserved correctly in legend item (in layout)
+
 ## 0.3
 
   - Major improvements
