@@ -182,6 +182,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_axis_y = name
         self.refresh()
 
+    def are_labels_default(self) -> bool:
+
+        return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
+    
     @property
     def get_font(self):
         return self.text_axis_x.font()
