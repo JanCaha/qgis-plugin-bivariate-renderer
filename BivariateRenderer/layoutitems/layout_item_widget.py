@@ -64,20 +64,25 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                 if layer.renderer().type() == Texts.bivariate_renderer_short_name:
                     usable_layers.append(layer.name())
 
-        self.axis_x_name = QLineEdit()
-        if self.layout_item.text_axis_x:
-            self.axis_x_name.setText(self.layout_item.text_axis_x)
-        self.axis_x_name.textChanged.connect(self.update_axis_x)
-        self.axis_y_name = QLineEdit()
-        if self.layout_item.text_axis_y:
-            self.axis_y_name.setText(self.layout_item.text_axis_y)
-        self.axis_y_name.textChanged.connect(self.update_axis_y)
-
         self.cb_layers = QComboBox()
         self.cb_layers.addItem("")
         self.cb_layers.addItems(usable_layers)
         self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
         self.cb_layers.setCurrentIndex(0)
+        
+        self.axis_x_name = QLineEdit()
+        
+        if self.layout_item.text_axis_x:
+            self.axis_x_name.setText(self.layout_item.text_axis_x)
+            
+        self.axis_x_name.textChanged.connect(self.update_axis_x)
+        
+        self.axis_y_name = QLineEdit()
+        
+        if self.layout_item.text_axis_y:
+            self.axis_y_name.setText(self.layout_item.text_axis_y)
+            
+        self.axis_y_name.textChanged.connect(self.update_axis_y)
 
         if self.layout_item.linked_layer_name:
             self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
@@ -99,17 +104,53 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.setLayout(self.form_layout)
 
     def pass_linesymbol(self):
+
+        self.layout_item.beginCommand(
+            self.tr('Change line symbol'),
+            QgsLayoutItem.UndoCustomCommand
+        )
+
+        self.layout_item.blockSignals(True)
         self.layout_item.set_line_format(self.b_line_symbol.symbol().clone())
-        # log(get_symbol_dict(self.b_line_symbol.symbol().clone()))
-
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()     
+        
     def pass_textformat_to_item(self):
-        self.layout_item.set_text_format(self.b_font.textFormat())
+        
+        self.layout_item.beginCommand(
+            self.tr('Change text format'),
+            QgsLayoutItem.UndoCustomCommand
+        )
 
+        self.layout_item.blockSignals(True)
+        self.layout_item.set_text_format(self.b_font.textFormat())
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
+        
     def update_axis_x(self, text: str):
+        
+        self.layout_item.beginCommand(
+            self.tr('Change change x axis name'),
+            QgsLayoutItem.UndoCustomCommand
+        )
+        
+        self.layout_item.blockSignals(True)
         self.layout_item.set_axis_x_name(text)
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
+                
 
     def update_axis_y(self, text: str):
+ 
+        self.layout_item.beginCommand(
+            self.tr('Change change y axis name'),
+            QgsLayoutItem.UndoCustomCommand
+        )
+        
+        self.layout_item.blockSignals(True)
         self.layout_item.set_axis_y_name(text)
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
 
     def update_layer_to_work_with(self):
 
@@ -121,11 +162,21 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                 if layer.name() == self.cb_layers.currentText():
 
-                    self.layout_item.set_linked_layer(layer)
-                    break
+                    self.layout_item.beginCommand(
+                        self.tr('Change linked layer'),
+                        QgsLayoutItem.UndoCustomCommand
+                    )
 
-        self.axis_x_name.setText(self.layout_item.renderer.field_name_1)
-        self.axis_y_name.setText(self.layout_item.renderer.field_name_2)
+                    self.layout_item.blockSignals(True)
+                    self.layout_item.set_linked_layer(layer)
+                    self.layout_item.blockSignals(False)
+                    self.layout_item.endCommand()
+                    break
+        
+        if self.layout_item.are_labels_default():
+            
+            self.axis_x_name.setText(self.layout_item.renderer.field_name_1)
+            self.axis_y_name.setText(self.layout_item.renderer.field_name_2)
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
