@@ -161,24 +161,24 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         # text
         # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L979
 
-    def set_linked_layer(self, layer: QgsVectorLayer) -> NoReturn:
+    def set_linked_layer(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
         self.renderer = layer.renderer().clone()
         self.refresh()
 
-    def set_line_format(self, line_format: QgsLineSymbol):
+    def set_line_format(self, line_format: QgsLineSymbol) -> None:
         self.line_format = line_format
         self.refresh()
 
-    def set_text_format(self, text_format: QgsTextFormat):
+    def set_text_format(self, text_format: QgsTextFormat) -> None:
         self.text_format = text_format
         self.refresh()
 
-    def set_axis_x_name(self, name: str) -> NoReturn:
+    def set_axis_x_name(self, name: str) -> None:
         self.text_axis_x = name
         self.refresh()
 
-    def set_axis_y_name(self, name: str) -> NoReturn:
+    def set_axis_y_name(self, name: str) -> None:
         self.text_axis_y = name
         self.refresh()
 
