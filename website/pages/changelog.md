@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4
+
+  - Implementation of option to rotate legend by 45 degrees
+
+  - Fix wrong default setting for arrows, which did not look good while zooming in the layout 
+
 ## 0.3.1
 
   - Fix bug, where texts were not preserved correctly in legend item (in layout)
