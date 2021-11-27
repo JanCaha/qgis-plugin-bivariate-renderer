@@ -38,6 +38,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     text_format: QgsTextFormat
     line_format: QgsSymbol
 
+    legend_rotated: bool
+    
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -52,6 +54,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.line_format.setColor(QColor(0, 0, 0))
 
         self.renderer = None
+        
+        self.legend_rotated = False
             
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
@@ -66,6 +70,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         legend_render.axis_line_symbol = self.line_format
 
+        legend_render.legend_rotated = self.legend_rotated
+        
         item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
 
         if self.renderer:
@@ -83,6 +89,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("axis_x_name", self.text_axis_x)
         bivariate_legend_element.setAttribute("axis_y_name", self.text_axis_y)
 
+        bivariate_legend_element.setAttribute("legend_rotated", str(self.legend_rotated))
+        
         line_symbol = doc.createElement("lineSymbol")
 
         symbol_elem = QgsSymbolLayerUtils.saveSymbol("",
@@ -153,6 +161,13 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_axis_x = element.attribute("axis_x_name")
         self.text_axis_y = element.attribute("axis_y_name")
         
+        if element.hasAttribute("legend_rotated"):
+        
+            self.legend_rotated = element.attribute("legend_rotated") == "True"
+        
+        else:
+            self.legend_rotated = False
+        
         return True
 
         # line
@@ -180,6 +195,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         
     def set_axis_y_name(self, name: str) -> None:
         self.text_axis_y = name
+        self.refresh()
+    
+    def set_legend_rotated(self, rotated: bool) -> None:
+        self.legend_rotated = rotated
         self.refresh()
         
     def are_labels_default(self) -> bool:
