@@ -34,17 +34,17 @@ class LegendRenderer:
         self.axis_line_symbol = get_symbol_object("{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '3', 'arrow_start_width_unit': 'Pixel', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '3', 'arrow_width_unit': 'Pixel', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '20', 'head_length_unit': 'Pixel', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '10', 'head_thickness_unit': 'Pixel', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'Pixel', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}")
         self.axis_line_symbol.setColor(QColor(0, 0, 0))
 
-    def render(self, contex: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]):
+    def render(self, context: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]):
 
         min_size = min(width, height)
 
         width = min_size
         height = min_size
 
-        width = width * contex.scaleFactor()
-        height = height * contex.scaleFactor()
+        width = width * context.scaleFactor()
+        height = height * context.scaleFactor()
 
-        painter: QPainter = contex.painter()
+        painter: QPainter = context.painter()
 
         painter.save()
 
@@ -53,7 +53,7 @@ class LegendRenderer:
 
         painter.setPen(Qt.NoPen)
 
-        text_height = QgsTextRenderer.textHeight(contex,
+        text_height = QgsTextRenderer.textHeight(context,
                                                  self.text_format,
                                                  textLines=[self.axis_title_x])
                 
@@ -108,23 +108,23 @@ class LegendRenderer:
 
         # painter.save()
                 
-        self.axis_line_symbol.startRender(contex)
+        self.axis_line_symbol.startRender(context)
             
         self.axis_line_symbol.renderPolyline(QPolygonF([point_lines_start,
                                                         point_line_x_end]),
-                                             None, contex)
+                                             None, context)
 
         self.axis_line_symbol.renderPolyline(QPolygonF([point_lines_start,
                                                         point_line_y_end]),
-                                             None, contex)
+                                             None, context)
 
-        self.axis_line_symbol.stopRender(contex)
+        self.axis_line_symbol.stopRender(context)
 
         # painter.restore()
 
         # painter.save()
 
-        text_height = QgsTextRenderer.textHeight(contex,
+        text_height = QgsTextRenderer.textHeight(context,
                                                  self.text_format,
                                                  textLines=[self.axis_title_x])
 
@@ -132,7 +132,7 @@ class LegendRenderer:
                                  text_rotation_x,
                                  QgsTextRenderer.AlignCenter,
                                  [self.axis_title_x],
-                                 contex,
+                                 context,
                                  self.text_format,
                                  QgsTextRenderer.AlignVCenter)
 
@@ -140,7 +140,7 @@ class LegendRenderer:
                                  text_rotation_y,
                                  QgsTextRenderer.AlignCenter,
                                  [self.axis_title_y],
-                                 contex,
+                                 context,
                                  self.text_format,
                                  QgsTextRenderer.AlignVCenter)
 
