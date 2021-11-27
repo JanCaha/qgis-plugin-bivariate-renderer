@@ -48,53 +48,25 @@ class LegendRenderer:
 
         painter.save()
 
-        # TODO do it around each drawing
-        painter.save()
-
         painter.setPen(Qt.NoPen)
 
         text_height = QgsTextRenderer.textHeight(context,
                                                  self.text_format,
                                                  textLines=[self.axis_title_x])
-                
-        if self.legend_rotated:
-            
-            scale_factor = 0.73
-            
-            painter.translate(width/2, height/2)
-            painter.rotate(-45)
-            painter.scale(scale_factor, scale_factor)
-            painter.translate(-width/2, -height/2)
-            
-            size_constant = width * 0.9 / math.sqrt(len(polygons))
-            polygon_start_pos_x = width * 0.05
-            polygon_start_pos_y = width * 0.95
-            
-            point_lines_start = QPointF(width * 0.025, height * 0.975)
-            point_line_x_end = QPointF(width * 0.95, height * 0.975)
-            point_line_y_end = QPointF(width * 0.025, height * 0.05)
-            
-            text_position_x = QPointF(width * 0.5, height + text_height / 2)
-            text_rotation_x = 0
-            
-            text_position_y = QPointF(width * 0 - text_height / 2, height * 0.5)
-            text_rotation_y = math.radians(-90)
-            
-        else:
-            
-            size_constant = (width * 0.8) / math.sqrt(len(polygons))
-            polygon_start_pos_x = width * 0.2
-            polygon_start_pos_y = width * 0.8
+        
+        size_constant = (width * 0.8) / math.sqrt(len(polygons))
+        polygon_start_pos_x = width * 0.2
+        polygon_start_pos_y = width * 0.8
 
-            point_lines_start = QPointF(width * 0.15, height * 0.85)
-            point_line_x_end = QPointF(width * 1, height * 0.85)
-            point_line_y_end = QPointF(width * 0.15, height * 0)
-            
-            text_position_x = QPointF(width * 0.6, height * 0.9 + text_height / 2)
-            text_rotation_x = 0
-            
-            text_position_y = QPointF(width * 0.1, height * 0.4)
-            text_rotation_y = math.radians(90)
+        point_lines_start = QPointF(width * 0.15, height * 0.85)
+        point_line_x_end = QPointF(width * 1, height * 0.85)
+        point_line_y_end = QPointF(width * 0.15, height * 0)
+
+        text_position_x = QPointF(width * 0.6, height * 0.9 + text_height / 2)
+        text_rotation_x = 0
+
+        text_position_y = QPointF(width * 0.1, height * 0.4)
+        text_rotation_y = math.radians(90)
         
         transform = QTransform.fromTranslate(0, 0)
                 
@@ -111,7 +83,7 @@ class LegendRenderer:
             text_rotation_x = math.radians(45)
             
             text_position_y = QPointF(width * 0.1 - text_height/2, height * 0.4)
-            
+
         for polygon in polygons:
 
             painter.setBrush(QBrush(polygon.symbol.color()))
@@ -119,32 +91,32 @@ class LegendRenderer:
             polygon = QPolygonF(QRectF(polygon_start_pos_x + polygon.x * size_constant,
                                        polygon_start_pos_y -
                                        (polygon.y + 1) * size_constant,
-                                    size_constant, size_constant))
-        
-            polygon = transform.map(polygon)
-
-            painter.drawPolygon(polygon)
-                
-        self.axis_line_symbol.startRender(context)
+                                       size_constant, size_constant))
             
+            polygon = transform.map(polygon)
+            
+            painter.drawPolygon(polygon)
+                            
+        self.axis_line_symbol.startRender(context)
+        
         line_x = QPolygonF([point_lines_start,
                             point_line_x_end])
         
         line_x = transform.map(line_x)
-
+                   
         self.axis_line_symbol.renderPolyline(line_x,
                                              None, context)
 
         line_y = QPolygonF([point_lines_start,
                             point_line_y_end])
-
+        
         line_y = transform.map(line_y)
-
+        
         self.axis_line_symbol.renderPolyline(line_y,
                                              None, context)
 
         self.axis_line_symbol.stopRender(context)
-
+        
         QgsTextRenderer.drawText(transform.map(text_position_x),
                                  text_rotation_x,
                                  QgsTextRenderer.AlignCenter,
