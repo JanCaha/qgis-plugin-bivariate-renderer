@@ -8,11 +8,34 @@ on:
 
 jobs:
 
-  call-workflow-mkdocs:
-    uses: JanCaha/github_workflows/.github/workflows/run_deploy_mkdocs.yaml@8db0e6e005750801f1a6c0f767e7a635a34596fa
-    with:
-      deploy_repo: $GITHUB_REPOSITORY
-      mkdocs_config_location: ./website/mkdocs.yml
-      nojekyll_location: ./website/docs/.nojekyll
-    secrets:
-      auth_token: ${{ secrets.REPO_ACCESS }}
+  build-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2.3.4
+
+    - name: Set up Python
+      uses: actions/setup-python@v2.2.2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install mkdocs
+        python3 -m pip install MarkdownHighlight
+        python3 -m pip install https://codeload.github.com/mkdocs/mkdocs-bootstrap/zip/master
+
+    - name: Build
+      run: |
+        mkdocs build --config-file ./website/mkdocs.yml
+        touch website/docs/.nojekyll
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3.8.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./website/docs
+        publish_branch: gh-pages
