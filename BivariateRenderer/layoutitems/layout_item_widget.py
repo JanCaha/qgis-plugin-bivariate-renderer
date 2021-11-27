@@ -4,7 +4,8 @@ from qgis.PyQt.QtWidgets import (QComboBox,
                                  QPushButton,
                                  QLineEdit,
                                  QVBoxLayout,
-                                 QLabel)
+                                 QLabel,
+                                 QCheckBox)
 
 from qgis.PyQt.QtGui import QIcon
 
@@ -31,6 +32,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     pb_update_legend: QPushButton
     axis_x_name: QLineEdit
     axis_y_name: QLineEdit
+    rotate_legend: QCheckBox
 
     layout_item: BivariateRendererLayoutItem
 
@@ -90,6 +92,10 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         if self.layout_item.line_format:
             self.b_line_symbol.setSymbol(self.layout_item.line_format)
 
+        self.rotate_legend = QCheckBox("Rotate")
+        self.rotate_legend.setChecked(self.layout_item.legend_rotated)
+        self.rotate_legend.stateChanged.connect(self.update_rotate_legend)
+        
         self.form_layout = QVBoxLayout()
         self.form_layout.addWidget(QLabel("Select layer to obtain the renderer from"))
         self.form_layout.addWidget(self.cb_layers)
@@ -101,10 +107,14 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.form_layout.addWidget(self.axis_x_name)
         self.form_layout.addWidget(QLabel("Axis Y name"))
         self.form_layout.addWidget(self.axis_y_name)
+        self.form_layout.addWidget(QLabel("Rotate legend by 45 degrees"))
+        self.form_layout.addWidget(self.rotate_legend)
         self.setLayout(self.form_layout)
 
     def pass_linesymbol(self):
 
+        log(get_symbol_dict(self.b_line_symbol.symbol()))
+        
         self.layout_item.beginCommand(
             self.tr('Change line symbol'),
             QgsLayoutItem.UndoCustomCommand
@@ -152,6 +162,18 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
+    def update_rotate_legend(self):
+        
+        self.layout_item.beginCommand(
+            self.tr('Change rotated legend'),
+            QgsLayoutItem.UndoCustomCommand
+        )
+
+        self.layout_item.blockSignals(True)
+        self.layout_item.set_legend_rotated(self.rotate_legend.isChecked())
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
+    
     def update_layer_to_work_with(self):
 
         if self.cb_layers.currentText() != "":
