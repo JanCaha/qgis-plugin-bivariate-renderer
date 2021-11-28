@@ -62,10 +62,12 @@ class LegendRenderer:
         point_line_x_end = QPointF(width * 1, height * 0.85)
         point_line_y_end = QPointF(width * 0.15, height * 0)
 
-        text_position_x = QPointF(width * 0.6, height * 0.9 + text_height / 2)
+        text_position_x = QPointF(width * 0.575, 
+                                  height * 0.9 + text_height / 2)
         text_rotation_x = 0
 
-        text_position_y = QPointF(width * 0.1, height * 0.4)
+        text_position_y = QPointF(width * 0.1, 
+                                  height - height * 0.575)
         text_rotation_y = math.radians(90)
         
         transform = QTransform.fromTranslate(0, 0)
@@ -82,7 +84,8 @@ class LegendRenderer:
             text_rotation_y = math.radians(-45)
             text_rotation_x = math.radians(45)
             
-            text_position_y = QPointF(width * 0.1 - text_height/2, height * 0.4)
+            text_position_y = QPointF(text_position_y.x() - text_height/2,
+                                      text_position_y.y())
 
         for polygon in polygons:
 
