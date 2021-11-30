@@ -7,8 +7,7 @@ from qgis.PyQt.QtGui import QPolygonF, QBrush, QColor, QPainter, QTransform
 from qgis.core import (QgsTextFormat,
                        QgsLineSymbol,
                        QgsRenderContext,
-                       QgsTextRenderer,
-                       QgsUnitTypes)
+                       QgsTextRenderer)
 
 from ..renderer.bivariate_renderer import LegendPolygon
 from ..utils import log, get_symbol_object
@@ -23,6 +22,8 @@ class LegendRenderer:
     axis_line_symbol: QgsLineSymbol
     
     legend_rotated = False
+    add_axes_arrows = False
+    add_axes_texts = False
 
     def __init__(self):
 
@@ -50,7 +51,8 @@ class LegendRenderer:
 
         painter.setPen(Qt.NoPen)
 
-        text_height = QgsTextRenderer.textHeight(context,
+        text_axis_x = self.axis_title_x.split("\n")
+        text_axis_y = self.axis_title_y.split("\n")
                                                  self.text_format,
                                                  textLines=[self.axis_title_x])
         
@@ -99,6 +101,8 @@ class LegendRenderer:
             polygon = transform.map(polygon)
             
             painter.drawPolygon(polygon)
+        
+        if self.add_axes_arrows:
                             
         self.axis_line_symbol.startRender(context)
         
@@ -120,10 +124,14 @@ class LegendRenderer:
 
         self.axis_line_symbol.stopRender(context)
         
+        # https://github.com/qgis/QGIS/blob/5e98648913b82466ca9eb42ed68f4bb0b536ae96/src/core/layout/qgslayoutitemlabel.cpp#L147
+        
+        if self.add_axes_texts:
+        
         QgsTextRenderer.drawText(transform.map(text_position_x),
                                  text_rotation_x,
                                  QgsTextRenderer.AlignCenter,
-                                 [self.axis_title_x],
+                                    text_axis_x,
                                  context,
                                  self.text_format,
                                  QgsTextRenderer.AlignVCenter)
@@ -131,7 +139,7 @@ class LegendRenderer:
         QgsTextRenderer.drawText(transform.map(text_position_y),
                                  text_rotation_y,
                                  QgsTextRenderer.AlignCenter,
-                                 [self.axis_title_y],
+                                    text_axis_y,
                                  context,
                                  self.text_format,
                                  QgsTextRenderer.AlignVCenter)
