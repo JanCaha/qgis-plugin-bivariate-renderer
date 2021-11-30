@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5
+
+  - Update of the controlling layout widget new options and collapsible boxes
+
+  - axes and axes labels are now optional, does not have to be draw
+
+  - axes labels can now be multiline
+
 ## 0.4
 
   - Implementation of option to rotate legend by 45 degrees
