@@ -39,6 +39,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     line_format: QgsSymbol
 
     legend_rotated: bool
+    add_axes_arrows: bool
+    add_axes_texts: bool
     
     def __init__(self, layout: QgsLayout):
 
@@ -56,6 +58,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.renderer = None
         
         self.legend_rotated = False
+        self.add_axes_arrows = True
+        self.add_axes_texts = True
             
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
@@ -71,6 +75,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.axis_line_symbol = self.line_format
 
         legend_render.legend_rotated = self.legend_rotated
+        
+        legend_render.add_axes_texts = self.add_axes_texts
+        
+        legend_render.add_axes_arrows = self.add_axes_arrows
         
         item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
 
@@ -90,6 +98,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("axis_y_name", self.text_axis_y)
 
         bivariate_legend_element.setAttribute("legend_rotated", str(self.legend_rotated))
+        bivariate_legend_element.setAttribute("draw_axes_text", str(self.add_axes_texts))
+        bivariate_legend_element.setAttribute("draw_axes_arrow", str(self.add_axes_arrows))
         
         line_symbol = doc.createElement("lineSymbol")
 
@@ -168,6 +178,20 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         else:
             self.legend_rotated = False
         
+        if element.hasAttribute("draw_axes_text"):
+
+            self.add_axes_texts = element.attribute("draw_axes_text") == "True"
+
+        else:
+            self.add_axes_texts = True
+        
+        if element.hasAttribute("draw_axes_arrow"):
+
+            self.add_axes_arrows = element.attribute("draw_axes_arrow") == "True"
+
+        else:
+            self.add_axes_arrows = True
+
         return True
 
         # line
@@ -204,6 +228,14 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def are_labels_default(self) -> bool:
 
         return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
+    
+    def set_draw_axes_text(self, draw: bool) -> None:
+        self.add_axes_texts = draw
+        self.refresh()
+    
+    def set_draw_axes_arrow(self, draw: bool) -> None:
+        self.add_axes_arrows = draw
+        self.refresh()
     
     @property
     def get_font(self):
