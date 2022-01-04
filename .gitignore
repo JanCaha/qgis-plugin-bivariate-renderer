@@ -4,3 +4,5 @@ __pycache__
 /BivariateRenderer/layoutitems/*.tmp
 /BivariateRenderer/zip_build/
 /tests/images/image.png
+/tests/data/*-shm
+/tests/data/*-wal
