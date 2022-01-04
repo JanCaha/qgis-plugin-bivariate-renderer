@@ -64,7 +64,9 @@ def test_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer)
+    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
+                                                   field1="fid",
+                                                   field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.render(render_context,
@@ -93,7 +95,9 @@ def test_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer)
+    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
+                                                   field1="fid",
+                                                   field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -123,7 +127,9 @@ def test_legend_with_arrows_texts(qgis_countries_layer, qgs_project, qgs_layout)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer)
+    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
+                                                   field1="fid",
+                                                   field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -155,7 +161,9 @@ def test_legend_with_arrows_texts_rotated(qgis_countries_layer, qgs_project, qgs
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer)
+    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
+                                                   field1="fid",
+                                                   field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
