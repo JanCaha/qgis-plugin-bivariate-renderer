@@ -1,35 +1,15 @@
-from typing import NoReturn
+from qgis.PyQt.QtGui import (QImage, QColor, QPainter, QPixmap)
 
-from qgis.PyQt.QtGui import (QImage,
-                             QColor,
-                             QPainter,
-                             QPixmap)
-
-from qgis.PyQt.QtWidgets import (QLabel,
-                                 QFormLayout,
-                                 QLabel,
-                                 QComboBox,
-                                 QPushButton)
+from qgis.PyQt.QtWidgets import (QFormLayout, QLabel, QComboBox)
 
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.gui import (QgsRendererWidget,
-                      QgsColorRampButton,
-                      QgsFieldComboBox,
-                      QgsDoubleSpinBox)
+from qgis.gui import (QgsRendererWidget, QgsColorRampButton, QgsFieldComboBox, QgsDoubleSpinBox)
 
-from qgis.core import (QgsGradientColorRamp,
-                       QgsClassificationMethod,
-                       QgsClassificationJenks,
-                       QgsClassificationEqualInterval,
-                       QgsClassificationQuantile,
-                       QgsClassificationPrettyBreaks,
-                       QgsClassificationLogarithmic,
-                       QgsFieldProxyModel,
-                       QgsRenderContext,
-                       QgsTextFormat,
-                       QgsLineSymbol)
-
+from qgis.core import (QgsGradientColorRamp, QgsClassificationMethod, QgsClassificationJenks,
+                       QgsClassificationEqualInterval, QgsClassificationQuantile,
+                       QgsClassificationPrettyBreaks, QgsClassificationLogarithmic,
+                       QgsFieldProxyModel, QgsRenderContext, QgsTextFormat)
 
 from .bivariate_renderer import BivariateRenderer
 from ..legendrenderer.legend_renderer import LegendRenderer
@@ -55,21 +35,21 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     register_color_ramps = BivariateColorRampsRegister()
 
-    default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255),
-                                                QColor(255, 0, 0))
+    default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(255, 0, 0))
 
-    default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255),
-                                                QColor(0, 0, 255))
+    default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(0, 0, 255))
 
     bivariate_renderer: BivariateRenderer
 
     legend_renderer: LegendRenderer
 
-    classification_methods = {QgsClassificationEqualInterval().name(): QgsClassificationEqualInterval(),
-                              QgsClassificationJenks().name(): QgsClassificationJenks(),
-                              QgsClassificationQuantile().name(): QgsClassificationQuantile(),
-                              QgsClassificationPrettyBreaks().name(): QgsClassificationPrettyBreaks(),
-                              QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic()}
+    classification_methods = {
+        QgsClassificationEqualInterval().name(): QgsClassificationEqualInterval(),
+        QgsClassificationJenks().name(): QgsClassificationJenks(),
+        QgsClassificationQuantile().name(): QgsClassificationQuantile(),
+        QgsClassificationPrettyBreaks().name(): QgsClassificationPrettyBreaks(),
+        QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic()
+    }
 
     scale_factor = 1
 
@@ -141,7 +121,8 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.cb_classification_methods.currentIndexChanged.connect(self.setClassificationMethod)
 
         if self.bivariate_renderer.classification_method_name:
-            self.cb_classification_methods.setCurrentText(self.bivariate_renderer.classification_method_name)
+            self.cb_classification_methods.setCurrentText(
+                self.bivariate_renderer.classification_method_name)
         else:
             self.cb_classification_methods.setCurrentIndex(1)
             self.cb_classification_methods.setCurrentIndex(0)
@@ -151,7 +132,8 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.cb_colormixing_methods.currentIndexChanged.connect(self.setColorMixingMethod)
 
         if self.bivariate_renderer.color_mixing_method:
-            self.cb_colormixing_methods.setCurrentText(self.bivariate_renderer.color_mixing_method.name())
+            self.cb_colormixing_methods.setCurrentText(
+                self.bivariate_renderer.color_mixing_method.name())
         else:
             self.cb_colormixing_methods.setCurrentIndex(1)
 
@@ -220,108 +202,96 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.legend_renderer.axis_title_x = self.cb_field1.currentText()
         self.legend_renderer.axis_title_y = self.cb_field2.currentText()
 
-        self.legend_renderer.render(context, self.size, self.size, self.bivariate_renderer.generate_legend_polygons())
+        self.legend_renderer.render(context, self.size, self.size,
+                                    self.bivariate_renderer.generate_legend_polygons())
 
         painter.end()
 
         self.label_legend.setPixmap(QPixmap.fromImage(image))
 
-    def setNumberOfClasses(self) -> NoReturn:
+    def setNumberOfClasses(self) -> None:
 
         self.number_of_classes = int(self.sb_number_classes.value())
 
-        self.bivariate_renderer.setNumberOfClasses(
-            int(self.sb_number_classes.value())
-        )
+        self.bivariate_renderer.setNumberOfClasses(int(self.sb_number_classes.value()))
 
         self.setField1Classes()
         self.setField2Classes()
 
         self.legend_changed.emit()
 
-    def setColorMixingMethod(self) -> NoReturn:
+    def setColorMixingMethod(self) -> None:
 
         self.bivariate_renderer.setColorMixingMethod(
-            self.register_color_mixing.get_by_name(self.cb_colormixing_methods.currentText())
-        )
+            self.register_color_mixing.get_by_name(self.cb_colormixing_methods.currentText()))
 
         self.legend_changed.emit()
 
-    def setClassificationMethod(self) -> NoReturn:
+    def setClassificationMethod(self) -> None:
 
-        self.classification_method = self.classification_methods[self.cb_classification_methods.currentText()]
+        self.classification_method = self.classification_methods[
+            self.cb_classification_methods.currentText()]
 
-        self.bivariate_renderer.setClassificationMethodName(self.cb_classification_methods.currentText())
+        self.bivariate_renderer.setClassificationMethodName(
+            self.cb_classification_methods.currentText())
 
         self.setField1Classes()
         self.setField2Classes()
 
         self.legend_changed.emit()
 
-    def setColorRamp1(self) -> NoReturn:
+    def setColorRamp1(self) -> None:
 
-        self.bivariate_renderer.setColorRamp1(
-            self.bt_color_ramp1.colorRamp()
-        )
+        self.bivariate_renderer.setColorRamp1(self.bt_color_ramp1.colorRamp())
 
         self.legend_changed.emit()
 
-    def setColorRamp2(self) -> NoReturn:
+    def setColorRamp2(self) -> None:
 
-        self.bivariate_renderer.setColorRamp2(
-            self.bt_color_ramp2.colorRamp()
-        )
+        self.bivariate_renderer.setColorRamp2(self.bt_color_ramp2.colorRamp())
 
         self.legend_changed.emit()
 
-    def setFieldName1(self) -> NoReturn:
+    def setFieldName1(self) -> None:
 
         self.field_name_1 = self.cb_field1.currentText()
 
-        self.bivariate_renderer.setFieldName1(
-            self.cb_field1.currentText()
-        )
+        self.bivariate_renderer.setFieldName1(self.cb_field1.currentText())
 
         self.setField1Classes()
 
         self.legend_changed.emit()
 
-    def setFieldName2(self) -> NoReturn:
+    def setFieldName2(self) -> None:
 
         self.field_name_2 = self.cb_field2.currentText()
 
-        self.bivariate_renderer.setFieldName2(
-            self.cb_field2.currentText()
-        )
+        self.bivariate_renderer.setFieldName2(self.cb_field2.currentText())
 
         self.setField2Classes()
 
         self.legend_changed.emit()
 
-    def setField1Classes(self):
+    def setField1Classes(self) -> None:
 
         self.bivariate_renderer.setField1Classes(
-            self.classification_method.classes(self.vectorLayer(),
-                                               self.field_name_1,
-                                               self.number_of_classes)
-        )
+            self.classification_method.classes(self.vectorLayer(), self.field_name_1,
+                                               self.number_of_classes))
 
-    def setField2Classes(self):
+    def setField2Classes(self) -> None:
 
         self.bivariate_renderer.setField2Classes(
-            self.classification_method.classes(self.vectorLayer(),
-                                               self.field_name_2,
-                                               self.number_of_classes)
-        )
+            self.classification_method.classes(self.vectorLayer(), self.field_name_2,
+                                               self.number_of_classes))
 
-    def log_renderer(self):
+    def log_renderer(self) -> None:
 
         log(repr(self.bivariate_renderer))
 
-    def renderer(self):
+    def renderer(self) -> BivariateRenderer:
         return self.bivariate_renderer
 
-    def change_color_ramps(self):
+    def change_color_ramps(self) -> None:
         name = self.cb_color_ramps.currentText()
 
         if name != "":

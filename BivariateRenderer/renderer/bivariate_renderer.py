@@ -1,18 +1,12 @@
 from __future__ import annotations
-from typing import NoReturn, List, Dict, Union
-from pathlib import Path
+from typing import List, Dict
 from dataclasses import dataclass
-
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtXml import QDomDocument, QDomElement
 
-from qgis.core import (QgsFeatureRenderer, QgsClassificationRange,
-                       QgsFeature,
-                       QgsColorRamp,
-                       QgsFillSymbol,
-                       QgsSymbolLayerUtils,
-                       QgsProcessingUtils)
+from qgis.core import (QgsFeatureRenderer, QgsClassificationRange, QgsFeature, QgsColorRamp,
+                       QgsFillSymbol, QgsSymbolLayerUtils)
 
 from ..text_constants import Texts
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
@@ -70,7 +64,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return int(size_constant)
 
-    def getLegendCategories(self) -> Dict[int, Dict[str, Union[int, str]]]:
+    def getLegendCategories(self) -> Dict[int, Dict[str, object]]:
 
         position = {}
 
@@ -84,15 +78,21 @@ class BivariateRenderer(QgsFeatureRenderer):
             y = 0
             for field_2_cat in self.field_2_classes:
 
-                color = self.getFeatureColor((field_1_cat.lowerBound() + field_1_cat.upperBound())/2,
-                                             (field_2_cat.lowerBound() + field_2_cat.upperBound())/2)
+                color = self.getFeatureColor(
+                    (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
+                    (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
 
-                value_hash = self.getFeatureValueCombinationHash((field_1_cat.lowerBound() + field_1_cat.upperBound())/2,
-                                                                 (field_2_cat.lowerBound() + field_2_cat.upperBound())/2)
+                value_hash = self.getFeatureValueCombinationHash(
+                    (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
+                    (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
 
-                position.update({value_hash: {"x": int(start_x + x*size_constant),
-                                              "y": int(start_y - y*size_constant),
-                                              "color": str(color.name())}})
+                position.update({
+                    value_hash: {
+                        "x": int(start_x + x * size_constant),
+                        "y": int(start_y - y * size_constant),
+                        "color": str(color.name())
+                    }
+                })
 
                 y += 1
 
@@ -100,47 +100,49 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return position
 
-    def setColorMixingMethod(self, method: ColorMixingMethod) -> NoReturn:
+    def setColorMixingMethod(self, method: ColorMixingMethod) -> None:
         self.color_mixing_method = method
         self._reset_cache()
 
-    def setClassificationMethodName(self, name: str) -> NoReturn:
+    def setClassificationMethodName(self, name: str) -> None:
         self.classification_method_name = name
         self._reset_cache()
 
-    def setNumberOfClasses(self, number: int) -> NoReturn:
+    def setNumberOfClasses(self, number: int) -> None:
         self.number_classes = int(number)
         self._reset_cache()
 
-    def setColorRamp1(self, color_ramp: QgsColorRamp) -> NoReturn:
+    def setColorRamp1(self, color_ramp: QgsColorRamp) -> None:
         self.color_ramp_1 = color_ramp
         self._reset_cache()
 
-    def setColorRamp2(self, color_ramp: QgsColorRamp) -> NoReturn:
+    def setColorRamp2(self, color_ramp: QgsColorRamp) -> None:
         self.color_ramp_2 = color_ramp
         self._reset_cache()
 
-    def setFieldName1(self, field_name: str) -> NoReturn:
+    def setFieldName1(self, field_name: str) -> None:
         self.field_name_1 = field_name
         self._reset_cache()
 
-    def setFieldName2(self, field_name: str) -> NoReturn:
+    def setFieldName2(self, field_name: str) -> None:
         self.field_name_2 = field_name
         self._reset_cache()
 
-    def setField1Classes(self, classes: List[QgsClassificationRange]) -> NoReturn:
+    def setField1Classes(self, classes: List[QgsClassificationRange]) -> None:
         self.field_1_classes = classes
 
-        self.field_1_min = (self.field_1_classes[0].lowerBound() + self.field_1_classes[0].upperBound()) / 2
-        self.field_1_max = (self.field_1_classes[len(self.field_1_classes)-1].lowerBound() +
-                            self.field_1_classes[len(self.field_1_classes)-1].upperBound()) / 2
+        self.field_1_min = (self.field_1_classes[0].lowerBound() +
+                            self.field_1_classes[0].upperBound()) / 2
+        self.field_1_max = (self.field_1_classes[len(self.field_1_classes) - 1].lowerBound() +
+                            self.field_1_classes[len(self.field_1_classes) - 1].upperBound()) / 2
 
         self._reset_cache()
 
-    def setField2Classes(self, classes: List[QgsClassificationRange]) -> NoReturn:
+    def setField2Classes(self, classes: List[QgsClassificationRange]) -> None:
         self.field_2_classes = classes
 
-        self.field_2_min = (self.field_2_classes[0].lowerBound() + self.field_2_classes[0].upperBound()) / 2
+        self.field_2_min = (self.field_2_classes[0].lowerBound() +
+                            self.field_2_classes[0].upperBound()) / 2
         self.field_2_max = (self.field_2_classes[len(self.field_2_classes) - 1].lowerBound() +
                             self.field_2_classes[len(self.field_2_classes) - 1].upperBound()) / 2
 
@@ -336,7 +338,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setField2Classes(field_2_classes)
 
         if element.hasAttribute('color_mixing_method'):
-            r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(element.attribute('color_mixing_method')))
+            r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(
+                element.attribute('color_mixing_method')))
         else:
             r.setColorMixingMethod(ColorMixingMethodDarken())
 
@@ -348,10 +351,12 @@ class BivariateRenderer(QgsFeatureRenderer):
     @staticmethod
     def get_default_symbol():
 
-        symbol = QgsFillSymbol.createSimple({"color": "#cccccc",
-                                             "outline_width": "0.0",
-                                             "outline_color": "0,0,0",
-                                             'outline_style': 'no'})
+        symbol = QgsFillSymbol.createSimple({
+            "color": "#cccccc",
+            "outline_width": "0.0",
+            "outline_color": "0,0,0",
+            'outline_style': 'no'
+        })
 
         return symbol
 
@@ -387,12 +392,12 @@ class BivariateRenderer(QgsFeatureRenderer):
             y = 0
             for field_2_cat in self.field_2_classes:
 
-                polygons.append(LegendPolygon(x=x,
-                                              y=y,
-                                              symbol=self.get_symbol_for_values(
-                                                  (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
-                                                  (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
-                                              ))
+                polygons.append(
+                    LegendPolygon(x=x,
+                                  y=y,
+                                  symbol=self.get_symbol_for_values(
+                                      (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
+                                      (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)))
                 y += 1
             x += 1
 
