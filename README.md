@@ -1,7 +1,7 @@
 # LoS Tools
 
 [![Tests for Plugin BivariateRenderer](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/test_plugin.yaml/badge.svg)](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/test_plugin.yaml)
-[!Build Documentation and Deploy to GitHub Pages](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/mkdocs_build_deploy.yaml/badge.svg)](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/mkdocs_build_deploy.yaml)
+[![Build Documentation and Deploy to GitHub Pages](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/mkdocs_build_deploy.yaml/badge.svg)](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/mkdocs_build_deploy.yaml)
 
 **Bivariate color polygon renderer** is a [QGIS](https://qgis.org/en/site/) plugin for creating visualizations based on combination of two variables. 
 
