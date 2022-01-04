@@ -1,15 +1,20 @@
-from typing import Union
+from typing import Optional, Union
 
 from qgis.core import (QgsReadWriteContext, QgsTextFormat, QgsVectorLayer,
-                       QgsClassificationEqualInterval, QgsGradientColorRamp)
+                       QgsClassificationEqualInterval, QgsGradientColorRamp, QgsLayout,
+                       QgsLayoutItemPage, QgsLayoutSize, QgsUnitTypes, QgsLayoutItemMap,
+                       QgsLayoutExporter)
+from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtXml import QDomElement, QDomDocument
 from qgis.PyQt.QtGui import QColor, QPainter, QImage, qRgba
+from qgis.PyQt.QtCore import QRectF, QSize
 
 from PIL import Image
 
 import numpy as np
 
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
+from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp
 
 
 def xml_string(element: Union[QDomElement, QgsTextFormat]) -> str:
@@ -59,8 +64,8 @@ def set_up_bivariate_renderer(
 
     if color_ramps is None:
 
-    default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(255, 0, 0))
-    default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(0, 0, 255))
+        default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(255, 0, 0))
+        default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(0, 0, 255))
 
     else:
 
@@ -104,3 +109,33 @@ def set_up_painter(image: QImage) -> QPainter:
     assert painter
 
     return painter
+
+
+def create_layout_for_layer(layer: QgsVectorLayer, qgs_layout: QgsLayout) -> QImage:
+
+    canvas = QgsMapCanvas()
+
+    extent = layer.extent()
+    canvas.setExtent(extent)
+
+    page = QgsLayoutItemPage(qgs_layout)
+    page.setPageSize(QgsLayoutSize(1200, 700, QgsUnitTypes.LayoutMillimeters))
+    collection = qgs_layout.pageCollection()
+    collection.addPage(page)
+
+    map_item = QgsLayoutItemMap(qgs_layout)
+    map_item.attemptSetSceneRect(QRectF(0, 0, 1200, 700))
+
+    map_item.setCrs(layer.crs())
+    map_item.zoomToExtent(extent)
+
+    qgs_layout.addItem(map_item)
+
+    dpmm = 200 / 25.4
+    width = int(dpmm * page.pageSize().width())
+    height = int(dpmm * page.pageSize().height())
+
+    size = QSize(width, height)
+    exporter = QgsLayoutExporter(qgs_layout)
+
+    return exporter.renderPageToImage(0, size)
