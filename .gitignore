@@ -1,4 +1,6 @@
 /.idea
 __pycache__
+.coverage
 /BivariateRenderer/layoutitems/*.tmp
 /BivariateRenderer/zip_build/
+/tests/images/image.png
