@@ -1,0 +1,30 @@
+name: Tests for Plugin BivariateRenderer
+
+on:
+  push:
+    paths:
+    - "BivariateRenderer/**"
+    - "tests/**"
+    - ".github/workflows/test_plugin.yaml"
+
+
+jobs:
+
+  Tests-plugin-BivariateRenderer:
+
+    runs-on: ubuntu-latest
+
+    container: cahik/vscode-ubuntu-qgis-testing:latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Print dir
+        run: dir
+
+      - name: Run tests
+        run: |
+          PYTHONPATH=$PYTHONPATH:./qgis-plugin-bivariate-renderer
+          pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP
