@@ -51,17 +51,27 @@ def assert_images_equal(image_1: str, image_2: str):
         assert normalized_sum_sq_diff < 0.001
 
 
-def set_up_bivariate_renderer(layer: QgsVectorLayer) -> BivariateRenderer:
+def set_up_bivariate_renderer(
+        layer: QgsVectorLayer,
+        field1: str = "",
+        field2: str = "",
+        color_ramps: Optional[BivariateColorRamp] = None) -> BivariateRenderer:
+
+    if color_ramps is None:
 
     default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(255, 0, 0))
-
     default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(0, 0, 255))
+
+    else:
+
+        default_color_ramp_1 = color_ramps.color_ramp_1
+        default_color_ramp_2 = color_ramps.color_ramp_2
 
     classification_method = QgsClassificationEqualInterval()
 
     bivariate_renderer = BivariateRenderer()
-    bivariate_renderer.setFieldName1("fid")
-    bivariate_renderer.setFieldName2("fid")
+    bivariate_renderer.setFieldName1(field1)
+    bivariate_renderer.setFieldName2(field2)
     bivariate_renderer.setColorRamp1(default_color_ramp_1)
     bivariate_renderer.setColorRamp2(default_color_ramp_2)
     bivariate_renderer.setField1Classes(
