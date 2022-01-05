@@ -29,6 +29,7 @@ from .renderer.bivariate_renderer_metadata import BivariateRendererMetadata
 
 from .layoutitems.layout_item import BivariateRendererLayoutItemMetadata
 from .layoutitems.layout_item_widget import BivariateRendererLayoutItemGuiMetadata
+from .bivariate_renderer_provider import BivariateRendererProvider
 
 
 class BivariateRendererPlugin:
@@ -44,7 +45,8 @@ class BivariateRendererPlugin:
         self.bivariate_renderer_layout_item_metadata = BivariateRendererLayoutItemMetadata()
 
         # TODO disconnect
-        QgsApplication.layoutItemRegistry().addLayoutItemType(self.bivariate_renderer_layout_item_metadata)
+        QgsApplication.layoutItemRegistry().addLayoutItemType(
+            self.bivariate_renderer_layout_item_metadata)
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -52,7 +54,10 @@ class BivariateRendererPlugin:
         QgsApplication.rendererRegistry().addRenderer(self.bivariate_renderer_metadata)
 
         # TODO disconnect
-        QgsGui.layoutItemGuiRegistry().addLayoutItemGuiMetadata(self.bivariate_renderer_layout_item_gui_metadata)
+        QgsGui.layoutItemGuiRegistry().addLayoutItemGuiMetadata(
+            self.bivariate_renderer_layout_item_gui_metadata)
+
+        self.initProcessing()
 
         # # TODO to remove after
         # from .legendrenderer.legend_renderer import LegendRenderer
@@ -81,10 +86,12 @@ class BivariateRendererPlugin:
         """Removes the plugin menu item and icon from QGIS GUI."""
 
         QgsApplication.rendererRegistry().removeRenderer(self.bivariate_renderer_metadata.name())
+        QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def run(self):
         """Run method that performs all the real work"""
         pass
 
-
-
+    def initProcessing(self):
+        self.provider = BivariateRendererProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
