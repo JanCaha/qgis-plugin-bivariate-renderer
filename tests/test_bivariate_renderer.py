@@ -2,7 +2,7 @@ from qgis.core import (QgsVectorLayer, QgsProject, QgsLayout)
 
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 
-from tests import set_up_bivariate_renderer, create_layout_for_layer, assert_images_equal
+from tests import set_up_bivariate_renderer, save_layout_for_layer, assert_images_equal
 
 
 def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProject,
@@ -17,8 +17,8 @@ def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProjec
 
     qgs_project.addMapLayer(nc_layer)
 
-    image = create_layout_for_layer(nc_layer, qgs_layout)
+    rendered_layout = "./tests/images/image.png"
 
-    image.save("./tests/images/image.png", "PNG")
+    save_layout_for_layer(nc_layer, qgs_layout, rendered_layout)
 
-    assert_images_equal("tests/images/correct/polygons_render.png", "tests/images/image.png")
+    assert_images_equal("tests/images/correct/layout_polygons_render.png", rendered_layout)
