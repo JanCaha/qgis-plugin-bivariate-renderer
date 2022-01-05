@@ -294,6 +294,9 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setNumberOfClasses(element.attribute("number_of_classes"))
         r.setClassificationMethodName(element.attribute("classification_method_name "))
 
+        if r.classification_method_name == "":
+            r.classification_method_name = None
+
         color_ramp_1_elem = element.firstChildElement("colorramp")
         r.setColorRamp1(QgsSymbolLayerUtils.loadColorRamp(color_ramp_1_elem))
 
