@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from pathlib import Path
 
 from qgis.core import (QgsReadWriteContext, QgsTextFormat, QgsVectorLayer,
                        QgsClassificationEqualInterval, QgsGradientColorRamp, QgsLayout,
@@ -111,31 +112,59 @@ def set_up_painter(image: QImage) -> QPainter:
     return painter
 
 
-def create_layout_for_layer(layer: QgsVectorLayer, qgs_layout: QgsLayout) -> QImage:
+LAYOUT_WIDTH = 297
+LAYOUT_HEIGHT = 210
+DPMM = 300 / 25.4
+
+
+def get_layout_space() -> QRectF:
+    return QRectF(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT)
+
+
+def set_up_layout_page_a4(qgs_layout: QgsLayout) -> QgsLayoutItemPage:
+
+    page = QgsLayoutItemPage(qgs_layout)
+    page.setPageSize(QgsLayoutSize(LAYOUT_WIDTH, LAYOUT_HEIGHT, QgsUnitTypes.LayoutMillimeters))
+    collection = qgs_layout.pageCollection()
+    collection.addPage(page)
+
+    return page
+
+
+def export_page_to_image(qgs_layout: QgsLayout, page: QgsLayoutItemPage,
+                         image_path: Union[Path, str]) -> None:
+
+    if isinstance(image_path, Path):
+        image_path = image_path.as_posix()
+
+    width = int(DPMM * page.pageSize().width())
+    height = int(DPMM * page.pageSize().height())
+
+    size = QSize(width, height)
+
+    exporter = QgsLayoutExporter(qgs_layout)
+
+    image: QImage = exporter.renderPageToImage(0, size)
+
+    image.save(image_path, "PNG")
+
+
+def save_layout_for_layer(layer: QgsVectorLayer, qgs_layout: QgsLayout,
+                          image_path: Union[str, Path]) -> QImage:
 
     canvas = QgsMapCanvas()
 
     extent = layer.extent()
     canvas.setExtent(extent)
 
-    page = QgsLayoutItemPage(qgs_layout)
-    page.setPageSize(QgsLayoutSize(1200, 700, QgsUnitTypes.LayoutMillimeters))
-    collection = qgs_layout.pageCollection()
-    collection.addPage(page)
+    page = set_up_layout_page_a4(qgs_layout)
 
     map_item = QgsLayoutItemMap(qgs_layout)
-    map_item.attemptSetSceneRect(QRectF(0, 0, 1200, 700))
+    map_item.attemptSetSceneRect(get_layout_space())
 
     map_item.setCrs(layer.crs())
     map_item.zoomToExtent(extent)
 
     qgs_layout.addItem(map_item)
 
-    dpmm = 200 / 25.4
-    width = int(dpmm * page.pageSize().width())
-    height = int(dpmm * page.pageSize().height())
-
-    size = QSize(width, height)
-    exporter = QgsLayoutExporter(qgs_layout)
-
-    return exporter.renderPageToImage(0, size)
+    export_page_to_image(qgs_layout, page, image_path)
