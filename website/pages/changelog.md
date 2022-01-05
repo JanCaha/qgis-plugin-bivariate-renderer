@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6
+
+  - add tool to calculate categories as String attribute
+
+  - add tests to ensure better stability of plugin and avoid of unnexpected erros
+
 ## 0.5
 
   - Update of the controlling layout widget new options and collapsible boxes
