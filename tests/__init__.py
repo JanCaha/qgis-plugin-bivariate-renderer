@@ -18,7 +18,7 @@ from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp
 
 
-def xml_string(element: Union[QDomElement, QgsTextFormat]) -> str:
+def xml_string(element: Union[QDomElement, QgsTextFormat, BivariateRenderer]) -> str:
 
     xml = QDomDocument("doc")
 
@@ -29,6 +29,12 @@ def xml_string(element: Union[QDomElement, QgsTextFormat]) -> str:
     if isinstance(element, QgsTextFormat):
 
         t = element.writeXml(xml, QgsReadWriteContext())
+
+        xml.appendChild(t)
+
+    elif isinstance(element, BivariateRenderer):
+
+        t = element.save(xml, QgsReadWriteContext())
 
         xml.appendChild(t)
 
