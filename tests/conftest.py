@@ -15,8 +15,14 @@ def qgs_layout(qgs_project) -> QgsLayout:
 
 
 @pytest.fixture
-def nc_layer() -> QgsVectorLayer:
+def nc_layer_path() -> str:
 
     path = Path(__file__).parent / "data" / "nc_data.gpkg"
 
-    return QgsVectorLayer(f"{path.as_posix()}|layername=nc_data", "layer", "ogr")
+    return f"{path.as_posix()}|layername=nc_data"
+
+
+@pytest.fixture
+def nc_layer(nc_layer_path) -> QgsVectorLayer:
+
+    return QgsVectorLayer(nc_layer_path, "layer", "ogr")
