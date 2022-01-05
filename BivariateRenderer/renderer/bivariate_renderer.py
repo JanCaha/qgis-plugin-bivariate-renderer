@@ -406,6 +406,27 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return polygons
 
+    def __eq__(self, other: object) -> bool:
+
+        if not isinstance(other, BivariateRenderer):
+            return False
+
+        else:
+            if (self.field_name_1 == other.field_name_1 and
+                    self.field_name_2 == other.field_name_2 and
+                    self.number_classes == other.number_classes and
+                    self.classification_method_name == other.classification_method_name and
+                    self.field_1_min == other.field_1_min and
+                    self.field_1_max == other.field_1_max and
+                    self.field_2_min == other.field_2_min and
+                    self.field_2_max == other.field_2_max and
+                    self.color_ramp_1.properties() == other.color_ramp_1.properties() and
+                    self.color_ramp_2.properties() == other.color_ramp_2.properties()):
+                return True
+
+            else:
+                return False
+
 
 @dataclass
 class LegendPolygon:
