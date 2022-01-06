@@ -4,7 +4,7 @@ from pathlib import Path
 from qgis.core import (QgsReadWriteContext, QgsTextFormat, QgsVectorLayer,
                        QgsClassificationEqualInterval, QgsGradientColorRamp, QgsLayout,
                        QgsLayoutItemPage, QgsLayoutSize, QgsUnitTypes, QgsLayoutItemMap,
-                       QgsLayoutExporter)
+                       QgsLayoutExporter, QgsStyle)
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtXml import QDomElement, QDomDocument
 from qgis.PyQt.QtGui import QColor, QPainter, QImage, qRgba
@@ -15,7 +15,8 @@ from PIL import Image
 import numpy as np
 
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp
+from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
+from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp, BivariateColorRampGreenPink
 
 
 def xml_string(element: Union[QDomElement, QgsTextFormat, BivariateRenderer]) -> str:
@@ -174,3 +175,15 @@ def save_layout_for_layer(layer: QgsVectorLayer, qgs_layout: QgsLayout,
     qgs_layout.addItem(map_item)
 
     export_page_to_image(qgs_layout, page, image_path)
+
+
+def set_up_bivariate_renderer_widget(layer: QgsVectorLayer) -> BivariateRendererWidget:
+
+    bivariate_renderer = set_up_bivariate_renderer(layer,
+                                                   field1="AREA",
+                                                   field2="PERIMETER",
+                                                   color_ramps=BivariateColorRampGreenPink())
+
+    widget = BivariateRendererWidget(layer=layer, style=QgsStyle(), renderer=bivariate_renderer)
+
+    return widget
