@@ -1,5 +1,6 @@
 from typing import Optional, Union
 from pathlib import Path
+import pytest
 
 from qgis.core import (QgsReadWriteContext, QgsTextFormat, QgsVectorLayer,
                        QgsClassificationEqualInterval, QgsGradientColorRamp, QgsLayout,
@@ -56,12 +57,17 @@ def assert_images_equal(image_1: str, image_2: str):
 
     sum_sq_diff = np.sum((np.asarray(img1).astype('float') - np.asarray(img2).astype('float'))**2)
 
-    if sum_sq_diff == 0:
-        # Images are exactly the same
-        pass
-    else:
+    if 0 < sum_sq_diff:
         normalized_sum_sq_diff = sum_sq_diff / np.sqrt(sum_sq_diff)
-        assert normalized_sum_sq_diff < 0.001
+    else:
+        normalized_sum_sq_diff = 0
+
+    if normalized_sum_sq_diff > 0.001:
+        __tracebackhide__ = True
+        pytest.fail(f"Images \n{image_1}\n{image_2}\ndo not look the same.\n"
+                    f"Difference is {normalized_sum_sq_diff}.")
+    else:
+        pass
 
 
 def set_up_bivariate_renderer(
