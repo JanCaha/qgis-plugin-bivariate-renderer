@@ -1,13 +1,6 @@
 {
-	"name": "Ubuntu",
-	"build": {
-		"dockerfile": "Dockerfile",
-		// Update 'VARIANT' to pick an Ubuntu version: hirsute, focal, bionic
-		// Use hirsute or bionic on local arm64/Apple Silicon.
-		"args": {
-			"VARIANT": "focal"
-		}
-	},
+	"name": "ubuntu-qgis-dev-vscode",
+	"image": "cahik/vscode-ubuntu-qgis-testing:v2",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {},
 	// Add the IDs of extensions you want installed when the container is created.
