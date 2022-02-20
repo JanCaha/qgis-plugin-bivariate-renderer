@@ -1,4 +1,4 @@
-# LoS Tools
+# Bivariate color polygon renderer
 
 [![Tests for Plugin BivariateRenderer](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/test_plugin.yaml/badge.svg)](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/test_plugin.yaml)
 [![Build Documentation and Deploy to GitHub Pages](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/mkdocs_build_deploy.yaml/badge.svg)](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/actions/workflows/mkdocs_build_deploy.yaml)
