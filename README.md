@@ -10,3 +10,13 @@ The plugin can be installed directly from **QGIS** Plugins menu.
 The website with description is available here: [https://jancaha.github.io/qgis-plugin-bivariate-renderer/](https://jancaha.github.io/qgis-plugin-bivariate-renderer/).
 
 The plugin page is: [hhttps://plugins.qgis.org/plugins/BivariateRenderer/](https://plugins.qgis.org/plugins/BivariateRenderer/).
+
+## How to use the plugin
+
+The render is located in the "Symbology" menu for polygon vector layers.
+
+![Render location and settings](./website/pages/images/anim_bivariate_renderer.gif)
+
+The legend in layout has its own icon on the left side, or can be found in "Add Item" menu as "Add Plot item Bivariate Renderer".
+
+![Render location and settings](./website/pages/images/anim_layout_legend.gif)
