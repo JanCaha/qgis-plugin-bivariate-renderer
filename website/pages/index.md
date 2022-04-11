@@ -13,6 +13,16 @@ The plugin contains all the necessary python objects to handle creation of bivar
 
 The plugin is available from QGIS Python Plugins Repository [here](https://plugins.qgis.org/plugins/BivariateRenderer/). It can also be installed directly from QGIS via the **Plugins** tool.
 
+## How to use the plugin
+
+The render is located in the "Symbology" menu for polygon vector layers.
+
+![Render location and settings](./images/anim_bivariate_renderer.gif)
+
+The legend in layout has its own icon on the left side, or can be found in "Add Item" menu as "Add Plot item Bivariate Renderer".
+
+![Render location and settings](./images/anim_layout_legend.gif)
+
 ## Contributors
 
 [List of project contributors on GitHub.](https://github.com/JanCaha/qgis-plugin-bivariate-renderer/graphs/contributors)
