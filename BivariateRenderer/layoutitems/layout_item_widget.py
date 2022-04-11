@@ -197,7 +197,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
                 
-
     def update_axis_y(self):
  
         self.layout_item.beginCommand(
@@ -269,8 +268,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         
         if self.layout_item.are_labels_default():
             
-            self.axis_x_name.setText(self.layout_item.renderer.field_name_1)
-            self.axis_y_name.setText(self.layout_item.renderer.field_name_2)
+            self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
+            self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
