@@ -1,10 +1,14 @@
 # Changelog
 
+## 0.7
+
+  - fix error in Layout Widget, where attribute names were not correctly into Layout Item when it was created 
+
 ## 0.6
 
   - add tool to calculate categories as String attribute
 
-  - add tests to ensure better stability of plugin and avoid of unnexpected erros
+  - add tests to ensure better stability of plugin and avoid of unexpected errors
 
 ## 0.5
 
