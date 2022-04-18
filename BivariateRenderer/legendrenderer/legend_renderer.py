@@ -33,6 +33,8 @@ class LegendRenderer:
     _text_axis_x: List[str]
     _text_axis_y: List[str]
 
+    _transform: QTransform = None
+
     def __init__(self):
 
         self._painter = None
@@ -248,24 +250,26 @@ class LegendRenderer:
     @property
     def transform(self) -> QTransform:
 
-        transform = QTransform()
+        if self._transform is None:
 
-        if self.legend_rotated:
+            self._transform = QTransform()
 
-            max_size = self.height - self.arrow_start_x
-            size = self.height - max_size
+            if self.legend_rotated:
 
-            scale_factor_orig = self.height / math.sqrt(
-                math.pow(max_size, 2) + math.pow(max_size, 2))
-            scale_factor = (int(scale_factor_orig * 100) / 100) - 0.02
+                max_size = self.height - self.arrow_start_x
+                size = self.height - max_size
 
-            transform.translate(self.width / 2, self.height / 2)
-            transform.rotate(-45)
-            transform.scale(scale_factor, scale_factor)
-            transform.translate(-(self.width / 2) - (size / 2) * scale_factor_orig,
-                                -(self.height / 2) + (size / 2) * scale_factor_orig)
+                scale_factor_orig = self.height / math.sqrt(
+                    math.pow(max_size, 2) + math.pow(max_size, 2))
+                scale_factor = (int(scale_factor_orig * 100) / 100) - 0.02
 
-        return transform
+                self._transform.translate(self.width / 2, self.height / 2)
+                self._transform.rotate(-45)
+                self._transform.scale(scale_factor, scale_factor)
+                self._transform.translate(-(self.width / 2) - (size / 2) * scale_factor_orig,
+                                          -(self.height / 2) + (size / 2) * scale_factor_orig)
+
+        return self._transform
 
     def draw_polygons(self, polygons: List[LegendPolygon]) -> None:
 
