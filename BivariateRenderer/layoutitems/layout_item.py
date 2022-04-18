@@ -1,20 +1,12 @@
-from typing import NoReturn, List, Optional
+from typing import List, Optional
 from pathlib import Path
 
 from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
-from qgis.core import (QgsLayoutItem,
-                       QgsLayout,
-                       QgsLayoutItemAbstractMetadata,
-                       QgsVectorLayer,
-                       QgsTextFormat,
-                       QgsLayoutItemRenderContext,
-                       QgsLineSymbol,
-                       QgsReadWriteContext,
-                       QgsSymbolLayerUtils,
-                       QgsSymbol,
-                       QgsProject,
+from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, QgsVectorLayer,
+                       QgsTextFormat, QgsLayoutItemRenderContext, QgsLineSymbol,
+                       QgsReadWriteContext, QgsSymbolLayerUtils, QgsSymbol, QgsProject,
                        QgsMapLayerType)
 
 from ..text_constants import Texts, IDS
@@ -41,7 +33,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     legend_rotated: bool
     add_axes_arrows: bool
     add_axes_texts: bool
-    
+
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -52,15 +44,17 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_axis_y = "Axis Y"
         self.text_format = QgsTextFormat()
 
-        self.line_format = get_symbol_object("{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '3', 'arrow_start_width_unit': 'Pixel', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '3', 'arrow_width_unit': 'Pixel', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '20', 'head_length_unit': 'Pixel', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '10', 'head_thickness_unit': 'Pixel', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'Pixel', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}")
+        self.line_format = get_symbol_object(
+            "{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '3', 'arrow_start_width_unit': 'Pixel', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '3', 'arrow_width_unit': 'Pixel', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '20', 'head_length_unit': 'Pixel', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '10', 'head_thickness_unit': 'Pixel', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'Pixel', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}"
+        )
         self.line_format.setColor(QColor(0, 0, 0))
 
         self.renderer = None
-        
+
         self.legend_rotated = False
         self.add_axes_arrows = True
         self.add_axes_texts = True
-            
+
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
         render_context = context.renderContext()
@@ -75,23 +69,19 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.axis_line_symbol = self.line_format
 
         legend_render.legend_rotated = self.legend_rotated
-        
+
         legend_render.add_axes_texts = self.add_axes_texts
-        
+
         legend_render.add_axes_arrows = self.add_axes_arrows
-        
+
         item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
 
         if self.renderer:
 
-            legend_render.render(render_context,
-                                 item_size.width(),
-                                 item_size.height(),
+            legend_render.render(render_context, item_size.width(), item_size.height(),
                                  self.renderer.generate_legend_polygons())
 
-    def writePropertiesToElement(self,
-                                 bivariate_legend_element: QDomElement,
-                                 doc: QDomDocument,
+    def writePropertiesToElement(self, bivariate_legend_element: QDomElement, doc: QDomDocument,
                                  context: QgsReadWriteContext) -> bool:
 
         bivariate_legend_element.setAttribute("axis_x_name", self.text_axis_x)
@@ -100,13 +90,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("legend_rotated", str(self.legend_rotated))
         bivariate_legend_element.setAttribute("draw_axes_text", str(self.add_axes_texts))
         bivariate_legend_element.setAttribute("draw_axes_arrow", str(self.add_axes_arrows))
-        
+
         line_symbol = doc.createElement("lineSymbol")
 
-        symbol_elem = QgsSymbolLayerUtils.saveSymbol("",
-                                                     self.line_format,
-                                                     doc,
-                                                     context)
+        symbol_elem = QgsSymbolLayerUtils.saveSymbol("", self.line_format, doc, context)
 
         line_symbol.appendChild(symbol_elem)
 
@@ -130,9 +117,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         return True
 
-    def readPropertiesFromElement(self,
-                                  element: QDomElement,
-                                  document: QDomDocument,
+    def readPropertiesFromElement(self, element: QDomElement, document: QDomDocument,
                                   context: QgsReadWriteContext) -> bool:
 
         if self.linked_layer:
@@ -170,21 +155,21 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.text_axis_x = element.attribute("axis_x_name")
         self.text_axis_y = element.attribute("axis_y_name")
-        
+
         if element.hasAttribute("legend_rotated"):
-        
+
             self.legend_rotated = element.attribute("legend_rotated") == "True"
-        
+
         else:
             self.legend_rotated = False
-        
+
         if element.hasAttribute("draw_axes_text"):
 
             self.add_axes_texts = element.attribute("draw_axes_text") == "True"
 
         else:
             self.add_axes_texts = True
-        
+
         if element.hasAttribute("draw_axes_arrow"):
 
             self.add_axes_arrows = element.attribute("draw_axes_arrow") == "True"
@@ -212,31 +197,31 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def set_text_format(self, text_format: QgsTextFormat) -> None:
         self.text_format = text_format
         self.refresh()
-                
+
     def set_axis_x_name(self, name: str) -> None:
         self.text_axis_x = name
         self.refresh()
-        
+
     def set_axis_y_name(self, name: str) -> None:
         self.text_axis_y = name
         self.refresh()
-    
+
     def set_legend_rotated(self, rotated: bool) -> None:
         self.legend_rotated = rotated
         self.refresh()
-        
+
     def are_labels_default(self) -> bool:
 
         return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
-    
+
     def set_draw_axes_text(self, draw: bool) -> None:
         self.add_axes_texts = draw
         self.refresh()
-    
+
     def set_draw_axes_arrow(self, draw: bool) -> None:
         self.add_axes_arrows = draw
         self.refresh()
-    
+
     @property
     def get_font(self):
         return self.text_axis_x.font()
@@ -270,7 +255,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 class BivariateRendererLayoutItemMetadata(QgsLayoutItemAbstractMetadata):
 
     def __init__(self):
-        super().__init__(IDS.plot_item_bivariate_renderer_legend, Texts.plot_item_bivariate_renderer)
+        super().__init__(IDS.plot_item_bivariate_renderer_legend,
+                         Texts.plot_item_bivariate_renderer)
 
     def createItem(self, layout):
         return BivariateRendererLayoutItem(layout)
