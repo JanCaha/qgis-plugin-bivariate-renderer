@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from pathlib import Path
 
 from qgis.PyQt.QtGui import QColor, QIcon
@@ -28,11 +28,15 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     text_axis_y: str
 
     text_format: QgsTextFormat
+    text_values_format: QgsTextFormat
     line_format: QgsSymbol
 
     legend_rotated: bool
     add_axes_arrows: bool
     add_axes_texts: bool
+    add_axes_values_texts: bool
+
+    y_axis_rotation: float
 
     def __init__(self, layout: QgsLayout):
 
@@ -43,6 +47,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_axis_x = "Axis X"
         self.text_axis_y = "Axis Y"
         self.text_format = QgsTextFormat()
+        self.text_values_format = QgsTextFormat()
 
         self.line_format = get_symbol_object(
             "{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '3', 'arrow_start_width_unit': 'Pixel', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '3', 'arrow_width_unit': 'Pixel', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '20', 'head_length_unit': 'Pixel', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '10', 'head_thickness_unit': 'Pixel', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'Pixel', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}"
@@ -54,6 +59,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.legend_rotated = False
         self.add_axes_arrows = True
         self.add_axes_texts = True
+        self.add_axes_values_texts = False
+
+        self.y_axis_rotation = 90
 
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
@@ -74,9 +82,18 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         legend_render.add_axes_arrows = self.add_axes_arrows
 
+        legend_render.add_axes_ticks_texts = self.add_axes_values_texts
+
+        legend_render.text_format_ticks = self.text_values_format
+
+        legend_render.set_text_rotation_y(self.y_axis_rotation)
+
         item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
 
         if self.renderer:
+
+            legend_render.texts_axis_x_ticks = self.renderer.field_1_labels
+            legend_render.texts_axis_y_ticks = self.renderer.field_2_labels
 
             legend_render.render(render_context, item_size.width(), item_size.height(),
                                  self.renderer.generate_legend_polygons())
@@ -90,6 +107,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("legend_rotated", str(self.legend_rotated))
         bivariate_legend_element.setAttribute("draw_axes_text", str(self.add_axes_texts))
         bivariate_legend_element.setAttribute("draw_axes_arrow", str(self.add_axes_arrows))
+        bivariate_legend_element.setAttribute("draw_axes_values_texts",
+                                              str(self.add_axes_values_texts))
+        bivariate_legend_element.setAttribute("y_axis_rotation", str(self.y_axis_rotation))
 
         line_symbol = doc.createElement("lineSymbol")
 
@@ -102,6 +122,14 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         text_elem = self.text_format.writeXml(doc, context)
 
         symbol_elem.appendChild(text_elem)
+
+        text_axes_values_format = doc.createElement("axesValuesFormat")
+
+        text_elem = self.text_values_format.writeXml(doc, context)
+
+        text_axes_values_format.appendChild(text_elem)
+
+        bivariate_legend_element.appendChild(text_axes_values_format)
 
         if self.layer:
             bivariate_legend_element.setAttribute("vectorLayerId", self.layer.id())
@@ -177,6 +205,31 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         else:
             self.add_axes_arrows = True
 
+        if element.hasAttribute("y_axis_rotation"):
+
+            self.y_axis_rotation = float(element.attribute("y_axis_rotation"))
+
+        else:
+            self.y_axis_rotation = 90
+
+        if element.hasAttribute("draw_axes_values_texts"):
+
+            self.add_axes_values_texts = element.attribute("draw_axes_values_texts") == "True"
+
+        else:
+
+            self.add_axes_values_texts = False
+
+        axes_values_format_elem = element.firstChildElement("axesValuesFormat")
+
+        if not axes_values_format_elem.isNull():
+
+            text_format_elem = axes_values_format_elem.firstChildElement("text-style")
+
+            if text_format_elem:
+
+                self.text_values_format.readXml(text_format_elem, context)
+
         return True
 
         # line
@@ -196,6 +249,14 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_text_format(self, text_format: QgsTextFormat) -> None:
         self.text_format = text_format
+        self.refresh()
+
+    def set_text_values_format(self, text_format: QgsTextFormat) -> None:
+        self.text_values_format = text_format
+        self.refresh()
+
+    def set_y_axis_rotation(self, rotation: float) -> None:
+        self.y_axis_rotation = rotation
         self.refresh()
 
     def set_axis_x_name(self, name: str) -> None:
@@ -220,6 +281,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_draw_axes_arrow(self, draw: bool) -> None:
         self.add_axes_arrows = draw
+        self.refresh()
+
+    def set_draw_axes_values(self, draw: bool) -> None:
+        self.add_axes_values_texts = draw
         self.refresh()
 
     @property
