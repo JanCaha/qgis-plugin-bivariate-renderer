@@ -1,4 +1,4 @@
-from typing import Union, NoReturn, Dict
+from typing import Dict, Any
 import json
 
 from qgis.core import (QgsMessageLog,
@@ -10,10 +10,8 @@ from qgis.core import (QgsMessageLog,
 from .text_constants import Texts
 
 
-def log(text: str) -> None:
-    QgsMessageLog.logMessage(str(text),
-                             Texts.plugin_name,
-                             Qgis.Info)
+def log(text: Any) -> None:
+    QgsMessageLog.logMessage(str(text), Texts.plugin_name, Qgis.Info)
 
 
 # these two functions are taken from
