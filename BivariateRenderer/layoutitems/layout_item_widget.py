@@ -33,6 +33,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     axis_x_name: QPlainTextEdit
     axis_y_name: QPlainTextEdit
     rotate_legend: QCheckBox
+    add_arrows: QCheckBox
+    add_axes_values_text: QCheckBox
+    rotate_direction: QComboBox
 
     layout_item: BivariateRendererLayoutItem
 
@@ -77,7 +80,49 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         
         self.form_layout.addWidget(self.widget_text_axes())
         
+        self.form_layout.addWidget(self.widget_text_ticks())
+
+        self.form_layout.addWidget(self.widget_rotate_y_axis_texts())
+
         self.setLayout(self.form_layout)
+
+    def widget_rotate_y_axis_texts(self) -> QgsCollapsibleGroupBoxBasic:
+
+        cg_rotate = QgsCollapsibleGroupBoxBasic('Rotate Y Axis')
+        cg_rotate_layout = QVBoxLayout()
+
+        self.rotate_direction = QComboBox()
+        self.rotate_direction.addItem("Counterclockwise")
+        self.rotate_direction.addItem("Clockwise")
+        self.rotate_direction.currentIndexChanged.connect(self.update_y_axis_rotation)
+        self.rotate_direction.setCurrentIndex(0)
+
+        if self.layout_item.y_axis_rotation == -90:
+            self.rotate_direction.setCurrentIndex(1)
+        else:
+            self.rotate_direction.setCurrentIndex(0)
+
+        cg_rotate_layout.addWidget(QLabel("Rotate Y axis in direction"))
+        cg_rotate_layout.addWidget(self.rotate_direction)
+
+        cg_rotate.setLayout(cg_rotate_layout)
+
+        return cg_rotate
+
+    def update_y_axis_rotation(self) -> None:
+
+        value = self.rotate_direction.currentText()
+
+        if value == "Counterclockwise":
+
+            self.layout_item.set_y_axis_rotation(90)
+
+        elif value == "Clockwise":
+
+            self.layout_item.set_y_axis_rotation(-90)
+
+        else:
+            self.layout_item.set_y_axis_rotation(90)
 
     def widget_rotate(self) -> QgsCollapsibleGroupBoxBasic:
         
@@ -161,6 +206,28 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         
         return cg_axes_descriptions
     
+    def widget_text_ticks(self) -> QgsCollapsibleGroupBoxBasic:
+
+        cg_axes_value_descriptions = QgsCollapsibleGroupBoxBasic('Axes Numerical Values')
+        cg_axes_descriptions_layout = QVBoxLayout()
+
+        self.b_font_values = QgsFontButton()
+        self.b_font_values.setTextFormat(self.layout_item.text_values_format)
+        self.b_font_values.changed.connect(self.pass_textformat_values_to_item)
+
+        self.add_axes_values_text = QCheckBox("Add numerical values")
+        self.add_axes_values_text.setChecked(self.layout_item.add_axes_values_texts)
+        self.add_axes_values_text.stateChanged.connect(self.update_add_axes_values_text)
+
+        cg_axes_descriptions_layout.addWidget(QLabel("Use axes values texts in legend"))
+        cg_axes_descriptions_layout.addWidget(self.add_axes_values_text)
+        cg_axes_descriptions_layout.addWidget(QLabel("Font"))
+        cg_axes_descriptions_layout.addWidget(self.b_font_values)
+
+        cg_axes_value_descriptions.setLayout(cg_axes_descriptions_layout)
+
+        return cg_axes_value_descriptions
+
     def pass_linesymbol(self):
         
         self.layout_item.beginCommand(
@@ -185,6 +252,16 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
         
+    def pass_textformat_values_to_item(self):
+
+        self.layout_item.beginCommand(self.tr('Change text values format'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.blockSignals(True)
+        self.layout_item.set_text_values_format(self.b_font_values.textFormat())
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
+
     def update_axis_x(self):
         
         self.layout_item.beginCommand(
@@ -221,6 +298,11 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
     
+        if self.rotate_legend.isChecked():
+            self.rotate_direction.setEnabled(False)
+        else:
+            self.rotate_direction.setEnabled(True)
+
     def update_add_axes_text(self):
         
         self.layout_item.beginCommand(
@@ -233,6 +315,15 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
     
+    def update_add_axes_values_text(self):
+
+        self.layout_item.beginCommand(self.tr('Add axes text'), QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.blockSignals(True)
+        self.layout_item.set_draw_axes_values(self.add_axes_values_text.isChecked())
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
+
     def update_add_axes_arrow(self):
         
         self.layout_item.beginCommand(
