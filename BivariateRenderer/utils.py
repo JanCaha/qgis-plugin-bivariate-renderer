@@ -1,11 +1,7 @@
 from typing import Dict, Any
 import json
 
-from qgis.core import (QgsMessageLog,
-                       Qgis,
-                       QgsProcessingUtils,
-                       QgsLineSymbol,
-                       QgsSymbol)
+from qgis.core import (QgsMessageLog, Qgis, QgsLineSymbol, QgsSymbol)
 
 from .text_constants import Texts
 
@@ -19,15 +15,15 @@ def log(text: Any) -> None:
 def get_symbol_object(symbol_srt: str) -> QgsLineSymbol:
     """ Return dictionary with objects of symbol"""
 
-    from qgis.core import (QgsArrowSymbolLayer,
-                           QgsSimpleLineSymbolLayer,
-                           QgsLineSymbol)
+    from qgis.core import (QgsArrowSymbolLayer, QgsSimpleLineSymbolLayer, QgsLineSymbol)
 
     symbol_obj = json.loads(symbol_srt.replace("'", '"').replace("ArrowLine", "Arrow"))
     symbol_layers = QgsLineSymbol()
 
     for layer_symbol in symbol_obj['layers_list']:
-        obj_symbol = eval(f"Qgs{layer_symbol['type_layer']}SymbolLayer.create({layer_symbol['properties_layer']})")
+        obj_symbol = eval(
+            f"Qgs{layer_symbol['type_layer']}SymbolLayer.create({layer_symbol['properties_layer']})"
+        )
         symbol_layers.appendSymbolLayer(obj_symbol)
 
     symbol_layers.deleteSymbolLayer(0)
