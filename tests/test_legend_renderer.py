@@ -141,6 +141,7 @@ def test_legend_with_arrows_texts(qgis_countries_layer, qgs_project, qgs_layout)
 
     painter.end()
 
+    # image.save("tests/images/correct/legend_with_arrows_texts.png", "PNG")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_arrows_texts.png",
@@ -176,6 +177,7 @@ def test_legend_with_arrows_texts_rotated(qgis_countries_layer, qgs_project, qgs
 
     painter.end()
 
+    # image.save("tests/images/correct/legend_with_arrows_texts_rotated.png", "PNG")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_arrows_texts_rotated.png",

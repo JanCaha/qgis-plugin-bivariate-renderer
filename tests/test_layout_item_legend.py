@@ -27,6 +27,7 @@ def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project
 
     file = "./tests/images/image.png"
 
+    # export_page_to_image(qgs_layout, page, "./tests/images/correct/layout_item_legend.png")
     export_page_to_image(qgs_layout, page, file)
 
     assert_images_equal(file, "./tests/images/correct/layout_item_legend.png")
