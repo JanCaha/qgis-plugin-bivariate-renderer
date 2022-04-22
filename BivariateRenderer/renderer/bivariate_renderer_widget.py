@@ -175,6 +175,11 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout = QFormLayout()
         self.form_layout.addRow("Predefined color ramps:", self.cb_color_ramps)
         self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
+        self.form_layout.addRow(
+            "",
+            QLabel(
+                "Data are categorized using Equal Interval classification method into provided number of categories for both fields."
+            ))
         # self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
         self.form_layout.addRow("Select color mixing method:", self.cb_colormixing_methods)
         self.form_layout.addRow("Select field 1:", self.cb_field1)
