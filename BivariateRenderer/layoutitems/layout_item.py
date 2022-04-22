@@ -38,6 +38,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     y_axis_rotation: float
 
+    ticks_x_precision: int
+    ticks_y_precision: int
+
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -63,6 +66,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.y_axis_rotation = 90
 
+        self.ticks_x_precision = 2
+        self.ticks_y_precision = 2
+
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
 
         render_context = context.renderContext()
@@ -85,6 +91,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.add_axes_ticks_texts = self.add_axes_values_texts
 
         legend_render.text_format_ticks = self.text_values_format
+
+        legend_render.ticks_x_precision = self.ticks_x_precision
+        legend_render.ticks_y_precision = self.ticks_y_precision
 
         legend_render.set_text_rotation_y(self.y_axis_rotation)
 
@@ -110,6 +119,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("draw_axes_values_texts",
                                               str(self.add_axes_values_texts))
         bivariate_legend_element.setAttribute("y_axis_rotation", str(self.y_axis_rotation))
+        bivariate_legend_element.setAttribute("ticks_x_precision", str(self.ticks_x_precision))
+        bivariate_legend_element.setAttribute("ticks_y_precision", str(self.ticks_y_precision))
 
         line_symbol = doc.createElement("lineSymbol")
 
@@ -183,6 +194,11 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.text_axis_x = element.attribute("axis_x_name")
         self.text_axis_y = element.attribute("axis_y_name")
+
+        if element.hasAttribute("ticks_x_precision"):
+
+            self.ticks_x_precision = int(element.attribute("ticks_x_precision"))
+            self.ticks_y_precision = int(element.attribute("ticks_y_precision"))
 
         if element.hasAttribute("legend_rotated"):
 
@@ -285,6 +301,11 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_draw_axes_values(self, draw: bool) -> None:
         self.add_axes_values_texts = draw
+        self.refresh()
+
+    def set_ticks_precisions(self, axis_x_precision: int, axis_y_precision: int) -> None:
+        self.ticks_x_precision = axis_x_precision
+        self.ticks_y_precision = axis_y_precision
         self.refresh()
 
     @property

@@ -4,7 +4,8 @@ import math
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
 from qgis.PyQt.QtGui import QPolygonF, QBrush, QColor, QPainter, QTransform
 
-from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer)
+from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer,
+                       QgsBasicNumericFormat, QgsNumericFormatContext)
 
 from ..renderer.bivariate_renderer import LegendPolygon
 from ..utils import get_symbol_object, log
@@ -40,9 +41,13 @@ class LegendRenderer:
     texts_axis_x_ticks: List[float]
     texts_axis_y_ticks: List[float]
 
-    text_axis_ticks_precision = 2
+    ticks_x_precision: int
+    ticks_y_precision: int
 
-    _text_rotation_y: float = 90
+    _numeric_format: QgsBasicNumericFormat
+    _numeric_format_context: QgsNumericFormatContext
+
+    _text_rotation_y: float
 
     def __init__(self):
 
@@ -53,10 +58,13 @@ class LegendRenderer:
 
         self.text_format = QgsTextFormat()
 
-        self.axis_line_symbol = get_symbol_object(
-            "{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '0.8', 'arrow_start_width_unit': 'MM', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '0.8', 'arrow_width_unit': 'MM', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '3', 'head_length_unit': 'MM', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '2', 'head_thickness_unit': 'MM', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'MM', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}"
-        )
-        self.axis_line_symbol.setColor(QColor(0, 0, 0))
+        self._text_rotation_y = 90
+
+        self.ticks_x_precision = 2
+        self.ticks_y_precision = 2
+
+        self._numeric_format = QgsBasicNumericFormat()
+        self._numeric_format_context = QgsNumericFormatContext()
 
     def set_size_context(self, width: float, height: float) -> None:
 
@@ -260,7 +268,7 @@ class LegendRenderer:
 
             if self.legend_rotated:
 
-                max_size = self.height  #- self.arrow_start_x
+                max_size = self.height
                 size = self.height - max_size
 
                 scale_factor_orig = self.height / math.sqrt(
@@ -329,9 +337,13 @@ class LegendRenderer:
                                  QgsTextRenderer.AlignCenter, self._text_axis_y, self.context,
                                  self.text_format, QgsTextRenderer.AlignTop)
 
-    def format_tick_value(self, value: float) -> List[str]:
+    def format_tick_value(self, value: float, precision: int) -> List[str]:
 
-        return [str(round(value, self.text_axis_ticks_precision))]
+        self._numeric_format.setNumberDecimalPlaces(int(precision))
+
+        value_str = self._numeric_format.formatDouble(value, self._numeric_format_context)
+
+        return [value_str]
 
     @property
     def axis_tick_text_height(self) -> float:
@@ -341,7 +353,8 @@ class LegendRenderer:
             return QgsTextRenderer.textHeight(self.context,
                                               self.text_format_ticks,
                                               textLines=self.format_tick_value(
-                                                  self.texts_axis_x_ticks[0]))
+                                                  self.texts_axis_x_ticks[0],
+                                                  self.ticks_x_precision))
 
         else:
 
@@ -355,7 +368,8 @@ class LegendRenderer:
             return QgsTextRenderer.textWidth(self.context,
                                              self.text_format_ticks,
                                              textLines=self.format_tick_value(
-                                                 max(self.texts_axis_y_ticks)))
+                                                 max(self.texts_axis_y_ticks),
+                                                 self.ticks_y_precision))
 
         else:
 
@@ -402,19 +416,20 @@ class LegendRenderer:
 
                 text_position = self.position_axis_tick_x(i)
 
-                QgsTextRenderer.drawText(self.transform.map(text_position),
-                                         self.text_rotation_x, QgsTextRenderer.AlignCenter,
-                                         self.format_tick_value(value), self.context,
-                                         self.text_format_ticks, QgsTextRenderer.AlignBottom)
+                QgsTextRenderer.drawText(self.transform.map(text_position), self.text_rotation_x,
+                                         QgsTextRenderer.AlignCenter,
+                                         self.format_tick_value(value, self.ticks_x_precision),
+                                         self.context, self.text_format_ticks,
+                                         QgsTextRenderer.AlignBottom)
 
             for i, value in enumerate(self.texts_axis_y_ticks):
 
                 text_position = self.position_axis_tick_y(len(self.texts_axis_y_ticks) - i - 1)
 
-                QgsTextRenderer.drawText(self.transform.map(text_position),
-                                         self.text_rotation_y, QgsTextRenderer.AlignCenter,
-                                         self.format_tick_value(value), self.context,
-                                         self.text_format_ticks)
+                QgsTextRenderer.drawText(self.transform.map(text_position), self.text_rotation_y,
+                                         QgsTextRenderer.AlignCenter,
+                                         self.format_tick_value(value, self.ticks_y_precision),
+                                         self.context, self.text_format_ticks)
 
     def render(self, context: QgsRenderContext, width: float, height: float,
                polygons: List[LegendPolygon]) -> None:

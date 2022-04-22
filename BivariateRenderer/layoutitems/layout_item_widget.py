@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from qgis.PyQt.QtWidgets import (QComboBox, QPushButton, QVBoxLayout, QLabel, QCheckBox,
-                                 QPlainTextEdit)
+                                 QPlainTextEdit, QSpinBox)
 
 from qgis.PyQt.QtGui import QIcon
 
@@ -25,6 +25,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     add_arrows: QCheckBox
     add_axes_values_text: QCheckBox
     rotate_direction: QComboBox
+
+    ticks_precision_x: QSpinBox
+    ticks_precision_y: QSpinBox
 
     layout_item: BivariateRendererLayoutItem
 
@@ -208,14 +211,49 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.add_axes_values_text.setChecked(self.layout_item.add_axes_values_texts)
         self.add_axes_values_text.stateChanged.connect(self.update_add_axes_values_text)
 
+        self.ticks_precision_x = QSpinBox()
+        self.ticks_precision_x.setMinimum(0)
+        self.ticks_precision_x.setMaximum(15)
+        self.ticks_precision_x.setValue(2)
+
+        if self.layout_item.ticks_x_precision:
+            self.ticks_precision_x.setValue(self.layout_item.ticks_x_precision)
+
+        self.ticks_precision_x.valueChanged.connect(self.pass_precisions)
+
+        self.ticks_precision_y = QSpinBox()
+        self.ticks_precision_y.setMinimum(0)
+        self.ticks_precision_y.setMaximum(15)
+        self.ticks_precision_y.setValue(2)
+
+        if self.layout_item.ticks_y_precision:
+            self.ticks_precision_y.setValue(self.layout_item.ticks_y_precision)
+
+        self.ticks_precision_y.valueChanged.connect(self.pass_precisions)
+
         cg_axes_descriptions_layout.addWidget(QLabel("Use axes values texts in legend"))
         cg_axes_descriptions_layout.addWidget(self.add_axes_values_text)
         cg_axes_descriptions_layout.addWidget(QLabel("Font"))
         cg_axes_descriptions_layout.addWidget(self.b_font_values)
+        cg_axes_descriptions_layout.addWidget(QLabel("Values precision on X axis"))
+        cg_axes_descriptions_layout.addWidget(self.ticks_precision_x)
+        cg_axes_descriptions_layout.addWidget(QLabel("Values precision on Y axis"))
+        cg_axes_descriptions_layout.addWidget(self.ticks_precision_y)
 
         cg_axes_value_descriptions.setLayout(cg_axes_descriptions_layout)
 
         return cg_axes_value_descriptions
+
+    def pass_precisions(self):
+
+        self.layout_item.beginCommand(self.tr('Change ticks precisions'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.blockSignals(True)
+        self.layout_item.set_ticks_precisions(self.ticks_precision_x.value(),
+                                              self.ticks_precision_y.value())
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
 
     def pass_linesymbol(self):
 
