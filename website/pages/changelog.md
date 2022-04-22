@@ -6,6 +6,8 @@
 
   - added option to rotate texts for y axis clockwise or counter clockwise
 
+  - added text specifying that data are categorized using Equal Interval classification method
+  
   - fix error in Layout Widget, where attribute names were not correctly into Layout Item when it was created 
 
   - default style for axis arrow is now stored in separate file, which makes potential changes much simpler
