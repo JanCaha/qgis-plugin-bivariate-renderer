@@ -57,6 +57,7 @@ class LegendRenderer:
         self.axis_title_y = "Axis Y"
 
         self.text_format = QgsTextFormat()
+        self.text_format_ticks = QgsTextFormat()
 
         self.axis_line_symbol = default_line_symbol()
 
@@ -111,11 +112,11 @@ class LegendRenderer:
             self._text_height_y = 0
 
     @property
-    def text_height_max_with_2_margin(self) -> float:
+    def text_height_max_with_margin(self) -> float:
 
         if self.add_axes_texts:
 
-            return self.text_height_max + (self.margin * 2)
+            return self.text_height_max + self.margin
 
         else:
 
@@ -150,7 +151,6 @@ class LegendRenderer:
 
         if self.add_axes_arrows:
 
-            # return self.text_height_max_with_2_margin + self.width * 0.025
             return self.axis_text_tics_top + self.width * 0.025
 
         else:
@@ -181,24 +181,24 @@ class LegendRenderer:
 
     @property
     def axis_text_tics_top(self):
-        return self.text_height_max_with_2_margin + self.axis_tick_text_height_with_2_margin
+        return self.text_height_max_with_margin + self.axis_tick_text_height_with_margin
 
     @property
     def all_elements_top(self) -> float:
-        return self.text_height_max_with_2_margin + self.arrow_width + self.axis_tick_text_height_with_2_margin
+        return self.axis_text_tics_top + self.arrow_width
 
     @property
     def text_position_x(self) -> QPointF:
 
         x = self.all_elements_top + (self.width - self.all_elements_top) / 2
-        y = self.width - self.margin
+        y = self.width
 
         return QPointF(x, y)
 
     @property
     def text_position_y(self) -> QPointF:
 
-        x = self.margin + self.text_height_max / 2
+        x = self.text_height_max / 2
         y = (self.width - self.all_elements_top) / 2
 
         if self.legend_rotated:
@@ -210,6 +210,10 @@ class LegendRenderer:
             if self._text_rotation_y == -90:
 
                 x = 0
+
+            else:
+
+                x = self.text_height_max / 2 + self.margin
 
             return QPointF(x, y)
 
@@ -286,11 +290,9 @@ class LegendRenderer:
             else:
 
                 max_size = self.height + self.axis_tick_last_y_value_width / 2
-                # size = self.height - max_size
 
                 scale_factor = self.height / max_size
 
-                # self._transform.translate(self.width / 2, self.height / 2)
                 self._transform.scale(scale_factor, scale_factor)
                 self._transform.translate(0, self.axis_tick_last_y_value_width / 2)
 
@@ -337,7 +339,7 @@ class LegendRenderer:
 
         QgsTextRenderer.drawText(self.transform.map(self.text_position_y), self.text_rotation_y,
                                  QgsTextRenderer.AlignCenter, self._text_axis_y, self.context,
-                                 self.text_format, QgsTextRenderer.AlignTop)
+                                 self.text_format, QgsTextRenderer.AlignBottom)
 
     def format_tick_value(self, value: float, precision: int) -> List[str]:
 
@@ -378,11 +380,11 @@ class LegendRenderer:
             return 0
 
     @property
-    def axis_tick_text_height_with_2_margin(self) -> float:
+    def axis_tick_text_height_with_margin(self) -> float:
 
         if self.add_axes_ticks_texts:
 
-            return self.axis_tick_text_height + (self.margin * 2)
+            return self.axis_tick_text_height + self.margin
 
         else:
 
@@ -390,23 +392,23 @@ class LegendRenderer:
 
     def position_axis_tick_x(self, index: int) -> QPointF:
         return QPointF(self.polygon_start_pos_x + index * self.size_constant,
-                       self.height - (self.axis_tick_text_height_with_2_margin + self.margin))
+                       self.height - self.text_height_max_with_margin)
 
     def position_axis_tick_y(self, index: int) -> QPointF:
 
-        x = self.text_height_max_with_2_margin + self.axis_tick_text_height_with_2_margin / 2
+        x = self.text_height_max_with_margin + self.axis_tick_text_height_with_margin / 2
 
         y = index * self.size_constant
 
         if self.legend_rotated:
 
-            x = self.text_height_max_with_2_margin
+            x = self.text_height_max_with_margin
 
         else:
 
             if self._text_rotation_y == -90:
 
-                x = self.text_height_max + self.margin * 2
+                x = self.text_height_max_with_margin
 
         return QPointF(x, y)
 
@@ -431,7 +433,8 @@ class LegendRenderer:
                 QgsTextRenderer.drawText(self.transform.map(text_position), self.text_rotation_y,
                                          QgsTextRenderer.AlignCenter,
                                          self.format_tick_value(value, self.ticks_y_precision),
-                                         self.context, self.text_format_ticks)
+                                         self.context, self.text_format_ticks,
+                                         QgsTextRenderer.AlignBottom)
 
     def render(self, context: QgsRenderContext, width: float, height: float,
                polygons: List[LegendPolygon]) -> None:
