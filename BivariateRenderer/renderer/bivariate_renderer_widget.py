@@ -207,6 +207,13 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.legend_renderer.axis_title_x = self.cb_field1.currentText()
         self.legend_renderer.axis_title_y = self.cb_field2.currentText()
 
+        self.legend_renderer.add_axes_ticks_texts = True
+
+        self.legend_renderer.texts_axis_x_ticks = self.bivariate_renderer.field_1_labels
+        self.legend_renderer.texts_axis_y_ticks = self.bivariate_renderer.field_2_labels
+
+        self.legend_renderer.text_format_ticks.setSize(50)
+
         self.legend_renderer.render(context, self.size, self.size,
                                     self.bivariate_renderer.generate_legend_polygons())
 
