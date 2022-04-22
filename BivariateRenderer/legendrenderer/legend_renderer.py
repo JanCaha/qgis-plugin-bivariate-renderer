@@ -8,7 +8,7 @@ from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRe
                        QgsBasicNumericFormat, QgsNumericFormatContext)
 
 from ..renderer.bivariate_renderer import LegendPolygon
-from ..utils import get_symbol_object, log
+from ..utils import default_line_symbol
 
 
 class LegendRenderer:
@@ -57,6 +57,8 @@ class LegendRenderer:
         self.axis_title_y = "Axis Y"
 
         self.text_format = QgsTextFormat()
+
+        self.axis_line_symbol = default_line_symbol()
 
         self._text_rotation_y = 90
 

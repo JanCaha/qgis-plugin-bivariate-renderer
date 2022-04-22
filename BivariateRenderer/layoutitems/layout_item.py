@@ -10,7 +10,7 @@ from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, 
                        QgsMapLayerType)
 
 from ..text_constants import Texts, IDS
-from ..utils import log, get_symbol_object, get_symbol_dict
+from ..utils import default_line_symbol
 from ..renderer.bivariate_renderer import BivariateRenderer
 
 from ..legendrenderer.legend_renderer import LegendRenderer
@@ -52,10 +52,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_format = QgsTextFormat()
         self.text_values_format = QgsTextFormat()
 
-        self.line_format = get_symbol_object(
-            "{'type': '', 'layers_list': [{'type_layer': 'ArrowLine', 'properties_layer': {'arrow_start_width': '3', 'arrow_start_width_unit': 'Pixel', 'arrow_start_width_unit_scale': '3x:0,0,0,0,0,0', 'arrow_type': '0', 'arrow_width': '3', 'arrow_width_unit': 'Pixel', 'arrow_width_unit_scale': '3x:0,0,0,0,0,0', 'head_length': '20', 'head_length_unit': 'Pixel', 'head_length_unit_scale': '3x:0,0,0,0,0,0', 'head_thickness': '10', 'head_thickness_unit': 'Pixel', 'head_thickness_unit_scale': '3x:0,0,0,0,0,0', 'head_type': '0', 'is_curved': '1', 'is_repeated': '1', 'offset': '0', 'offset_unit': 'Pixel', 'offset_unit_scale': '3x:0,0,0,0,0,0', 'ring_filter': '0'}}]}"
-        )
-        self.line_format.setColor(QColor(0, 0, 0))
+        self.line_format = default_line_symbol()
 
         self.renderer = None
 
