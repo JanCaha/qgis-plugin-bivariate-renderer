@@ -2,6 +2,7 @@ from qgis.core import (QgsTextFormat, QgsLayoutUtils)
 from qgis.PyQt.QtGui import QColor
 
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
+from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDirect
 from BivariateRenderer.utils import get_symbol_dict
 
 from tests import (set_up_image, set_up_painter, xml_string, assert_images_equal,
@@ -76,7 +77,6 @@ def test_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
 
     painter.end()
 
-    # image.save("tests/images/correct/legend_only.png")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_only.png", "tests/images/image.png")
@@ -109,7 +109,6 @@ def test_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout):
 
     painter.end()
 
-    # image.save("tests/images/correct/legend_with_arrows.png")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_arrows.png", "tests/images/image.png")
@@ -143,7 +142,6 @@ def test_legend_with_arrows_texts(qgis_countries_layer, qgs_project, qgs_layout)
 
     painter.end()
 
-    # image.save("tests/images/correct/legend_with_arrows_texts.png", "PNG")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_arrows_texts.png",
@@ -179,7 +177,6 @@ def test_legend_with_arrows_texts_rotated(qgis_countries_layer, qgs_project, qgs
 
     painter.end()
 
-    # image.save("tests/images/correct/legend_with_arrows_texts_rotated.png", "PNG")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_arrows_texts_rotated.png",
@@ -219,7 +216,6 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
 
     painter.end()
 
-    # image.save("tests/images/correct/legend_with_values_ticks.png", "PNG")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_values_ticks.png",
@@ -259,7 +255,47 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
 
     painter.end()
 
-    # image.save("tests/images/correct/legend_with_all.png", "PNG")
     image.save("./tests/images/image.png", "PNG")
 
     assert_images_equal("tests/images/correct/legend_with_all.png", "tests/images/image.png")
+
+
+def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
+
+    assert qgis_countries_layer
+    assert qgs_project
+    assert qgs_layout
+
+    image = set_up_image()
+
+    painter = set_up_painter(image)
+
+    render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
+
+    assert render_context
+
+    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
+                                                   field1="fid",
+                                                   field2="fid")
+
+    bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
+
+    legend_renderer = LegendRenderer()
+    legend_renderer.add_axes_arrows = True
+    legend_renderer.add_axes_texts = True
+    legend_renderer.legend_rotated = True
+    legend_renderer.add_axes_ticks_texts = True
+    legend_renderer.texts_axis_x_ticks = bivariate_renderer.field_1_labels
+    legend_renderer.texts_axis_y_ticks = bivariate_renderer.field_2_labels
+
+    legend_renderer.render(render_context,
+                           image.width() / render_context.scaleFactor(),
+                           image.width() / render_context.scaleFactor(),
+                           bivariate_renderer.generate_legend_polygons())
+
+    painter.end()
+
+    image.save("./tests/images/image.png", "PNG")
+
+    assert_images_equal("tests/images/correct/legend_with_all_rotated.png",
+                        "tests/images/image.png")
