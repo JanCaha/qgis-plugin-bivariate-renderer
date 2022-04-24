@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from qgis.PyQt.QtWidgets import (QComboBox, QPushButton, QVBoxLayout, QLabel, QCheckBox,
-                                 QPlainTextEdit, QSpinBox)
+from qgis.PyQt.QtWidgets import (QComboBox, QVBoxLayout, QLabel, QCheckBox, QPlainTextEdit,
+                                 QSpinBox)
 
 from qgis.PyQt.QtGui import QIcon
 
@@ -18,7 +18,8 @@ from .layout_item import BivariateRendererLayoutItem
 
 class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
-    pb_update_legend: QPushButton
+    cb_layers: QComboBox
+
     axis_x_name: QPlainTextEdit
     axis_y_name: QPlainTextEdit
     rotate_legend: QCheckBox
@@ -28,6 +29,10 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     ticks_precision_x: QSpinBox
     ticks_precision_y: QSpinBox
+
+    b_line_symbol: QgsSymbolButton
+    b_font: QgsFontButton
+    b_font_values: QgsFontButton
 
     layout_item: BivariateRendererLayoutItem
 
@@ -84,8 +89,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         cg_rotate_layout = QVBoxLayout()
 
         self.rotate_direction = QComboBox()
-        self.rotate_direction.addItem("Counterclockwise")
-        self.rotate_direction.addItem("Clockwise")
+        self.rotate_direction.addItem("Counterclockwise", 90)
+        self.rotate_direction.addItem("Clockwise", -90)
         self.rotate_direction.currentIndexChanged.connect(self.update_y_axis_rotation)
         self.rotate_direction.setCurrentIndex(0)
 
@@ -103,18 +108,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     def update_y_axis_rotation(self) -> None:
 
-        value = self.rotate_direction.currentText()
+        index = self.rotate_direction.currentIndex()
 
-        if value == "Counterclockwise":
-
-            self.layout_item.set_y_axis_rotation(90)
-
-        elif value == "Clockwise":
-
-            self.layout_item.set_y_axis_rotation(-90)
-
-        else:
-            self.layout_item.set_y_axis_rotation(90)
+        self.layout_item.set_y_axis_rotation(self.rotate_direction.itemData(index))
 
     def widget_rotate(self) -> QgsCollapsibleGroupBoxBasic:
 
