@@ -10,7 +10,7 @@ from tests import set_up_bivariate_renderer, save_layout_for_layer, assert_image
 import pytest
 
 
-@pytest.skip("Problem with comparing the outcomes")
+@pytest.mark.skip(reason="Problem with comparing the outcomes")
 def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProject,
                                 qgs_layout: QgsLayout):
 
