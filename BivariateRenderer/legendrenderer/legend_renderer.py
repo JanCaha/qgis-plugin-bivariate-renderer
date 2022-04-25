@@ -2,7 +2,7 @@ from typing import List
 import math
 
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
-from qgis.PyQt.QtGui import QPolygonF, QBrush, QColor, QPainter, QTransform
+from qgis.PyQt.QtGui import QPolygonF, QBrush, QPainter, QTransform
 
 from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer,
                        QgsBasicNumericFormat, QgsNumericFormatContext)
@@ -196,6 +196,11 @@ class LegendRenderer:
         return QPointF(x, y)
 
     @property
+    def axis_y_text_rotated_counterclockwise(self) -> bool:
+
+        return self._text_rotation_y == 90
+
+    @property
     def text_position_y(self) -> QPointF:
 
         x = self.text_height_max / 2
@@ -203,17 +208,17 @@ class LegendRenderer:
 
         if self.legend_rotated:
 
-            return QPointF(x - self.text_height_y, y)
+            return QPointF(x - self.text_height_max, y)
 
         else:
 
-            if self._text_rotation_y == -90:
+            if self.axis_y_text_rotated_counterclockwise:
 
-                x = 0
+                x = self.text_height_max
 
             else:
 
-                x = self.text_height_max / 2 + self.margin
+                x = 0
 
             return QPointF(x, y)
 
