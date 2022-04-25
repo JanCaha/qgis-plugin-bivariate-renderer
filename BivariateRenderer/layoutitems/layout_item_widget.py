@@ -60,11 +60,12 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.cb_layers = QComboBox()
         self.cb_layers.addItem("")
         self.cb_layers.addItems(usable_layers)
-        self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
-        self.cb_layers.setCurrentIndex(0)
 
         if self.layout_item.linked_layer_name:
             self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
+
+        self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
+        self.cb_layers.setCurrentIndex(0)
 
         self.form_layout = QVBoxLayout()
 
@@ -140,10 +141,11 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.b_line_symbol = QgsSymbolButton(self, "Arrow")
         self.b_line_symbol.setSymbolType(QgsSymbol.Line)
         self.b_line_symbol.setMinimumWidth(50)
-        self.b_line_symbol.changed.connect(self.pass_linesymbol)
 
         if self.layout_item.line_format:
             self.b_line_symbol.setSymbol(self.layout_item.line_format)
+
+        self.b_line_symbol.changed.connect(self.pass_linesymbol)
 
         cg_axes_arrows_layout.addWidget(QLabel("Use axis arrows in legend"))
         cg_axes_arrows_layout.addWidget(self.add_arrows)
