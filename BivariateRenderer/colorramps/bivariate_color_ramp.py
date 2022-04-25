@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from pathlib import Path
 
 from qgis.core import QgsGradientColorRamp
 from qgis.PyQt.QtGui import QIcon, QColor
+
+from ..utils import get_icon
 
 
 class BivariateColorRamp(ABC):
@@ -27,13 +28,6 @@ class BivariateColorRamp(ABC):
     def icon(self) -> QIcon:
         pass
 
-    @property
-    def icons_path(self) -> Path:
-        return Path(__file__).parent.parent / "icons"
-
-    def get_icon_path(self, icon_name: str) -> str:
-        return str(self.icons_path / icon_name)
-
 
 class BivariateColorRampDarkRedLightBlue(BivariateColorRamp):
 
@@ -51,7 +45,7 @@ class BivariateColorRampDarkRedLightBlue(BivariateColorRamp):
 
     @property
     def icon(self) -> QIcon:
-        return QIcon(self.get_icon_path("cp_darkred_lightblue.png"))
+        return get_icon("cp_darkred_lightblue.png")
 
 
 class BivariateColorRampAquamarinePink(BivariateColorRamp):
@@ -70,7 +64,7 @@ class BivariateColorRampAquamarinePink(BivariateColorRamp):
 
     @property
     def icon(self) -> QIcon:
-        return QIcon(self.get_icon_path("cp_aquamarine_pink.png"))
+        return get_icon("cp_aquamarine_pink.png")
 
 
 class BivariateColorRampYellowPink(BivariateColorRamp):
@@ -89,7 +83,7 @@ class BivariateColorRampYellowPink(BivariateColorRamp):
 
     @property
     def icon(self) -> QIcon:
-        return QIcon(self.get_icon_path("cp_yellow_violet.png"))
+        return get_icon("cp_yellow_violet.png")
 
 
 class BivariateColorRampBlueGreen(BivariateColorRamp):
@@ -108,7 +102,7 @@ class BivariateColorRampBlueGreen(BivariateColorRamp):
 
     @property
     def icon(self) -> QIcon:
-        return QIcon(self.get_icon_path("cp_blue_green.png"))
+        return get_icon("cp_blue_green.png")
 
 
 class BivariateColorRampGreenPink(BivariateColorRamp):
@@ -127,7 +121,7 @@ class BivariateColorRampGreenPink(BivariateColorRamp):
 
     @property
     def icon(self) -> QIcon:
-        return QIcon(self.get_icon_path("cp_green_pink.png"))
+        return get_icon("cp_green_pink.png")
 
 
 class BivariateColorRampOrangeBlue(BivariateColorRamp):
@@ -146,4 +140,4 @@ class BivariateColorRampOrangeBlue(BivariateColorRamp):
 
     @property
     def icon(self) -> QIcon:
-        return QIcon(self.get_icon_path("cp_orange_blue.png"))
+        return get_icon("cp_orange_blue.png")
