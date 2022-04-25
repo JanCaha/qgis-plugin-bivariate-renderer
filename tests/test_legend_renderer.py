@@ -201,6 +201,8 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
                                                    field1="fid",
                                                    field2="fid")
 
+    bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
+
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = False
     legend_renderer.add_axes_texts = False
