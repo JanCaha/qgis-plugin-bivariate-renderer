@@ -331,14 +331,57 @@ class LegendRenderer:
 
         self.axis_line_symbol.stopRender(self.context)
 
+    @property
+    def axis_text_max_lines(self) -> int:
+        return max(len(self._text_axis_x), len(self._text_axis_y))
+
+    def add_empty_lines(self,
+                        text: List[str],
+                        number_of_lines: int,
+                        add_before_text: bool = False) -> List[str]:
+
+        if add_before_text:
+
+            return ["\n"] * number_of_lines + text
+
+        else:
+
+            return text + ["\n"] * number_of_lines
+
+    def add_lines_if_shorter(self,
+                             text: List[str],
+                             required_length: int,
+                             add_before_text: bool = False) -> List[str]:
+
+        if len(text) == required_length:
+
+            return text
+
+        else:
+
+            return self.add_empty_lines(text, required_length - len(text), add_before_text)
+
+    @property
+    def text_axis_x(self) -> List[str]:
+
+        return self.add_lines_if_shorter(self._text_axis_x, self.axis_text_max_lines)
+
+    @property
+    def text_axis_y(self) -> List[str]:
+
+        rotated_counterclockwise = self._text_rotation_y == 90
+
+        return self.add_lines_if_shorter(self._text_axis_y, self.axis_text_max_lines,
+                                         rotated_counterclockwise)
+
     def draw_axes_texts(self) -> None:
 
         QgsTextRenderer.drawText(self.transform.map(self.text_position_x), self.text_rotation_x,
-                                 QgsTextRenderer.AlignCenter, self._text_axis_x, self.context,
+                                 QgsTextRenderer.AlignCenter, self.text_axis_x, self.context,
                                  self.text_format, QgsTextRenderer.AlignBottom)
 
         QgsTextRenderer.drawText(self.transform.map(self.text_position_y), self.text_rotation_y,
-                                 QgsTextRenderer.AlignCenter, self._text_axis_y, self.context,
+                                 QgsTextRenderer.AlignCenter, self.text_axis_y, self.context,
                                  self.text_format, QgsTextRenderer.AlignBottom)
 
     def format_tick_value(self, value: float, precision: int) -> List[str]:
