@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 
 from qgis.core import QgsGradientColorRamp
 from qgis.PyQt.QtGui import QIcon
@@ -26,7 +25,6 @@ def test_color_ramp(color_ramp: BivariateColorRamp):
     assert issubclass(type(color_ramp), BivariateColorRamp)
 
     assert isinstance(color_ramp.name, str)
-    assert isinstance(color_ramp.icons_path, Path)
     assert isinstance(color_ramp.icon, QIcon)
     assert isinstance(color_ramp.color_ramp_1, QgsGradientColorRamp)
     assert isinstance(color_ramp.color_ramp_2, QgsGradientColorRamp)
