@@ -1,7 +1,7 @@
 from typing import Optional
 from pathlib import Path
 
-from qgis.PyQt.QtGui import QColor, QIcon
+from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, QgsVectorLayer,
@@ -66,9 +66,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.ticks_x_precision = 2
         self.ticks_y_precision = 2
 
-    def draw(self, context: QgsLayoutItemRenderContext) -> None:
-
-        render_context = context.renderContext()
+    def to_legend_renderer(self) -> LegendRenderer:
 
         legend_render = LegendRenderer()
 
@@ -94,12 +92,22 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         legend_render.set_text_rotation_y(self.y_axis_rotation)
 
-        item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
-
         if self.renderer:
 
             legend_render.texts_axis_x_ticks = self.renderer.field_1_labels
             legend_render.texts_axis_y_ticks = self.renderer.field_2_labels
+
+        return legend_render
+
+    def draw(self, context: QgsLayoutItemRenderContext) -> None:
+
+        render_context = context.renderContext()
+
+        item_size = self.layout().convertToLayoutUnits(self.sizeWithUnits())
+
+        legend_render = self.to_legend_renderer()
+
+        if self.renderer:
 
             legend_render.render(render_context, item_size.width(), item_size.height(),
                                  self.renderer.generate_legend_polygons())
