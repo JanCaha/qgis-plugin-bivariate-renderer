@@ -9,6 +9,7 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 
 from tests import set_up_bivariate_renderer, set_up_layout_page_a4, get_layout_space, export_page_to_image
+from tests import set_up_bivariate_renderer, save_layout_for_layer
 
 skip_setting = pytest.mark.skipif(True, reason="do not generate with every run")
 
@@ -239,6 +240,7 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
     bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
                                                    field1="fid",
                                                    field2="fid")
+
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
     legend_renderer = LegendRenderer()
@@ -333,3 +335,18 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
     painter.end()
 
     image.save("./tests/images/correct/legend_with_all_rotated.png", "PNG")
+
+
+@skip_setting
+def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout):
+
+    bivariate_renderer = set_up_bivariate_renderer(nc_layer,
+                                                   field1="AREA",
+                                                   field2="PERIMETER",
+                                                   color_ramps=BivariateColorRampGreenPink())
+
+    nc_layer.setRenderer(bivariate_renderer)
+
+    qgs_project.addMapLayer(nc_layer)
+
+    save_layout_for_layer(nc_layer, qgs_layout, "tests/images/correct/layout_polygons_render.png")
