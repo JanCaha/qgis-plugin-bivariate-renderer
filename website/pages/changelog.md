@@ -12,6 +12,8 @@
 
   - legend preview in Renderer Settings now shows break values in legend
 
+  - renderer has correctly assigned icon in the list of renderers
+  
   - fix error in Layout Widget, where attribute names were not correctly into Layout Item when it was created 
 
   - default style for axis arrow is now stored in separate file, which makes potential changes much simpler
