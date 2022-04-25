@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from qgis.core import (QgsMessageLog, Qgis, QgsLineSymbol, QgsSymbol)
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtGui import QColor, QIcon
 
 from .text_constants import Texts
 
@@ -74,6 +74,18 @@ def default_line_symbol() -> QgsLineSymbol:
     line_symbol.setColor(QColor(0, 0, 0))
 
     return line_symbol
+
+
+def path_icon(file_name: str) -> Path:
+
+    return Path(__file__).parent / "icons" / file_name
+
+
+def get_icon(file_name: str) -> QIcon:
+
+    path = path_icon(file_name)
+
+    return QIcon(path.absolute().as_posix())
 
 
 class Singleton(type):
