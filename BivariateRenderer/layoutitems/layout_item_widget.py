@@ -64,9 +64,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         if self.layout_item.linked_layer_name:
             self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
 
-        self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
-        self.cb_layers.setCurrentIndex(0)
-
         self.form_layout = QVBoxLayout()
 
         self.form_layout.addWidget(QLabel("Select layer to obtain the renderer from"))
@@ -83,6 +80,11 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.form_layout.addWidget(self.widget_rotate_y_axis_texts())
 
         self.setLayout(self.form_layout)
+
+        self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
+
+        if 0 < len(usable_layers):
+            self.cb_layers.setCurrentIndex(1)
 
     def widget_rotate_y_axis_texts(self) -> QgsCollapsibleGroupBoxBasic:
 
