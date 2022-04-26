@@ -214,6 +214,10 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_renderer.text_format_ticks.setSize(50)
 
+        self.legend_renderer._text_rotation_y = -90
+
+        self.legend_renderer._space_above_ticks = 15
+
         self.legend_renderer.render(context, self.size, self.size,
                                     self.bivariate_renderer.generate_legend_polygons())
 
