@@ -8,8 +8,7 @@ from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodD
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 
-from tests import set_up_bivariate_renderer, set_up_layout_page_a4, get_layout_space, export_page_to_image
-from tests import set_up_bivariate_renderer, save_layout_for_layer
+from tests import set_up_bivariate_renderer, set_up_layout_page_a4, get_layout_space, export_page_to_image, save_layout_for_layer
 
 skip_setting = pytest.mark.skipif(True, reason="do not generate with every run")
 
