@@ -49,6 +49,8 @@ class LegendRenderer:
 
     _text_rotation_y: float
 
+    _space_above_ticks: int
+
     def __init__(self):
 
         self._painter = None
@@ -62,6 +64,8 @@ class LegendRenderer:
         self.axis_line_symbol = default_line_symbol()
 
         self._text_rotation_y = 90
+
+        self._space_above_ticks = 10
 
         self.ticks_x_precision = 2
         self.ticks_y_precision = 2
@@ -483,6 +487,9 @@ class LegendRenderer:
                                          self.format_tick_value(value, self.ticks_y_precision),
                                          self.context, self.text_format_ticks,
                                          QgsTextRenderer.AlignBottom)
+
+    def set_space_above_ticks(self, space: int) -> None:
+        self._space_above_ticks = int(space)
 
     def render(self, context: QgsRenderContext, width: float, height: float,
                polygons: List[LegendPolygon]) -> None:

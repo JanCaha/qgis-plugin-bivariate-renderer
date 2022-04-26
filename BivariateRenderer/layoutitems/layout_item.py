@@ -1,8 +1,8 @@
 from typing import Optional
-from pathlib import Path
 
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
+from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, QgsVectorLayer,
                        QgsTextFormat, QgsLayoutItemRenderContext, QgsLineSymbol,
@@ -10,7 +10,7 @@ from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, 
                        QgsMapLayerType)
 
 from ..text_constants import Texts, IDS
-from ..utils import default_line_symbol
+from ..utils import default_line_symbol, get_icon
 from ..renderer.bivariate_renderer import BivariateRenderer
 
 from ..legendrenderer.legend_renderer import LegendRenderer
@@ -41,6 +41,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     ticks_x_precision: int
     ticks_y_precision: int
 
+    space_above_ticks: int
+
+    settings_updated = pyqtSignal()
+
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -65,6 +69,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.ticks_x_precision = 2
         self.ticks_y_precision = 2
+
+        self.space_above_ticks = 10
+
+        self.settings_updated.connect(self.refresh)
 
     def to_legend_renderer(self) -> LegendRenderer:
 
@@ -91,6 +99,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.ticks_y_precision = self.ticks_y_precision
 
         legend_render.set_text_rotation_y(self.y_axis_rotation)
+
+        legend_render.set_space_above_ticks(self.space_above_ticks)
 
         if self.renderer:
 
@@ -126,6 +136,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("y_axis_rotation", str(self.y_axis_rotation))
         bivariate_legend_element.setAttribute("ticks_x_precision", str(self.ticks_x_precision))
         bivariate_legend_element.setAttribute("ticks_y_precision", str(self.ticks_y_precision))
+        bivariate_legend_element.setAttribute("space_above_ticks", str(self.space_above_ticks))
 
         line_symbol = doc.createElement("lineSymbol")
 
@@ -205,6 +216,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
             self.ticks_x_precision = int(element.attribute("ticks_x_precision"))
             self.ticks_y_precision = int(element.attribute("ticks_y_precision"))
 
+        if element.hasAttribute("space_above_ticks"):
+            self.space_above_ticks = int(element.attribute("space_above_ticks"))
+
         if element.hasAttribute("legend_rotated"):
 
             self.legend_rotated = element.attribute("legend_rotated") == "True"
@@ -262,35 +276,43 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def set_linked_layer(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
         self.renderer = layer.renderer().clone()
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_line_format(self, line_format: QgsLineSymbol) -> None:
         self.line_format = line_format
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_text_format(self, text_format: QgsTextFormat) -> None:
         self.text_format = text_format
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_text_values_format(self, text_format: QgsTextFormat) -> None:
         self.text_values_format = text_format
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_y_axis_rotation(self, rotation: float) -> None:
         self.y_axis_rotation = rotation
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_axis_x_name(self, name: str) -> None:
         self.text_axis_x = name
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_axis_y_name(self, name: str) -> None:
         self.text_axis_y = name
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_legend_rotated(self, rotated: bool) -> None:
         self.legend_rotated = rotated
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def are_labels_default(self) -> bool:
 
@@ -298,20 +320,29 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_draw_axes_text(self, draw: bool) -> None:
         self.add_axes_texts = draw
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_draw_axes_arrow(self, draw: bool) -> None:
         self.add_axes_arrows = draw
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_draw_axes_values(self, draw: bool) -> None:
         self.add_axes_values_texts = draw
-        self.refresh()
+
+        self.settings_updated.emit()
 
     def set_ticks_precisions(self, axis_x_precision: int, axis_y_precision: int) -> None:
         self.ticks_x_precision = axis_x_precision
         self.ticks_y_precision = axis_y_precision
-        self.refresh()
+
+        self.settings_updated.emit()
+
+    def set_space_above_ticks(self, space: int) -> None:
+        self.space_above_ticks = int(space)
+
+        self.settings_updated.emit()
 
     @property
     def get_font(self):
@@ -338,9 +369,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def icon(self) -> QIcon:
 
-        path = Path(__file__).parent.parent / "icons" / "legend_icon.png"
-
-        return QIcon(path.absolute().as_posix())
+        return get_icon("legend_icon.png")
 
 
 class BivariateRendererLayoutItemMetadata(QgsLayoutItemAbstractMetadata):

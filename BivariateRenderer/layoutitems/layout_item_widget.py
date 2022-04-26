@@ -29,6 +29,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     ticks_precision_x: QSpinBox
     ticks_precision_y: QSpinBox
+    space_above_ticks: QSpinBox
 
     b_line_symbol: QgsSymbolButton
     b_font: QgsFontButton
@@ -231,6 +232,17 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.ticks_precision_y.valueChanged.connect(self.pass_precisions)
 
+        self.space_above_ticks = QSpinBox()
+        self.space_above_ticks.setMinimum(0)
+        self.space_above_ticks.setMaximum(100)
+        self.space_above_ticks.setValue(10)
+        self.space_above_ticks.setSuffix("px")
+
+        if self.layout_item.space_above_ticks:
+            self.space_above_ticks.setValue(self.layout_item.space_above_ticks)
+
+        self.space_above_ticks.valueChanged.connect(self.pass_space)
+
         cg_axes_descriptions_layout.addWidget(QLabel("Use axes values texts in legend"))
         cg_axes_descriptions_layout.addWidget(self.add_axes_values_text)
         cg_axes_descriptions_layout.addWidget(QLabel("Font"))
@@ -239,10 +251,21 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         cg_axes_descriptions_layout.addWidget(self.ticks_precision_x)
         cg_axes_descriptions_layout.addWidget(QLabel("Values precision on Y axis"))
         cg_axes_descriptions_layout.addWidget(self.ticks_precision_y)
+        cg_axes_descriptions_layout.addWidget(QLabel("Space above value (to arrow or legend)"))
+        cg_axes_descriptions_layout.addWidget(self.space_above_ticks)
 
         cg_axes_value_descriptions.setLayout(cg_axes_descriptions_layout)
 
         return cg_axes_value_descriptions
+
+    def pass_space(self):
+        self.layout_item.beginCommand(self.tr('Change space above ticks'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.blockSignals(True)
+        self.layout_item.set_space_above_ticks(self.space_above_ticks.value())
+        self.layout_item.blockSignals(False)
+        self.layout_item.endCommand()
 
     def pass_precisions(self):
 
