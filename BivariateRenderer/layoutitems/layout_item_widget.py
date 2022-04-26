@@ -239,7 +239,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.space_above_ticks.setSuffix("px")
 
         if self.layout_item.space_above_ticks:
-            self.space_above_ticks.setValue(self.layout_item.space_above_ticks)
+            self.space_above_ticks.setValue(int(self.layout_item.space_above_ticks))
 
         self.space_above_ticks.valueChanged.connect(self.pass_space)
 
