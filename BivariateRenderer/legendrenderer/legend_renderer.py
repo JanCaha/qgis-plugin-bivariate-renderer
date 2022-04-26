@@ -197,6 +197,9 @@ class LegendRenderer:
         x = self.all_elements_top + (self.width - self.all_elements_top) / 2
         y = self.width
 
+        if self.legend_rotated:
+            y = self.width + self.text_height_max / 2
+
         return QPointF(x, y)
 
     @property
@@ -212,7 +215,9 @@ class LegendRenderer:
 
         if self.legend_rotated:
 
-            return QPointF(x - self.text_height_max, y)
+            x = -self.text_height_max / 2
+
+            return QPointF(x, y)
 
         else:
 
@@ -436,19 +441,27 @@ class LegendRenderer:
 
         if self.add_axes_ticks_texts:
 
-            return self.axis_tick_text_height + self.margin
+            return self.axis_tick_text_height + self._space_above_ticks
 
         else:
 
             return 0
 
     def position_axis_tick_x(self, index: int) -> QPointF:
-        return QPointF(self.polygon_start_pos_x + index * self.size_constant,
-                       self.height - self.text_height_max_with_margin)
+
+        if not self.add_axes_texts:
+
+            y = self.height - (self.axis_tick_text_height + self.margin)
+
+        else:
+
+            y = self.height - self.text_height_max_with_margin
+
+        return QPointF(self.polygon_start_pos_x + index * self.size_constant, y)
 
     def position_axis_tick_y(self, index: int) -> QPointF:
 
-        x = self.text_height_max_with_margin + self.axis_tick_text_height_with_margin / 2
+        x = self.text_height_max_with_margin + self.axis_tick_text_height_with_margin
 
         y = index * self.size_constant
 
@@ -458,9 +471,15 @@ class LegendRenderer:
 
         else:
 
-            if self._text_rotation_y == -90:
+            if not self.axis_y_text_rotated_counterclockwise:
 
-                x = self.text_height_max_with_margin
+                if self.add_axes_texts is False:
+
+                    x = self.text_height_max_with_margin + self.margin
+
+                else:
+
+                    x = self.text_height_max_with_margin
 
         return QPointF(x, y)
 
