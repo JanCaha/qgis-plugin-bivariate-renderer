@@ -2,10 +2,10 @@ from typing import List
 import math
 
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
-from qgis.PyQt.QtGui import QPolygonF, QBrush, QPainter, QTransform
+from qgis.PyQt.QtGui import QPolygonF, QBrush, QPainter, QTransform, QColor, QPen
 
 from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer,
-                       QgsBasicNumericFormat, QgsNumericFormatContext)
+                       QgsBasicNumericFormat, QgsNumericFormatContext, QgsLineString, QgsPoint)
 
 from ..renderer.bivariate_renderer import LegendPolygon
 from ..utils import default_line_symbol
@@ -451,7 +451,7 @@ class LegendRenderer:
 
         if not self.add_axes_texts:
 
-            y = self.height - (self.axis_tick_text_height + self.margin)
+            y = self.height - (self.margin)
 
         else:
 
@@ -461,7 +461,7 @@ class LegendRenderer:
 
     def position_axis_tick_y(self, index: int) -> QPointF:
 
-        x = self.text_height_max_with_margin + self.axis_tick_text_height_with_margin
+        x = self.text_height_max_with_margin + self.axis_tick_text_height
 
         y = index * self.size_constant
 
@@ -510,6 +510,47 @@ class LegendRenderer:
     def set_space_above_ticks(self, space: int) -> None:
         self._space_above_ticks = int(space)
 
+    def draw_debug_lines(self):
+
+        self.painter.save()
+
+        pen = QPen(QColor(255, 0, 0, 255), 3, Qt.SolidLine)
+
+        self.painter.setPen(pen)
+
+        line = QgsLineString([
+            QgsPoint(0, self.height - self.text_height_max),
+            QgsPoint(self.width, self.height - self.text_height_max)
+        ])
+
+        line.draw(self.painter)
+
+        line = QgsLineString(
+            [QgsPoint(self.text_height_max, 0),
+             QgsPoint(self.text_height_max, self.height)])
+
+        line.draw(self.painter)
+
+        # Lines
+        pen = QPen(QColor(0, 255, 0, 255), 3, Qt.SolidLine)
+
+        self.painter.setPen(pen)
+
+        line = QgsLineString([
+            QgsPoint(0, self.height - self.axis_text_tics_top),
+            QgsPoint(self.width, self.height - self.axis_text_tics_top)
+        ])
+
+        line.draw(self.painter)
+
+        line = QgsLineString(
+            [QgsPoint(self.axis_text_tics_top, 0),
+             QgsPoint(self.axis_text_tics_top, self.height)])
+
+        line.draw(self.painter)
+
+        self.painter.restore()
+
     def render(self, context: QgsRenderContext, width: float, height: float,
                polygons: List[LegendPolygon]) -> None:
 
@@ -545,5 +586,7 @@ class LegendRenderer:
         if self.add_axes_ticks_texts:
 
             self.draw_values()
+
+        # self.draw_debug_lines()
 
         self.painter.restore()
