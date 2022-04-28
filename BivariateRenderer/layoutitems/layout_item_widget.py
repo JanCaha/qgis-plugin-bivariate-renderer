@@ -146,7 +146,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.b_line_symbol.setMinimumWidth(50)
 
         if self.layout_item.line_format:
-            self.b_line_symbol.setSymbol(self.layout_item.line_format)
+            self.b_line_symbol.setSymbol(self.layout_item.line_format.clone())
 
         self.b_line_symbol.changed.connect(self.pass_linesymbol)
 

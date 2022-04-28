@@ -52,7 +52,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.text_format = QgsTextFormat()
         self.text_values_format = QgsTextFormat()
 
-        self.line_format = default_line_symbol()
+        self.line_format = default_line_symbol().clone()
 
         self.renderer = None
 
@@ -274,7 +274,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.refresh()
 
     def set_line_format(self, line_format: QgsLineSymbol) -> None:
-        self.line_format = line_format
+        self.line_format = line_format.clone()
 
         self.refresh()
 

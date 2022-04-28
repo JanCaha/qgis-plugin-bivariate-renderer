@@ -61,7 +61,7 @@ class LegendRenderer:
         self.text_format = QgsTextFormat()
         self.text_format_ticks = QgsTextFormat()
 
-        self.axis_line_symbol = default_line_symbol()
+        self.axis_line_symbol = default_line_symbol().clone()
 
         self._text_rotation_y = 90
 
