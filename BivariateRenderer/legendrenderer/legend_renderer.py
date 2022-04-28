@@ -249,11 +249,23 @@ class LegendRenderer:
 
     @property
     def point_line_x_end(self) -> QPolygonF:
-        return QPointF(self.width, self.arrow_x_y)
+
+        x = self.width
+
+        if self.add_axes_ticks_texts:
+            x = self.width + self.axis_tick_last_value_max_width / 2
+
+        return QPointF(x, self.arrow_x_y)
 
     @property
     def point_line_y_end(self) -> float:
-        return QPointF(self.arrow_start_x, self.height * 0)
+
+        y = 0.0
+
+        if self.add_axes_ticks_texts:
+            y = -self.axis_tick_last_value_max_width / 2
+
+        return QPointF(self.arrow_start_x, y)
 
     @property
     def text_rotation_x(self) -> float:
@@ -303,12 +315,12 @@ class LegendRenderer:
 
             else:
 
-                max_size = self.height + self.axis_tick_last_y_value_width / 2
+                max_size = self.height + self.axis_tick_last_value_max_width / 2
 
                 scale_factor = self.height / max_size
 
                 self._transform.scale(scale_factor, scale_factor)
-                self._transform.translate(0, self.axis_tick_last_y_value_width / 2)
+                self._transform.translate(0, self.axis_tick_last_value_max_width / 2)
 
         return self._transform
 
@@ -435,6 +447,26 @@ class LegendRenderer:
         else:
 
             return 0
+
+    @property
+    def axis_tick_last_x_value_width(self) -> float:
+
+        if self.add_axes_ticks_texts:
+
+            return QgsTextRenderer.textWidth(self.context,
+                                             self.text_format_ticks,
+                                             textLines=self.format_tick_value(
+                                                 max(self.texts_axis_x_ticks),
+                                                 self.ticks_x_precision))
+
+        else:
+
+            return 0
+
+    @property
+    def axis_tick_last_value_max_width(self) -> float:
+
+        return max(self.axis_tick_last_x_value_width, self.axis_tick_last_y_value_width)
 
     @property
     def axis_tick_text_height_with_margin(self) -> float:
