@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+- fix provider error cause by missing export
+
 ## 0.7
 
   - added option to include break values for both axis in legend, with option to style font a specify number precision for each axis
