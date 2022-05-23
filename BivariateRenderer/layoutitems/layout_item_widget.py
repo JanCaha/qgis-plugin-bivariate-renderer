@@ -55,8 +55,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                 layer: QgsVectorLayer
 
-                if layer.renderer().type() == Texts.bivariate_renderer_short_name:
-                    usable_layers.append(layer.name())
+                if layer.renderer():
+                    if layer.renderer().type() == Texts.bivariate_renderer_short_name:
+                        usable_layers.append(layer.name())
 
         self.cb_layers = QComboBox()
         self.cb_layers.addItem("")
