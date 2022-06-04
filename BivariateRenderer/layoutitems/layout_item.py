@@ -155,15 +155,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         if self.layer:
             bivariate_legend_element.setAttribute("vectorLayerId", self.layer.id())
 
-        # line
-        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L831
-
-        # text
-        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L765
-
-        # layer
-        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemattributetable.cpp#L840
-
         return True
 
     def readPropertiesFromElement(self, element: QDomElement, document: QDomDocument,
