@@ -64,8 +64,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_renderer = LegendRenderer()
 
-        self.legend_size = self.size().width() / 3
-        self.text_ticks_size = self.legend_size / 5
+        self.calculate_legend_sizes()
 
         # objects
         self.field_name_1 = None
@@ -195,11 +194,20 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.update_legend()
 
+    def calculate_legend_sizes(self) -> None:
+        self.legend_size = int(self.size().width() / 3)
+        self.text_ticks_size = self.legend_size / 4
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.calculate_legend_sizes()
+        self.update_legend()
+
     def update_legend(self):
 
         self.label_legend.clear()
 
-        image = QImage(int(self.legend_size), int(self.legend_size), QImage.Format_ARGB32)
+        image = QImage(self.legend_size, self.legend_size, QImage.Format_ARGB32)
         image.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(image)
@@ -216,7 +224,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_renderer._text_rotation_y = -90
 
-        self.legend_renderer._space_above_ticks = self.text_ticks_size / 10
+        self.legend_renderer._space_above_ticks = self.text_ticks_size / 100
 
         self.legend_renderer.render(context, self.legend_size, self.legend_size,
                                     self.bivariate_renderer.generate_legend_polygons())
