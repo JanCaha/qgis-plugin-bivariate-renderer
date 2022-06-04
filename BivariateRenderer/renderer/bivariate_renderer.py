@@ -6,7 +6,8 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtXml import QDomDocument, QDomElement
 
 from qgis.core import (QgsFeatureRenderer, QgsClassificationRange, QgsFeature, QgsColorRamp,
-                       QgsFillSymbol, QgsSymbolLayerUtils)
+                       QgsFillSymbol, QgsSymbolLayerUtils, QgsVectorLayer, QgsClassificationMethod,
+                       QgsClassificationEqualInterval)
 
 from ..text_constants import Texts
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
@@ -25,6 +26,7 @@ class BivariateRenderer(QgsFeatureRenderer):
     field_2_classes: List[QgsClassificationRange]
 
     color_mixing_method: ColorMixingMethod
+    classification_method: QgsClassificationMethod
 
     def __init__(self, syms=None):
 
@@ -33,6 +35,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.number_classes = 3
 
         self.color_mixing_method = ColorMixingMethodDarken()
+
+        self.classification_method = QgsClassificationEqualInterval()
 
         self.field_name_1 = None
         self.field_name_2 = None
