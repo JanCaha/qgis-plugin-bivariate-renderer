@@ -54,19 +54,9 @@ class BivariateRenderer(QgsFeatureRenderer):
     def _reset_cache(self):
         self.cached = {}
 
-    def getLegendCategorySize(self) -> int:
-
-        size_constant = 250 / self.number_classes
-
-        return int(size_constant)
-
-    def getLegendCategories(self) -> Dict[int, Dict[str, object]]:
+    def getLegendCategories(self) -> Dict[int, Dict[str, str]]:
 
         position = {}
-
-        size_constant = self.getLegendCategorySize()
-        start_y = 250 - size_constant
-        start_x = 50
 
         x = 0
         for field_1_cat in self.field_1_classes:
@@ -82,13 +72,7 @@ class BivariateRenderer(QgsFeatureRenderer):
                     (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
                     (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
 
-                position.update({
-                    value_hash: {
-                        "x": int(start_x + x * size_constant),
-                        "y": int(start_y - y * size_constant),
-                        "color": str(color.name())
-                    }
-                })
+                position.update({value_hash: {"color": str(color.name())}})
 
                 y += 1
 
