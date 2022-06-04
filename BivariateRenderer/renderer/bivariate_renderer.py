@@ -403,7 +403,7 @@ class BivariateRenderer(QgsFeatureRenderer):
             if (self.field_name_1 == other.field_name_1 and
                     self.field_name_2 == other.field_name_2 and
                     self.number_classes == other.number_classes and
-                    self.classification_method.id() == other.classification_method.id() and
+                    # self.classification_method.id() == other.classification_method.id() and
                     self.field_1_min == other.field_1_min and
                     self.field_1_max == other.field_1_max and
                     self.field_2_min == other.field_2_min and
