@@ -6,10 +6,10 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.gui import (QgsRendererWidget, QgsColorRampButton, QgsFieldComboBox, QgsDoubleSpinBox)
 
-from qgis.core import (QgsGradientColorRamp, QgsClassificationMethod, QgsClassificationJenks,
+from qgis.core import (QgsGradientColorRamp, QgsClassificationJenks,
                        QgsClassificationEqualInterval, QgsClassificationQuantile,
                        QgsClassificationPrettyBreaks, QgsClassificationLogarithmic,
-                       QgsFieldProxyModel, QgsRenderContext, QgsTextFormat)
+                       QgsFieldProxyModel, QgsRenderContext)
 
 from .bivariate_renderer import BivariateRenderer
 from ..legendrenderer.legend_renderer import LegendRenderer
@@ -178,20 +178,19 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.legend_changed.connect(self.update_legend)
 
         self.form_layout = QFormLayout()
-        self.form_layout.addRow("Predefined color ramps:", self.cb_color_ramps)
-        self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
+        self.form_layout.addRow("Color ramps", self.cb_color_ramps)
+        self.form_layout.addRow("Number of classes", self.sb_number_classes)
         self.form_layout.addRow(
-            "",
             QLabel(
-                "Data are categorized using Equal Interval classification method into provided number of categories for both fields."
+                "Data are categorized using Equal Interval classification\nmethod into provided number of categories for both fields."
             ))
         # self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
-        self.form_layout.addRow("Select color mixing method:", self.cb_colormixing_methods)
-        self.form_layout.addRow("Select field 1:", self.cb_field1)
-        self.form_layout.addRow("Select color ramp 1:", self.bt_color_ramp1)
-        self.form_layout.addRow("Select field 2:", self.cb_field2)
-        self.form_layout.addRow("Select color ramp 2:", self.bt_color_ramp2)
-        self.form_layout.addRow("Example of legend:", self.label_legend)
+        self.form_layout.addRow("Color mixing method", self.cb_colormixing_methods)
+        self.form_layout.addRow("Field 1", self.cb_field1)
+        self.form_layout.addRow("Color Ramp 1", self.bt_color_ramp1)
+        self.form_layout.addRow("Field 2", self.cb_field2)
+        self.form_layout.addRow("Color Ramp 2", self.bt_color_ramp2)
+        self.form_layout.addRow("Legend", self.label_legend)
         self.setLayout(self.form_layout)
 
         self.update_legend()
@@ -200,7 +199,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.label_legend.clear()
 
-        image = QImage(self.size, self.size, QImage.Format_ARGB32)
+        image = QImage(int(self.legend_size), int(self.legend_size), QImage.Format_ARGB32)
         image.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(image)
