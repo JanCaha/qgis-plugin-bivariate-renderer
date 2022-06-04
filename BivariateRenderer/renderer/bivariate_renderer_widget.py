@@ -26,7 +26,6 @@ class BivariateRendererWidget(QgsRendererWidget):
     # objects
     color_ramp_1: QgsGradientColorRamp
     color_ramp_2: QgsGradientColorRamp
-    number_of_classes: int
     field_name_1: str
     field_name_2: str
 
@@ -71,7 +70,6 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.legend_renderer = LegendRenderer()
 
         # objects
-        self.number_of_classes = self.bivariate_renderer.number_classes
         self.field_name_1 = None
         self.field_name_2 = None
 
@@ -112,7 +110,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.sb_number_classes.setMaximum(5)
         self.sb_number_classes.setSingleStep(1)
         self.sb_number_classes.valueChanged.connect(self.setNumberOfClasses)
-        self.sb_number_classes.setValue(self.number_of_classes)
+        self.sb_number_classes.setValue(self.bivariate_renderer.number_classes)
 
         self.cb_classification_methods = QComboBox()
         self.cb_classification_methods.addItems(list(self.classification_methods.keys()))
@@ -235,8 +233,6 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.label_legend.setPixmap(QPixmap.fromImage(image))
 
     def setNumberOfClasses(self) -> None:
-
-        self.number_of_classes = int(self.sb_number_classes.value())
 
         self.bivariate_renderer.setNumberOfClasses(int(self.sb_number_classes.value()))
 
