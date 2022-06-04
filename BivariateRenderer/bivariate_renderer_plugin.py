@@ -59,29 +59,6 @@ class BivariateRendererPlugin:
 
         self.initProcessing()
 
-        # # TODO to remove after
-        # from .legendrenderer.legend_renderer import LegendRenderer
-        # from qgis.PyQt.QtGui import (QImage, QPainter, QColor, QPixmap)
-        # from qgis.PyQt.QtWidgets import (QLabel)
-        # from qgis.core import QgsRenderContext
-        #
-        # image = QImage(500, 500, QImage.Format_ARGB32)
-        # image.fill(QColor(255, 255, 255))
-        #
-        # painter = QPainter(image)
-        #
-        # context = QgsRenderContext.fromQPainter(painter)
-        #
-        # legend_renderer = LegendRenderer()
-        #
-        # legend_renderer.render(context, 500, 500)
-        #
-        # painter.end()
-        #
-        # self.label = QLabel()
-        # self.label.show()
-        # self.label.setPixmap(QPixmap.fromImage(image))
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
