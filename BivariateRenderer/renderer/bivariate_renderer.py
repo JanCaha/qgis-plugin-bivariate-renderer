@@ -126,13 +126,15 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return values
 
-    def setField1Classes(self, classes: List[QgsClassificationRange]) -> None:
-        self.field_1_classes = classes
+    def setField1Classes(self, layer: QgsVectorLayer, attribute: str) -> None:
+        self.field_1_classes = self.classification_method.classes(layer, attribute,
+                                                                  self.number_classes)
 
         self._reset_cache()
 
-    def setField2Classes(self, classes: List[QgsClassificationRange]) -> None:
-        self.field_2_classes = classes
+    def setField2Classes(self, layer: QgsVectorLayer, attribute: str) -> None:
+        self.field_2_classes = self.classification_method.classes(layer, attribute,
+                                                                  self.number_classes)
 
         self._reset_cache()
 
