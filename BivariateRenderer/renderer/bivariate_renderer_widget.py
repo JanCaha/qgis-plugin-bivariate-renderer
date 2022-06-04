@@ -2,8 +2,6 @@ from qgis.PyQt.QtGui import (QImage, QColor, QPainter, QPixmap)
 
 from qgis.PyQt.QtWidgets import (QFormLayout, QLabel, QComboBox)
 
-from qgis.PyQt.QtCore import pyqtSignal
-
 from qgis.gui import (QgsRendererWidget, QgsColorRampButton, QgsFieldComboBox, QgsDoubleSpinBox)
 
 from qgis.core import (QgsGradientColorRamp, QgsClassificationMethod, QgsClassificationJenks,
@@ -57,8 +55,6 @@ class BivariateRendererWidget(QgsRendererWidget):
     text_format = QgsTextFormat()
     text_format.setSize(60)
 
-    legend_changed = pyqtSignal()
-
     def __init__(self, layer, style, renderer: BivariateRenderer):
 
         super().__init__(layer, style)
@@ -67,6 +63,8 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.bivariate_renderer = BivariateRenderer()
         else:
             self.bivariate_renderer = renderer.clone()
+
+        self.bivariate_renderer.settingsUpdated.connect(self.update_legend())
 
         self.legend_renderer = LegendRenderer()
 
@@ -179,8 +177,6 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.label_legend = QLabel()
 
-        self.legend_changed.connect(self.update_legend)
-
         self.form_layout = QFormLayout()
         self.form_layout.addRow("Predefined color ramps:", self.cb_color_ramps)
         self.form_layout.addRow("Select number of classes:", self.sb_number_classes)
@@ -243,14 +239,10 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.setField1Classes()
         self.setField2Classes()
 
-        self.legend_changed.emit()
-
     def setColorMixingMethod(self) -> None:
 
         self.bivariate_renderer.setColorMixingMethod(
             self.register_color_mixing.get_by_name(self.cb_colormixing_methods.currentText()))
-
-        self.legend_changed.emit()
 
     def setClassificationMethod(self) -> None:
 
@@ -262,19 +254,13 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.setField1Classes()
         self.setField2Classes()
 
-        self.legend_changed.emit()
-
     def setColorRamp1(self) -> None:
 
         self.bivariate_renderer.setColorRamp1(self.bt_color_ramp1.colorRamp())
 
-        self.legend_changed.emit()
-
     def setColorRamp2(self) -> None:
 
         self.bivariate_renderer.setColorRamp2(self.bt_color_ramp2.colorRamp())
-
-        self.legend_changed.emit()
 
     def setFieldName1(self) -> None:
 
@@ -284,8 +270,6 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.setField1Classes()
 
-        self.legend_changed.emit()
-
     def setFieldName2(self) -> None:
 
         self.field_name_2 = self.cb_field2.currentText()
@@ -293,8 +277,6 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.bivariate_renderer.setFieldName2(self.cb_field2.currentText())
 
         self.setField2Classes()
-
-        self.legend_changed.emit()
 
     def setField1Classes(self) -> None:
 
