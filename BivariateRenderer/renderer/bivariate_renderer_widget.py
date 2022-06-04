@@ -51,11 +51,6 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     scale_factor = 1
 
-    size = 300
-
-    text_format = QgsTextFormat()
-    text_format.setSize(60)
-
     legend_changed = pyqtSignal()
 
     def __init__(self, layer, style, renderer: BivariateRenderer):
@@ -68,6 +63,9 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.bivariate_renderer = renderer.clone()
 
         self.legend_renderer = LegendRenderer()
+
+        self.legend_size = self.size().width() / 3
+        self.text_ticks_size = self.legend_size / 5
 
         # objects
         self.field_name_1 = None
@@ -210,22 +208,18 @@ class BivariateRendererWidget(QgsRendererWidget):
         context = QgsRenderContext.fromQPainter(painter)
         context.setScaleFactor(self.scale_factor)
 
-        self.legend_renderer.text_format = self.text_format
-        self.legend_renderer.axis_title_x = self.cb_field1.currentText()
-        self.legend_renderer.axis_title_y = self.cb_field2.currentText()
-
         self.legend_renderer.add_axes_ticks_texts = True
 
         self.legend_renderer.texts_axis_x_ticks = self.bivariate_renderer.field_1_labels
         self.legend_renderer.texts_axis_y_ticks = self.bivariate_renderer.field_2_labels
 
-        self.legend_renderer.text_format_ticks.setSize(50)
+        self.legend_renderer.text_format_ticks.setSize(self.text_ticks_size)
 
         self.legend_renderer._text_rotation_y = -90
 
-        self.legend_renderer._space_above_ticks = 15
+        self.legend_renderer._space_above_ticks = self.text_ticks_size / 10
 
-        self.legend_renderer.render(context, self.size, self.size,
+        self.legend_renderer.render(context, self.legend_size, self.legend_size,
                                     self.bivariate_renderer.generate_legend_polygons())
 
         painter.end()
