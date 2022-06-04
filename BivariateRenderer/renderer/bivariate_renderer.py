@@ -17,7 +17,6 @@ from ..colormixing.color_mixing_method import ColorMixingMethod, ColorMixingMeth
 class BivariateRenderer(QgsFeatureRenderer):
 
     number_classes: int
-    classification_method_name: str
     color_ramp_1: QgsColorRamp
     color_ramp_2: QgsColorRamp
     field_name_1: str
@@ -41,8 +40,6 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.field_name_1 = None
         self.field_name_2 = None
 
-        self.classification_method_name = None
-
         self.color_ramp_1 = None
         self.color_ramp_2 = None
 
@@ -51,7 +48,7 @@ class BivariateRenderer(QgsFeatureRenderer):
     def __repr__(self) -> str:
         return f"BivariateRenderer with {self.number_classes} classes for each attribute, " \
                f"for fields {self.field_name_1} and {self.field_name_2}, " \
-               f"with classification method {self.classification_method_name}," \
+               f"with classification method {self.classification_method.name()}," \
                f"field 1 vals {self.field_1_min};{self.field_1_max} " \
                f"field 2 vals {self.field_2_min};{self.field_2_max} "
 
@@ -88,8 +85,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.color_mixing_method = method
         self._reset_cache()
 
-    def setClassificationMethodName(self, name: str) -> None:
-        self.classification_method_name = name
+    def setClassificationMethod(self, method: QgsClassificationMethod) -> None:
+        self.classification_method = method
         self._reset_cache()
 
     def setNumberOfClasses(self, number: int) -> None:
@@ -214,7 +211,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r = BivariateRenderer()
         r.setFieldName1(self.field_name_1)
         r.setFieldName2(self.field_name_2)
-        r.classification_method_name = self.classification_method_name
+        r.classification_method = self.classification_method.clone()
         r.setNumberOfClasses(self.number_classes)
         r.setColorRamp1(self.color_ramp_1.clone())
         r.setColorRamp2(self.color_ramp_2.clone())
@@ -233,7 +230,8 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.setAttribute('number_of_classes', self.number_classes)
 
-        renderer_elem.setAttribute('classification_method_name', self.classification_method_name)
+        classification_method_elem = self.classification_method.save(doc, context)
+        renderer_elem.appendChild(classification_method_elem)
 
         renderer_elem.setAttribute('field_name_1', self.field_name_1)
         renderer_elem.setAttribute('field_name_2', self.field_name_2)
@@ -275,7 +273,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         return renderer_elem
 
     @staticmethod
-    def create_render_from_element(element: QDomElement) -> BivariateRenderer:
+    def create_render_from_element(element: QDomElement, context) -> BivariateRenderer:
 
         r = BivariateRenderer()
 
@@ -283,10 +281,9 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setFieldName2(element.attribute("field_name_2"))
 
         r.setNumberOfClasses(int(element.attribute("number_of_classes")))
-        r.setClassificationMethodName(element.attribute("classification_method_name "))
 
-        if r.classification_method_name == "":
-            r.classification_method_name = None
+        method_elem = element.firstChildElement("classificationMethod")
+        r.setClassificationMethod(QgsClassificationMethod.create(method_elem, context))
 
         color_ramp_1_elem = element.firstChildElement("colorramp")
         r.setColorRamp1(QgsSymbolLayerUtils.loadColorRamp(color_ramp_1_elem))
@@ -340,7 +337,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         return r
 
     def load(self, symbology_elem: QDomElement, context):
-        return self.create_render_from_element(symbology_elem)
+        return self.create_render_from_element(symbology_elem, context)
 
     @staticmethod
     def get_default_symbol():
@@ -406,7 +403,7 @@ class BivariateRenderer(QgsFeatureRenderer):
             if (self.field_name_1 == other.field_name_1 and
                     self.field_name_2 == other.field_name_2 and
                     self.number_classes == other.number_classes and
-                    self.classification_method_name == other.classification_method_name and
+                    self.classification_method.id() == other.classification_method.id() and
                     self.field_1_min == other.field_1_min and
                     self.field_1_max == other.field_1_max and
                     self.field_2_min == other.field_2_min and

@@ -24,7 +24,7 @@ class BivariateRendererMetadata(QgsRendererAbstractMetadata):
         return Texts.bivariate_renderer_full_name
 
     def createRenderer(self, element: QDomElement, context):
-        return BivariateRenderer.create_render_from_element(element)
+        return BivariateRenderer.create_render_from_element(element, context)
 
     def createRendererWidget(self, layer, style, renderer):
         return BivariateRendererWidget(layer, style, renderer)

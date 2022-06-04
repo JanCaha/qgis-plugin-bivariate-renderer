@@ -24,7 +24,6 @@ from ..text_constants import Texts
 class BivariateRendererWidget(QgsRendererWidget):
 
     # objects
-    classification_method: QgsClassificationMethod
     color_ramp_1: QgsGradientColorRamp
     color_ramp_2: QgsGradientColorRamp
     number_of_classes: int
@@ -72,7 +71,6 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.legend_renderer = LegendRenderer()
 
         # objects
-        self.classification_method = QgsClassificationEqualInterval()
         self.number_of_classes = self.bivariate_renderer.number_classes
         self.field_name_1 = None
         self.field_name_2 = None
@@ -120,9 +118,20 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.cb_classification_methods.addItems(list(self.classification_methods.keys()))
         self.cb_classification_methods.currentIndexChanged.connect(self.setClassificationMethod)
 
-        if self.bivariate_renderer.classification_method_name:
-            self.cb_classification_methods.setCurrentText(
-                self.bivariate_renderer.classification_method_name)
+        if self.bivariate_renderer.classification_method:
+
+            if self.bivariate_renderer.classification_method.name() in list(
+                    self.classification_methods.keys()):
+
+                index = list(self.classification_methods.keys()).\
+                    index(self.bivariate_renderer.classification_method.name())
+
+            else:
+
+                index = 0
+
+            self.cb_classification_methods.setCurrentIndex(index)
+
         else:
             self.cb_classification_methods.setCurrentIndex(1)
             self.cb_classification_methods.setCurrentIndex(0)
@@ -245,11 +254,10 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     def setClassificationMethod(self) -> None:
 
-        self.classification_method = self.classification_methods[
+        classification_method = self.classification_methods[
             self.cb_classification_methods.currentText()]
 
-        self.bivariate_renderer.setClassificationMethodName(
-            self.cb_classification_methods.currentText())
+        self.bivariate_renderer.setClassificationMethodName(classification_method)
 
         self.setField1Classes()
         self.setField2Classes()
