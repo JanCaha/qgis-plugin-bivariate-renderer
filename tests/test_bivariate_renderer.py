@@ -37,15 +37,10 @@ def test_functions(nc_layer: QgsVectorLayer):
                                                    field2="PERIMETER",
                                                    color_ramps=BivariateColorRampGreenPink())
 
-    assert isinstance(bivariate_renderer.getLegendCategorySize(), int)
-    assert bivariate_renderer.getLegendCategorySize() == 83
-
     categories = bivariate_renderer.getLegendCategories()
 
     assert isinstance(categories, dict)
     assert isinstance(categories[list(categories.keys())[0]], dict)
-    assert "x" in categories[list(categories.keys())[0]].keys()
-    assert "y" in categories[list(categories.keys())[0]].keys()
     assert "color" in categories[list(categories.keys())[0]].keys()
 
     xml_renderer = """<!DOCTYPE doc>
@@ -91,7 +86,8 @@ def test_functions(nc_layer: QgsVectorLayer):
     xml.setContent(xml_renderer)
     element = xml.documentElement()
 
-    renderer_from_xml = BivariateRenderer.create_render_from_element(element)
+    renderer_from_xml = BivariateRenderer.create_render_from_element(element,
+                                                                     QgsReadWriteContext())
 
     assert renderer_from_xml
     assert bivariate_renderer == renderer_from_xml

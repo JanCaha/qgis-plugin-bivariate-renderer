@@ -93,12 +93,8 @@ def set_up_bivariate_renderer(
     bivariate_renderer.setFieldName2(field2)
     bivariate_renderer.setColorRamp1(default_color_ramp_1)
     bivariate_renderer.setColorRamp2(default_color_ramp_2)
-    bivariate_renderer.setField1Classes(
-        classification_method.classes(layer, bivariate_renderer.field_name_1,
-                                      bivariate_renderer.number_classes))
-    bivariate_renderer.setField2Classes(
-        classification_method.classes(layer, bivariate_renderer.field_name_2,
-                                      bivariate_renderer.number_classes))
+    bivariate_renderer.setField1ClassificationData(layer, bivariate_renderer.field_name_1)
+    bivariate_renderer.setField2ClassificationData(layer, bivariate_renderer.field_name_2)
 
     return bivariate_renderer
 
