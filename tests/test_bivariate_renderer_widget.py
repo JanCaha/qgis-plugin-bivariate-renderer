@@ -13,8 +13,6 @@ def test_widget_elements(nc_layer: QgsVectorLayer):
 
     widget = set_up_bivariate_renderer_widget(nc_layer)
 
-    assert isinstance(widget.classification_method, QgsClassificationMethod)
-    assert isinstance(widget.number_of_classes, int)
     assert isinstance(widget.field_name_1, str)
     assert isinstance(widget.field_name_2, str)
     assert isinstance(widget.bivariate_renderer, BivariateRenderer)
