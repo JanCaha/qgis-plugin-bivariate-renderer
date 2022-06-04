@@ -261,15 +261,13 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         return True
 
-        # line
-        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L894
-
-        # text
-        # https://github.com/qgis/QGIS/blob/32c2cea54cb92bbb2243b222816c8154c2b9adf9/src/core/layout/qgslayoutitemscalebar.cpp#L979
-
     def set_linked_layer(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
-        self.renderer = layer.renderer().clone()
+        self.reload_renderer()
+        self.layer.styleChanged.connect(self.reload_renderer)
+
+    def reload_renderer(self) -> None:
+        self.renderer = self.layer.renderer().clone()
 
         self.refresh()
 
