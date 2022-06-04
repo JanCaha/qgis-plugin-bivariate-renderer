@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from qgis.core import (QgsFeatureRenderer, QgsClassificationRange, QgsFeature, QgsColorRamp,
                        QgsFillSymbol, QgsSymbolLayerUtils, QgsVectorLayer, QgsClassificationMethod,
@@ -15,7 +14,7 @@ from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegist
 from ..colormixing.color_mixing_method import ColorMixingMethod, ColorMixingMethodDarken
 
 
-class BivariateRenderer(QgsFeatureRenderer, QObject):
+class BivariateRenderer(QgsFeatureRenderer):
 
     number_classes: int
     color_ramp_1: QgsColorRamp
@@ -27,8 +26,6 @@ class BivariateRenderer(QgsFeatureRenderer, QObject):
 
     color_mixing_method: ColorMixingMethod
     classification_method: QgsClassificationMethod
-
-    settingsUpdated = pyqtSignal()
 
     def __init__(self, syms=None):
 
@@ -87,37 +84,30 @@ class BivariateRenderer(QgsFeatureRenderer, QObject):
     def setColorMixingMethod(self, method: ColorMixingMethod) -> None:
         self.color_mixing_method = method
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setClassificationMethod(self, method: QgsClassificationMethod) -> None:
         self.classification_method = method
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setNumberOfClasses(self, number: int) -> None:
         self.number_classes = int(number)
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setColorRamp1(self, color_ramp: QgsColorRamp) -> None:
         self.color_ramp_1 = color_ramp
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setColorRamp2(self, color_ramp: QgsColorRamp) -> None:
         self.color_ramp_2 = color_ramp
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setFieldName1(self, field_name: str) -> None:
         self.field_name_1 = field_name
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setFieldName2(self, field_name: str) -> None:
         self.field_name_2 = field_name
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def classes_to_legend_breaks(self, classes: List[QgsClassificationRange]) -> List[float]:
 
@@ -138,14 +128,12 @@ class BivariateRenderer(QgsFeatureRenderer, QObject):
                                                                   self.number_classes)
 
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def setField2ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
         self.field_2_classes = self.classification_method.classes(layer, attribute,
                                                                   self.number_classes)
 
         self._reset_cache()
-        self.settingsUpdated.emit()
 
     def positionValueField1(self, value: float) -> float:
 
