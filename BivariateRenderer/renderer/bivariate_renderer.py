@@ -23,12 +23,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     field_name_2: str
     field_1_classes: List[QgsClassificationRange]
     field_2_classes: List[QgsClassificationRange]
-    field_1_labels: List[float]
-    field_2_labels: List[float]
-    field_1_min: float
-    field_1_max: float
-    field_2_min: float
-    field_2_max: float
 
     color_mixing_method: ColorMixingMethod
 
@@ -147,24 +141,10 @@ class BivariateRenderer(QgsFeatureRenderer):
     def setField1Classes(self, classes: List[QgsClassificationRange]) -> None:
         self.field_1_classes = classes
 
-        self.field_1_min = (self.field_1_classes[0].lowerBound() +
-                            self.field_1_classes[0].upperBound()) / 2
-        self.field_1_max = (self.field_1_classes[len(self.field_1_classes) - 1].lowerBound() +
-                            self.field_1_classes[len(self.field_1_classes) - 1].upperBound()) / 2
-
-        self.field_1_labels = self.classes_to_legend_breaks(classes)
-
         self._reset_cache()
 
     def setField2Classes(self, classes: List[QgsClassificationRange]) -> None:
         self.field_2_classes = classes
-
-        self.field_2_min = (self.field_2_classes[0].lowerBound() +
-                            self.field_2_classes[0].upperBound()) / 2
-        self.field_2_max = (self.field_2_classes[len(self.field_2_classes) - 1].lowerBound() +
-                            self.field_2_classes[len(self.field_2_classes) - 1].upperBound()) / 2
-
-        self.field_2_labels = self.classes_to_legend_breaks(classes)
 
         self._reset_cache()
 
@@ -446,6 +426,32 @@ class BivariateRenderer(QgsFeatureRenderer):
 
             else:
                 return False
+
+    @property
+    def field_2_min(self) -> float:
+        return (self.field_2_classes[0].lowerBound() + self.field_2_classes[0].upperBound()) / 2
+
+    @property
+    def field_2_max(self) -> float:
+        return (self.field_2_classes[len(self.field_2_classes) - 1].lowerBound() +
+                self.field_2_classes[len(self.field_2_classes) - 1].upperBound()) / 2
+
+    @property
+    def field_2_labels(self) -> List[float]:
+        return self.classes_to_legend_breaks(self.field_2_classes)
+
+    @property
+    def field_1_min(self) -> float:
+        return (self.field_1_classes[0].lowerBound() + self.field_1_classes[0].upperBound()) / 2
+
+    @property
+    def field_1_max(self) -> float:
+        return (self.field_1_classes[len(self.field_1_classes) - 1].lowerBound() +
+                self.field_1_classes[len(self.field_1_classes) - 1].upperBound()) / 2
+
+    @property
+    def field_1_labels(self) -> List[float]:
+        return self.classes_to_legend_breaks(self.field_1_classes)
 
 
 @dataclass
