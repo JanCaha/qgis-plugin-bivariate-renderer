@@ -173,11 +173,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
                 if layer.type() == QgsMapLayerType.VectorLayer:
 
-                    layer: QgsVectorLayer
-
-                    if layer.renderer().type() == Texts.bivariate_renderer_short_name:
-                        self.layer = layer
-                        self.renderer = layer.renderer()
+                    if isinstance(layer.renderer(), BivariateRenderer):
+                        self.set_linked_layer(layer)
 
         line_symbol_elem = element.firstChildElement("lineSymbol")
 
@@ -254,10 +251,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_linked_layer(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
-        self.reload_renderer()
-        self.layer.styleChanged.connect(self.reload_renderer)
+        self.load_renderer_from_layer()
+        self.layer.styleChanged.connect(self.load_renderer_from_layer)
 
-    def reload_renderer(self) -> None:
+    def load_renderer_from_layer(self) -> None:
         self.renderer = self.layer.renderer().clone()
 
         self.refresh()
