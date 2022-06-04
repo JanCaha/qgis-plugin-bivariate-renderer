@@ -86,8 +86,6 @@ def set_up_bivariate_renderer(
         default_color_ramp_1 = color_ramps.color_ramp_1
         default_color_ramp_2 = color_ramps.color_ramp_2
 
-    classification_method = QgsClassificationEqualInterval()
-
     bivariate_renderer = BivariateRenderer()
     bivariate_renderer.setFieldName1(field1)
     bivariate_renderer.setFieldName2(field2)
