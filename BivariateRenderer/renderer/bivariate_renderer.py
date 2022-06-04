@@ -126,13 +126,13 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return values
 
-    def setField1Classes(self, layer: QgsVectorLayer, attribute: str) -> None:
+    def setField1ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
         self.field_1_classes = self.classification_method.classes(layer, attribute,
                                                                   self.number_classes)
 
         self._reset_cache()
 
-    def setField2Classes(self, layer: QgsVectorLayer, attribute: str) -> None:
+    def setField2ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
         self.field_2_classes = self.classification_method.classes(layer, attribute,
                                                                   self.number_classes)
 
@@ -218,9 +218,10 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setNumberOfClasses(self.number_classes)
         r.setColorRamp1(self.color_ramp_1.clone())
         r.setColorRamp2(self.color_ramp_2.clone())
-        r.setField1Classes(self.field_1_classes)
-        r.setField2Classes(self.field_2_classes)
+        r.field_1_classes = self.field_1_classes
+        r.field_2_classes = self.field_2_classes
         r.setColorMixingMethod(self.color_mixing_method)
+        r._reset_cache()
 
         return r
 
@@ -327,8 +328,8 @@ class BivariateRenderer(QgsFeatureRenderer):
 
             range_elem = range_elem.nextSiblingElement()
 
-        r.setField1Classes(field_1_classes)
-        r.setField2Classes(field_2_classes)
+        r.field_1_classes = field_1_classes
+        r.field_2_classes = field_2_classes
 
         if element.hasAttribute('color_mixing_method'):
             r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(

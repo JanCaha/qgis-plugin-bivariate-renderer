@@ -290,11 +290,11 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     def setField1Classes(self) -> None:
 
-        self.bivariate_renderer.setField1Classes(self.vectorLayer(), self.field_name_1)
+        self.bivariate_renderer.setField1ClassificationData(self.vectorLayer(), self.field_name_1)
 
     def setField2Classes(self) -> None:
 
-        self.bivariate_renderer.setField2Classes(self.vectorLayer(), self.field_name_2)
+        self.bivariate_renderer.setField2ClassificationData(self.vectorLayer(), self.field_name_2)
 
     def log_renderer(self) -> None:
 
