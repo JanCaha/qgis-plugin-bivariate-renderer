@@ -12,7 +12,7 @@ from qgis.gui import (QgsLayoutItemBaseWidget, QgsLayoutItemAbstractGuiMetadata,
                       QgsSymbolButton, QgsCollapsibleGroupBoxBasic)
 
 from ..text_constants import Texts, IDS
-from ..utils import log, get_symbol_dict
+from ..utils import log, get_symbol_dict, get_icon
 from .layout_item import BivariateRendererLayoutItem
 
 
@@ -412,5 +412,4 @@ class BivariateRendererLayoutItemGuiMetadata(QgsLayoutItemAbstractGuiMetadata):
         return BivariateRendererLayoutItemWidget(None, item)
 
     def creationIcon(self) -> QIcon:
-        path = Path(__file__).parent.parent / "icons" / "legend_icon.png"
-        return QIcon(path.absolute().as_posix())
+        return get_icon("add_legend_icon.png")
