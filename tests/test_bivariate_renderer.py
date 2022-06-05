@@ -5,19 +5,20 @@ from qgis.PyQt.QtXml import QDomDocument
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
-from tests import set_up_bivariate_renderer, save_layout_for_layer, assert_images_equal
+from tests import assert_images_equal
 
 import pytest
 
 
 @pytest.mark.skip(reason="Problem with comparing the outcomes")
 def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProject,
-                                qgs_layout: QgsLayout):
+                                qgs_layout: QgsLayout, prepare_bivariate_renderer,
+                                save_layout_for_layer):
 
-    bivariate_renderer = set_up_bivariate_renderer(nc_layer,
-                                                   field1="AREA",
-                                                   field2="PERIMETER",
-                                                   color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(nc_layer,
+                                                    field1="AREA",
+                                                    field2="PERIMETER",
+                                                    color_ramps=BivariateColorRampGreenPink())
 
     nc_layer.setRenderer(bivariate_renderer)
 
@@ -30,12 +31,12 @@ def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProjec
     assert_images_equal("tests/images/correct/layout_polygons_render.png", rendered_layout)
 
 
-def test_functions(nc_layer: QgsVectorLayer):
+def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
 
-    bivariate_renderer = set_up_bivariate_renderer(nc_layer,
-                                                   field1="AREA",
-                                                   field2="PERIMETER",
-                                                   color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(nc_layer,
+                                                    field1="AREA",
+                                                    field2="PERIMETER",
+                                                    color_ramps=BivariateColorRampGreenPink())
 
     categories = bivariate_renderer.getLegendCategories()
 

@@ -1,11 +1,11 @@
-from qgis.PyQt.QtGui import QPainter, QImage, qRgba
+from qgis.PyQt.QtGui import QPainter
 from qgis.core import (QgsLayoutUtils)
 
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDarken, ColorMixingMethodDirect, ColorMixingMethod
 from BivariateRenderer.colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
 
-from tests import set_up_bivariate_renderer, assert_images_equal
+from tests import assert_images_equal
 
 
 def test_color_mixing_register():
@@ -24,13 +24,12 @@ def test_color_mixing_register():
     assert register.get_by_name("does not exist") is None
 
 
-def test_color_mixing_direct_mixing(qgis_countries_layer, qgs_project, qgs_layout):
+def test_color_mixing_direct_mixing(qgis_countries_layer, qgs_project, qgs_layout,
+                                    prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -38,9 +37,9 @@ def test_color_mixing_direct_mixing(qgis_countries_layer, qgs_project, qgs_layou
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
     legend_renderer = LegendRenderer()
@@ -56,13 +55,12 @@ def test_color_mixing_direct_mixing(qgis_countries_layer, qgs_project, qgs_layou
                         "./tests/images/image.png")
 
 
-def test_color_mixing_darknen(qgis_countries_layer, qgs_project, qgs_layout):
+def test_color_mixing_darknen(qgis_countries_layer, qgs_project, qgs_layout,
+                              prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -70,9 +68,9 @@ def test_color_mixing_darknen(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
     bivariate_renderer.color_mixing_method = ColorMixingMethodDarken()
 
     legend_renderer = LegendRenderer()
