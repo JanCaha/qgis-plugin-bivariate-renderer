@@ -10,7 +10,17 @@ from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutIte
 
 from tests import set_up_bivariate_renderer, set_up_layout_page_a4, get_layout_space, export_page_to_image, save_layout_for_layer
 
-skip_setting = pytest.mark.skipif(True, reason="do not generate with every run")
+skip_setting = pytest.mark.skipif(False, reason="do not generate with every run")
+
+
+def prepare_default_QImage(size: int = 500) -> QImage:
+
+    image = QImage(size, size, QImage.Format_ARGB32)
+    image.fill(qRgba(254, 254, 254, 254))
+
+    assert isinstance(image, QImage)
+
+    return image
 
 
 @skip_setting
@@ -18,9 +28,7 @@ def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -47,9 +55,7 @@ def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layo
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -77,10 +83,7 @@ def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -109,10 +112,7 @@ def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_proj
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -142,9 +142,7 @@ def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -172,9 +170,7 @@ def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_la
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -226,9 +222,7 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -265,9 +259,7 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -302,9 +294,7 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
 
     legend_size = 500
 
-    image = QImage(legend_size, legend_size, QImage.Format_ARGB32)
-    image.fill(qRgba(0, 0, 0, 0))
-    assert isinstance(image, QImage)
+    image = prepare_default_QImage(legend_size)
 
     painter = QPainter(image)
 
