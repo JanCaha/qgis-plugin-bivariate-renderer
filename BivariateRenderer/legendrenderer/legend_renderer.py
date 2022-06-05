@@ -195,7 +195,7 @@ class LegendRenderer:
     def text_position_x(self) -> QPointF:
 
         x = self.all_elements_top + (self.width - self.all_elements_top) / 2
-        y = self.width
+        y = self.width - (self.text_height_x / len(self._text_axis_x)) * 0.15
 
         if self.legend_rotated:
             y = self.width + self.text_height_max / 2
