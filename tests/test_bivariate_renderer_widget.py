@@ -18,7 +18,6 @@ def test_widget_elements(nc_layer: QgsVectorLayer):
     assert isinstance(widget.bivariate_renderer, BivariateRenderer)
     assert isinstance(widget.legend_renderer, LegendRenderer)
     assert isinstance(widget.classification_methods, dict)
-    assert isinstance(widget.text_format, QgsTextFormat)
     assert isinstance(widget.cb_field1, QgsFieldComboBox)
     assert isinstance(widget.cb_field2, QgsFieldComboBox)
     assert isinstance(widget.sb_number_classes, QgsDoubleSpinBox)
