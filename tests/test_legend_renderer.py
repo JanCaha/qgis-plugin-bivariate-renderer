@@ -5,8 +5,7 @@ from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDirect
 from BivariateRenderer.utils import get_symbol_dict
 
-from tests import (set_up_image, set_up_painter, xml_string, assert_images_equal,
-                   set_up_bivariate_renderer)
+from tests import (xml_string, assert_images_equal)
 
 
 def test_default_values():
@@ -51,23 +50,24 @@ def test_default_values():
     assert legend_renderer.add_axes_texts is False
 
 
-def test_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
+def test_just_legend(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                     prepare_bivariate_renderer, prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.render(render_context,
@@ -82,23 +82,24 @@ def test_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
     assert_images_equal("tests/images/correct/legend_only.png", "tests/images/image.png")
 
 
-def test_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                            prepare_bivariate_renderer, prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -114,23 +115,25 @@ def test_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout):
     assert_images_equal("tests/images/correct/legend_with_arrows.png", "tests/images/image.png")
 
 
-def test_legend_with_arrows_texts(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_with_arrows_texts(qgis_countries_layer, qgs_project, qgs_layout,
+                                  prepare_default_QImage, prepare_bivariate_renderer,
+                                  prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -148,23 +151,25 @@ def test_legend_with_arrows_texts(qgis_countries_layer, qgs_project, qgs_layout)
                         "tests/images/image.png")
 
 
-def test_legend_with_arrows_texts_rotated(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_with_arrows_texts_rotated(qgis_countries_layer, qgs_project, qgs_layout,
+                                          prepare_default_QImage, prepare_bivariate_renderer,
+                                          prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -183,23 +188,24 @@ def test_legend_with_arrows_texts_rotated(qgis_countries_layer, qgs_project, qgs
                         "tests/images/image.png")
 
 
-def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                      prepare_bivariate_renderer, prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
@@ -224,23 +230,24 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
                         "tests/images/image.png")
 
 
-def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                    prepare_bivariate_renderer, prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -262,23 +269,24 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
     assert_images_equal("tests/images/correct/legend_with_all.png", "tests/images/image.png")
 
 
-def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                            prepare_bivariate_renderer, prepare_painter):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = set_up_image()
+    image = prepare_default_QImage()
 
-    painter = set_up_painter(image)
+    painter = prepare_painter(image)
 
     render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 

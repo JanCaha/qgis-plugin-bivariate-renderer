@@ -1,6 +1,6 @@
 import pytest
 
-from qgis.PyQt.QtGui import QPainter, QImage, qRgba
+from qgis.PyQt.QtGui import QPainter
 from qgis.core import (QgsLayoutUtils)
 
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
@@ -8,23 +8,12 @@ from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodD
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 
-from tests import set_up_bivariate_renderer, set_up_layout_page_a4, get_layout_space, export_page_to_image, save_layout_for_layer
-
-skip_setting = pytest.mark.skipif(False, reason="do not generate with every run")
-
-
-def prepare_default_QImage(size: int = 500) -> QImage:
-
-    image = QImage(size, size, QImage.Format_ARGB32)
-    image.fill(qRgba(254, 254, 254, 254))
-
-    assert isinstance(image, QImage)
-
-    return image
+skip_setting = pytest.mark.skipif(True, reason="do not generate with every run")
 
 
 @skip_setting
-def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
+def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout,
+                              prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -36,9 +25,9 @@ def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
@@ -51,7 +40,8 @@ def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout):
 
 
 @skip_setting
-def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout):
+def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout,
+                                     prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -63,9 +53,9 @@ def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layo
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -79,7 +69,8 @@ def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layo
 
 
 @skip_setting
-def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs_layout):
+def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs_layout,
+                                          prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -91,9 +82,9 @@ def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -108,7 +99,9 @@ def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs
 
 
 @skip_setting
-def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_project, qgs_layout):
+def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_project, qgs_layout,
+                                                  prepare_default_QImage,
+                                                  prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -120,9 +113,9 @@ def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_proj
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -138,7 +131,8 @@ def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_proj
 
 
 @skip_setting
-def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout):
+def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout,
+                                prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -150,9 +144,9 @@ def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
     bivariate_renderer.color_mixing_method = ColorMixingMethodDarken()
 
     legend_renderer = LegendRenderer()
@@ -166,7 +160,8 @@ def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout):
 
 
 @skip_setting
-def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_layout):
+def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_layout,
+                                       prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -178,9 +173,9 @@ def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_la
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
     legend_renderer = LegendRenderer()
@@ -194,14 +189,13 @@ def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_la
 
 
 @skip_setting
-def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project):
+def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project, layout_page_a4,
+                                   prepare_bivariate_renderer, layout_space, export_page_to_image):
 
-    page = set_up_layout_page_a4(qgs_layout)
-
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid",
-                                                   color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid",
+                                                    color_ramps=BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
@@ -210,15 +204,17 @@ def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project
     layout_item = BivariateRendererLayoutItem(qgs_layout)
     layout_item.set_linked_layer(qgis_countries_layer)
 
-    layout_item.attemptSetSceneRect(get_layout_space())
+    layout_item.attemptSetSceneRect(layout_space)
 
     qgs_layout.addItem(layout_item)
 
-    export_page_to_image(qgs_layout, page, "./tests/images/correct/layout_item_legend.png")
+    export_page_to_image(qgs_layout, layout_page_a4,
+                         "./tests/images/correct/layout_item_legend.png")
 
 
 @skip_setting
-def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                      prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -230,9 +226,9 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
@@ -255,7 +251,8 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout):
 
 
 @skip_setting
-def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                    prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -267,9 +264,9 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -290,7 +287,8 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout):
 
 
 @skip_setting
-def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
+def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                            prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -302,9 +300,9 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
 
     assert render_context
 
-    bivariate_renderer = set_up_bivariate_renderer(qgis_countries_layer,
-                                                   field1="fid",
-                                                   field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
@@ -327,12 +325,13 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout):
 
 
 @skip_setting
-def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout):
+def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                                prepare_bivariate_renderer, save_layout_for_layer):
 
-    bivariate_renderer = set_up_bivariate_renderer(nc_layer,
-                                                   field1="AREA",
-                                                   field2="PERIMETER",
-                                                   color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(nc_layer,
+                                                    field1="AREA",
+                                                    field2="PERIMETER",
+                                                    color_ramps=BivariateColorRampGreenPink())
 
     nc_layer.setRenderer(bivariate_renderer)
 

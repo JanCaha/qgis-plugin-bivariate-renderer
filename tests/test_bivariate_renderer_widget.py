@@ -6,12 +6,10 @@ from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 
-from tests import set_up_bivariate_renderer_widget
 
+def test_widget_elements(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
 
-def test_widget_elements(nc_layer: QgsVectorLayer):
-
-    widget = set_up_bivariate_renderer_widget(nc_layer)
+    widget = prepare_bivariate_renderer_widget(nc_layer)
 
     assert isinstance(widget.field_name_1, str)
     assert isinstance(widget.field_name_2, str)
@@ -29,9 +27,9 @@ def test_widget_elements(nc_layer: QgsVectorLayer):
     assert isinstance(widget.form_layout, QFormLayout)
 
 
-def test_widget_values(nc_layer: QgsVectorLayer):
+def test_widget_values(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
 
-    widget = set_up_bivariate_renderer_widget(nc_layer)
+    widget = prepare_bivariate_renderer_widget(nc_layer)
 
     assert widget.cb_field1.fields() == nc_layer.fields()
     assert widget.cb_field2.fields() == nc_layer.fields()
