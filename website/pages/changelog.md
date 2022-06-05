@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0
+
+- Breaking Changes in saving and loading renderer !!! Older projects will not load the renderer correctly. It is unfortunate, but it was necessary to improve the plugin.
+
+- some elements rewritten to make them more readable and maintainable
+
+- legend in layout will now properly update, when the renderer's settings are changed
+
+- new icon for layout item add (with the nice green plus)
+
 ## 0.7.1
 
 - fix provider error cause by missing export
