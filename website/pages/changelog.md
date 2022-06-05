@@ -10,6 +10,8 @@
 
 - new icon for layout item add (with the nice green plus)
 
+- fix error on axis label with underscore, that might not be drawn due to bad text positioning
+
 ## 0.7.1
 
 - fix provider error cause by missing export
