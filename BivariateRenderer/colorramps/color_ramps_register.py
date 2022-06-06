@@ -3,21 +3,31 @@ from typing import List, Optional
 from qgis.PyQt.QtGui import QIcon
 
 from ..utils import Singleton
-from .bivariate_color_ramp import (BivariateColorRamp, BivariateColorRampDarkRedLightBlue,
-                                   BivariateColorRampAquamarinePink, BivariateColorRampYellowPink,
-                                   BivariateColorRampBlueGreen, BivariateColorRampGreenPink,
-                                   BivariateColorRampOrangeBlue)
+from .bivariate_color_ramp import (BivariateColorRamp, BivariateColorRampBlueGreen,
+                                   BivariateColorRampCyanBrow, BivariateColorRampCyanViolet,
+                                   BivariateColorRampGreenPink, BivariateColorRampGreenPurple,
+                                   BivariateColorRampLigthYellowPurple,
+                                   BivariateColorRampOrangeBlue, BivariateColorRampOrangePurple,
+                                   BivariateColorRampPinkBlue, BivariateColorRampTurquoiseGold,
+                                   BivariateColorRampVioletBlue, BivariateColorRampYellowBlue)
 
 
 class BivariateColorRampsRegister(metaclass=Singleton):
 
     color_ramps = [
-        BivariateColorRampDarkRedLightBlue(),
-        BivariateColorRampAquamarinePink(),
-        BivariateColorRampYellowPink(),
+        BivariateColorRampBlueGreen(),
+        BivariateColorRampCyanBrow(),
+        BivariateColorRampCyanViolet(),
         BivariateColorRampBlueGreen(),
         BivariateColorRampGreenPink(),
-        BivariateColorRampOrangeBlue()
+        BivariateColorRampOrangeBlue(),
+        BivariateColorRampGreenPurple(),
+        BivariateColorRampLigthYellowPurple(),
+        BivariateColorRampOrangePurple(),
+        BivariateColorRampPinkBlue(),
+        BivariateColorRampTurquoiseGold(),
+        BivariateColorRampVioletBlue(),
+        BivariateColorRampYellowBlue()
     ]
 
     @property
