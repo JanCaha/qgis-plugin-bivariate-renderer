@@ -55,8 +55,8 @@ def test_color_mixing_direct_mixing(qgis_countries_layer, qgs_project, qgs_layou
                         "./tests/images/image.png")
 
 
-def test_color_mixing_darknen(qgis_countries_layer, qgs_project, qgs_layout,
-                              prepare_default_QImage, prepare_bivariate_renderer):
+def test_color_mixing_darken(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                             prepare_bivariate_renderer):
 
     legend_size = 500
 
