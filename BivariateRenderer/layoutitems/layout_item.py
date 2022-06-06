@@ -96,11 +96,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         legend_render.set_space_above_ticks(self.space_above_ticks)
 
-        if self.renderer:
-
-            legend_render.texts_axis_x_ticks = self.renderer.field_1_labels
-            legend_render.texts_axis_y_ticks = self.renderer.field_2_labels
-
         return legend_render
 
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
@@ -113,8 +108,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         if self.renderer:
 
-            legend_render.render(render_context, item_size.width(), item_size.height(),
-                                 self.renderer.generate_legend_polygons())
+            legend_render.render_legend(render_context, item_size.width(), item_size.height(),
+                                        self.renderer)
 
     def writePropertiesToElement(self, bivariate_legend_element: QDomElement, doc: QDomDocument,
                                  context: QgsReadWriteContext) -> bool:
