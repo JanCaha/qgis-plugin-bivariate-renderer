@@ -41,3 +41,18 @@ class ColorMixingMethodDarken(ColorMixingMethod):
 
         return QColor(min(color1.red(), color2.red()), min(color1.green(), color2.green()),
                       min(color1.blue(), color2.blue()))
+
+
+class ColorMixingMethodMultiply(ColorMixingMethod):
+
+    def __init__(self):
+        pass
+
+    def name(self) -> str:
+        return "Multiply blend color mixing"
+
+    def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
+
+        return QColor((color1.redF() * color2.redF()) * 255,
+                      (color1.greenF() * color2.greenF()) * 255,
+                      (color1.blueF() * color2.blueF()) * 255)
