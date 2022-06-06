@@ -33,9 +33,8 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     register_color_ramps = BivariateColorRampsRegister()
 
-    default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(255, 0, 0))
-
-    default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(0, 0, 255))
+    default_color_ramp_1 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
+    default_color_ramp_2 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
 
     bivariate_renderer: BivariateRenderer
 
