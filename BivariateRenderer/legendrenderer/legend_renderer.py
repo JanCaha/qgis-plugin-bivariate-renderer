@@ -583,6 +583,14 @@ class LegendRenderer:
 
         self.painter.restore()
 
+    def render_legend(self, context: QgsRenderContext, width: float, height: float,
+                      renderer: BivariateRenderer) -> None:
+
+        self.texts_axis_x_ticks = renderer.field_1_labels
+        self.texts_axis_y_ticks = renderer.field_2_labels
+
+        self.render(context, width, height, renderer.generate_legend_polygons())
+
     def render(self, context: QgsRenderContext, width: float, height: float,
                polygons: List[LegendPolygon]) -> None:
 
