@@ -53,6 +53,6 @@ class ColorMixingMethodMultiply(ColorMixingMethod):
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
-        return QColor((color1.redF() * color2.redF()) * 255,
-                      (color1.greenF() * color2.greenF()) * 255,
-                      (color1.blueF() * color2.blueF()) * 255)
+        return QColor(int((color1.redF() * color2.redF()) * 255),
+                      int((color1.greenF() * color2.greenF()) * 255),
+                      int((color1.blueF() * color2.blueF()) * 255))
