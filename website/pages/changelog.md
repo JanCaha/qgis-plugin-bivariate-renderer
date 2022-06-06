@@ -2,6 +2,8 @@
 
 ## 0.8.0
 
+- new default color palette when renderer is selected
+
 - new prepared palettes - now there are 12
 
 - new color mixing method multiply
