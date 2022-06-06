@@ -9,9 +9,14 @@ from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodD
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 
-generate_images = os.getenv("BIVARIATE_GENERATE").lower() == "true"
+env_value = os.getenv("BIVARIATE_GENERATE")
 
-skip_setting = pytest.mark.skipif(generate_images, reason="do not generate with every run")
+if env_value:
+    generate_images = env_value.lower() == "true"
+else:
+    generate_images = False
+
+skip_setting = pytest.mark.skipif(not generate_images, reason="do not generate with every run")
 
 
 @skip_setting
@@ -340,4 +345,4 @@ def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout, prepare_defau
 
     qgs_project.addMapLayer(nc_layer)
 
-    save_layout_for_layer(nc_layer, qgs_layout, "tests/images/correct/layout_polygons_render.png")
+    save_layout_for_layer(nc_layer, "tests/images/correct/layout_polygons_render.png")
