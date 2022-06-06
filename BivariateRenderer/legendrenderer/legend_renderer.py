@@ -7,7 +7,7 @@ from qgis.PyQt.QtGui import QPolygonF, QBrush, QPainter, QTransform, QColor, QPe
 from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer,
                        QgsBasicNumericFormat, QgsNumericFormatContext, QgsLineString, QgsPoint)
 
-from ..renderer.bivariate_renderer import LegendPolygon
+from ..renderer.bivariate_renderer import LegendPolygon, BivariateRenderer
 from ..utils import default_line_symbol
 
 
@@ -298,9 +298,10 @@ class LegendRenderer:
 
             self._transform = QTransform()
 
+            max_size = self.height + self.axis_tick_last_value_max_width / 2
+
             if self.legend_rotated:
 
-                max_size = self.height
                 size = self.height - max_size
 
                 scale_factor_orig = self.height / math.sqrt(
@@ -314,8 +315,6 @@ class LegendRenderer:
                                           -(self.height / 2) + (size / 2) * scale_factor_orig)
 
             else:
-
-                max_size = self.height + self.axis_tick_last_value_max_width / 2
 
                 scale_factor = self.height / max_size
 
