@@ -19,6 +19,20 @@
             "problemMatcher": []
         },
         {
+            "label": "Run Pytest tests with image generation",
+            "type": "shell",
+            "command": "BIVARIATE_GENERATE=True pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Show website",
             "type": "shell",
             "command": "mkdocs serve --config-file ./website/mkdocs.yml;google-chrome http://127.0.0.1:8000/qgis-plugin-bivariate-renderer/",
