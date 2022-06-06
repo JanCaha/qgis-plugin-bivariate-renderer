@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from qgis.PyQt.QtGui import QPainter
@@ -8,7 +9,9 @@ from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodD
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 
-skip_setting = pytest.mark.skipif(True, reason="do not generate with every run")
+generate_images = os.getenv("BIVARIATE_GENERATE").lower() == "true"
+
+skip_setting = pytest.mark.skipif(generate_images, reason="do not generate with every run")
 
 
 @skip_setting
