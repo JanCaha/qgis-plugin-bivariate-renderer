@@ -228,13 +228,20 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.setAttribute('type', Texts.bivariate_renderer_short_name)
 
-        renderer_elem.setAttribute('number_of_classes', self.number_classes)
+        number_classes_elem = doc.createElement('number_of_classes')
+        number_classes_elem.setAttribute("value", str(self.number_classes))
+        renderer_elem.appendChild(number_classes_elem)
 
         classification_method_elem = self.classification_method.save(doc, context)
         renderer_elem.appendChild(classification_method_elem)
 
-        renderer_elem.setAttribute('field_name_1', self.field_name_1)
-        renderer_elem.setAttribute('field_name_2', self.field_name_2)
+        field_1_elem = doc.createElement('field_name_1')
+        field_1_elem.setAttribute("name", self.field_name_1)
+        renderer_elem.appendChild(field_1_elem)
+
+        field_2_elem = doc.createElement('field_name_2')
+        field_2_elem.setAttribute("name", self.field_name_2)
+        renderer_elem.appendChild(field_2_elem)
 
         color_ramp_elem = QgsSymbolLayerUtils.saveColorRamp("color_ramp_1", self.color_ramp_1, doc)
         renderer_elem.appendChild(color_ramp_elem)
@@ -268,7 +275,9 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.appendChild(ranges_elem2)
 
-        renderer_elem.setAttribute('color_mixing_method', self.color_mixing_method.name())
+        color_mixing_method_elem = doc.createElement('color_mixing_method')
+        color_mixing_method_elem.setAttribute("name", self.color_mixing_method.name())
+        renderer_elem.appendChild(color_mixing_method_elem)
 
         return renderer_elem
 
@@ -277,10 +286,11 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         r = BivariateRenderer()
 
-        r.setFieldName1(element.attribute("field_name_1"))
-        r.setFieldName2(element.attribute("field_name_2"))
-
-        r.setNumberOfClasses(int(element.attribute("number_of_classes")))
+        r.setFieldName1(element.firstChildElement("field_name_1").attribute("name"))
+        r.setFieldName2(element.firstChildElement("field_name_2").attribute("name"))
+        element.firstChildElement("number_of_classes").attributes().item(0)
+        r.setNumberOfClasses(int(
+            element.firstChildElement("number_of_classes").attribute("value")))
 
         method_elem = element.firstChildElement("classificationMethod")
         r.setClassificationMethod(QgsClassificationMethod.create(method_elem, context))
@@ -328,11 +338,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.field_1_classes = field_1_classes
         r.field_2_classes = field_2_classes
 
-        if element.hasAttribute('color_mixing_method'):
-            r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(
-                element.attribute('color_mixing_method')))
-        else:
-            r.setColorMixingMethod(ColorMixingMethodDarken())
+        r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(
+            element.firstChildElement("color_mixing_method").attribute("name")))
 
         return r
 
