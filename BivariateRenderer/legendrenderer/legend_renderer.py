@@ -606,10 +606,7 @@ class LegendRenderer:
 
         self._painter.setPen(Qt.NoPen)
 
-        text_axis_x = self.axis_title_x.split("\n")
-        text_axis_y = self.axis_title_y.split("\n")
-
-        self.set_text_height(text_axis_x, text_axis_y)
+        self.set_text_height(self.axis_title_x.split("\n"), self.axis_title_y.split("\n"))
 
         self.draw_polygons(polygons)
 
