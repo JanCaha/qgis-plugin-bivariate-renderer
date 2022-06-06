@@ -195,7 +195,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     def calculate_legend_sizes(self) -> None:
         self.legend_size = int(self.size().width() / 3)
-        self.text_ticks_size = self.legend_size / 4
+        self.text_ticks_size = self.legend_size / 5
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -223,7 +223,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_renderer._text_rotation_y = -90
 
-        self.legend_renderer._space_above_ticks = self.text_ticks_size / 100
+        self.legend_renderer.set_space_above_ticks(self.text_ticks_size / 2)
 
         self.legend_renderer.render(context, self.legend_size, self.legend_size,
                                     self.bivariate_renderer.generate_legend_polygons())
