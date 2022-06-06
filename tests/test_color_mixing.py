@@ -19,8 +19,8 @@ def test_color_mixing_register():
     assert isinstance(register.methods[0], ColorMixingMethodDirect)
     assert issubclass(type(register.methods[0]), ColorMixingMethod)
 
-    assert register.get_by_name("Direct color mixing")
-    assert issubclass(type(register.get_by_name("Direct color mixing")), ColorMixingMethod)
+    assert register.get_by_name("Direct Mixing")
+    assert issubclass(type(register.get_by_name("Direct Mixing")), ColorMixingMethod)
     assert register.get_by_name("does not exist") is None
 
 
