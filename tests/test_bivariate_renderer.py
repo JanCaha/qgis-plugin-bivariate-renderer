@@ -5,7 +5,7 @@ from qgis.PyQt.QtXml import QDomDocument
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
-from tests import assert_images_equal
+from tests import assert_images_equal, xml_string
 
 import pytest
 
@@ -44,42 +44,63 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     assert isinstance(categories[list(categories.keys())[0]], dict)
     assert "color" in categories[list(categories.keys())[0]].keys()
 
-    xml_renderer = """<!DOCTYPE doc>
-<renderer-v2 field_name_2="PERIMETER" field_name_1="AREA" classification_method_name="" type="BivariateRenderer" number_of_classes="3" color_mixing_method="Darken blend color mixing">
- <colorramp name="color_ramp_1" type="gradient">
+    xml_renderer = """
+<!DOCTYPE doc>
+<renderer-v2 type="BivariateRenderer">
+ <number_of_classes value="3"/>
+ <classificationMethod id="EqualInterval">
+  <symmetricMode symmetrypoint="0" enabled="0" astride="0"/>
+  <labelFormat format="%1 - %2" trimtrailingzeroes="1" labelprecision="4"/>
+  <parameters>
+   <Option/>
+  </parameters>
+  <extraInformation/>
+ </classificationMethod>
+ <field_name_1 name="AREA"/>
+ <field_name_2 name="PERIMETER"/>
+ <colorramp type="gradient" name="color_ramp_1">
   <Option type="Map">
-   <Option value="243,243,243,255" name="color1" type="QString"/>
-   <Option value="138,225,174,255" name="color2" type="QString"/>
-   <Option value="0" name="discrete" type="QString"/>
-   <Option value="gradient" name="rampType" type="QString"/>
+   <Option type="QString" name="color1" value="211,211,211,255"/>
+   <Option type="QString" name="color2" value="76,172,38,255"/>
+   <Option type="QString" name="direction" value="ccw"/>
+   <Option type="QString" name="discrete" value="0"/>
+   <Option type="QString" name="rampType" value="gradient"/>
+   <Option type="QString" name="spec" value="rgb"/>
   </Option>
-  <prop k="color1" v="243,243,243,255"/>
-  <prop k="color2" v="138,225,174,255"/>
-  <prop k="discrete" v="0"/>
-  <prop k="rampType" v="gradient"/>
+  <prop v="211,211,211,255" k="color1"/>
+  <prop v="76,172,38,255" k="color2"/>
+  <prop v="ccw" k="direction"/>
+  <prop v="0" k="discrete"/>
+  <prop v="gradient" k="rampType"/>
+  <prop v="rgb" k="spec"/>
  </colorramp>
- <colorramp name="color_ramp_2" type="gradient">
+ <colorramp type="gradient" name="color_ramp_2">
   <Option type="Map">
-   <Option type="QString" value="243,243,243,255" name="color1"/>
-   <Option type="QString" value="230,162,208,255" name="color2"/>
-   <Option type="QString" value="0" name="discrete"/>
-   <Option type="QString" value="gradient" name="rampType"/>
+   <Option type="QString" name="color1" value="211,211,211,255"/>
+   <Option type="QString" name="color2" value="208,37,140,255"/>
+   <Option type="QString" name="direction" value="ccw"/>
+   <Option type="QString" name="discrete" value="0"/>
+   <Option type="QString" name="rampType" value="gradient"/>
+   <Option type="QString" name="spec" value="rgb"/>
   </Option>
-  <prop k="color1" v="243,243,243,255"/>
-  <prop k="color2" v="230,162,208,255"/>
-  <prop k="discrete" v="0"/>
-  <prop k="rampType" v="gradient"/>
+  <prop v="211,211,211,255" k="color1"/>
+  <prop v="208,37,140,255" k="color2"/>
+  <prop v="ccw" k="direction"/>
+  <prop v="0" k="discrete"/>
+  <prop v="gradient" k="rampType"/>
+  <prop v="rgb" k="spec"/>
  </colorramp>
  <ranges_1>
-  <range_1 lower="0.042" label="0.042 - 0.1083" upper="0.10833333333333334"/>
-  <range_1 lower="0.10833333333333334" label="0.1083 - 0.1747" upper="0.17466666666666666"/>
-  <range_1 lower="0.17466666666666666" label="0.1747 - 0.241" upper="0.241"/>
+  <range_1 upper="0.10833333333333334" label="0,042 - 0,1083" lower="0.042"/>
+  <range_1 upper="0.17466666666666666" label="0,1083 - 0,1747" lower="0.10833333333333334"/>
+  <range_1 upper="0.241" label="0,1747 - 0,241" lower="0.17466666666666666"/>
  </ranges_1>
  <ranges_2>
-  <range_2 lower="0.999" label="0.999 - 1.8793" upper="1.8793333333333333"/>
-  <range_2 lower="1.8793333333333333" label="1.8793 - 2.7597" upper="2.7596666666666665"/>
-  <range_2 lower="2.7596666666666665" label="2.7597 - 3.64" upper="3.64"/>
+  <range_2 upper="1.8793333333333333" label="0,999 - 1,8793" lower="0.999"/>
+  <range_2 upper="2.7596666666666665" label="1,8793 - 2,7597" lower="1.8793333333333333"/>
+  <range_2 upper="3.64" label="2,7597 - 3,64" lower="2.7596666666666665"/>
  </ranges_2>
+ <color_mixing_method name="Darken blend color mixing"/>
 </renderer-v2>
 """
 
