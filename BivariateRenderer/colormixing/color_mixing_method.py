@@ -20,7 +20,7 @@ class ColorMixingMethodDirect(ColorMixingMethod):
         pass
 
     def name(self) -> str:
-        return "Direct color mixing"
+        return "Direct Mixing"
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
@@ -35,7 +35,7 @@ class ColorMixingMethodDarken(ColorMixingMethod):
         pass
 
     def name(self) -> str:
-        return "Darken blend color mixing"
+        return "Blend Darken"
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
@@ -49,7 +49,7 @@ class ColorMixingMethodMultiply(ColorMixingMethod):
         pass
 
     def name(self) -> str:
-        return "Multiply blend color mixing"
+        return "Blend Multiply"
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
