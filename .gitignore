@@ -6,3 +6,4 @@ __pycache__
 /tests/images/image.png
 /tests/data/*-shm
 /tests/data/*-wal
+/.vscode/*.log
