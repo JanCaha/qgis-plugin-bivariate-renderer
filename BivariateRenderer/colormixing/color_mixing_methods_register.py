@@ -2,12 +2,12 @@ from typing import List, Optional
 
 from ..utils import Singleton
 from .color_mixing_method import (ColorMixingMethodDirect, ColorMixingMethodDarken,
-                                  ColorMixingMethod)
+                                  ColorMixingMethod, ColorMixingMethodMultiply)
 
 
 class ColorMixingMethodsRegister(metaclass=Singleton):
 
-    methods = [ColorMixingMethodDirect(), ColorMixingMethodDarken()]
+    methods = [ColorMixingMethodDirect(), ColorMixingMethodDarken(), ColorMixingMethodMultiply()]
 
     @property
     def names(self) -> List[str]:
