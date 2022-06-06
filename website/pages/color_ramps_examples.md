@@ -1,40 +1,31 @@
 # Color ramps examples
 
-There is couple of bivariate legends prepared directly in the plugin and available from **Predefined color ramps:** option. They are listed here with images and note, about **Color mixing method** that provides best result for them.
+The default color ramps provided by the plugin are extracted from R package [biscale](https://cran.r-project.org/web/packages/biscale) and can be [seen at this vignette](https://cran.r-project.org/web/packages/biscale/vignettes/bivariate_palettes.html).
 
-## Dark red - Light Blue
+There is couple of bivariate legends prepared directly in the plugin and available from **Color ramps:** option. These should be tried with different color mixing methods, to find the best one for each bivariate color ramp.
 
-- Darken blend color mixing
+## Examples
 
-![](./images/cp_darkred_lightblue.png)
-
-## Aquamarine - Pink
-
-- Darken blend color mixing
-
-![](./images/cp_aquamarine_pink.png)
-
-## Blue - Green
-
-- Direct color mixing
+Some of these may not look best here, as they are all exported with the **Darken Blend** mixing method, which may not be ideal for every color ramp.
 
 ![](./images/cp_blue_green.png)
 
-## Yellow - Violet
+![](./images/cp_cyan_brown.png)
 
-- Direct color mixing
-
-![](./images/cp_yellow_violet.png)
-
-## Green - Pink
-
-- this one kinda works with both although the Darken blend color mixing option is probably better
+![](./images/cp_cyan_violet.png)
 
 ![](./images/cp_green_pink.png)
 
-## Orange - Blue
+![](./images/cp_green_purple.png)
 
-- Darken blend color mixing
+![](./images/cp_ligth_yellow_purple.png)
 
-![](./images/cp_orange_blue.png)
+![](./images/cp_orange_purple.png)
 
+![](./images/cp_pink_blue.png)
+
+![](./images/cp_turquoise_gold.png)
+
+![](./images/cp_violet_blue.png)
+
+![](./images/cp_yellow_blue.png)
