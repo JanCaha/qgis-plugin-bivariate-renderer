@@ -55,32 +55,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     def _reset_cache(self):
         self.cached = {}
 
-    def getLegendCategories(self) -> Dict[int, Dict[str, str]]:
-
-        position = {}
-
-        x = 0
-        for field_1_cat in self.field_1_classes:
-
-            y = 0
-            for field_2_cat in self.field_2_classes:
-
-                color = self.getFeatureColor(
-                    (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
-                    (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
-
-                value_hash = self.getFeatureValueCombinationHash(
-                    (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
-                    (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)
-
-                position.update({value_hash: {"color": str(color.name())}})
-
-                y += 1
-
-            x += 1
-
-        return position
-
     def setColorMixingMethod(self, method: ColorMixingMethod) -> None:
         self.color_mixing_method = method
         self._reset_cache()
