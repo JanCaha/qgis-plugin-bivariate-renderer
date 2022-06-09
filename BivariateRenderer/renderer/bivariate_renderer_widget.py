@@ -15,6 +15,7 @@ from .bivariate_renderer import BivariateRenderer
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
 from ..colorramps.color_ramps_register import BivariateColorRampsRegister
+from .bivariate_legend import BivariateLegendViewerLegend
 
 from ..utils import (log)
 
@@ -60,6 +61,7 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.bivariate_renderer = BivariateRenderer()
         else:
             self.bivariate_renderer = renderer.clone()
+            self.bivariate_renderer.generateCategories()
 
         self.legend_renderer = LegendRenderer()
 
@@ -231,6 +233,12 @@ class BivariateRendererWidget(QgsRendererWidget):
         painter.end()
 
         self.label_legend.setPixmap(QPixmap.fromImage(image))
+
+        self.updateLayerLegend()
+
+    def updateLayerLegend(self):
+        legend = BivariateLegendViewerLegend(self.bivariate_renderer, self.vectorLayer())
+        self.vectorLayer().setLegend(legend)
 
     def setNumberOfClasses(self) -> None:
 
