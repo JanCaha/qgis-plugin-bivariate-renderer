@@ -8,6 +8,23 @@ The plugin contains all the necessary python objects to handle creation of bivar
 
 ![](./images/example.jpg)
 
+## Citation
+
+If you use the plugin in your work, please cite it properly. The citation for the plugin should be:
+
+```
+CAHA, Jan, 2022. Bivariate color polygon renderer (version 1.0).  Online. QGIS Plugin - Python. Available from: https://jancaha.github.io/qgis-plugin-bivariate-renderer/
+```
+
+```
+@misc{caha_bivariate_2022,
+ title = {Bivariate color polygon renderer (version 1.0)},
+ url = {https://jancaha.github.io/qgis-plugin-bivariate-renderer/},
+ author = {Caha, Jan},
+ year = {2022},
+ note = {QGIS Plugin - Python},
+}
+```  
 
 ## Installation
 
