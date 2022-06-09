@@ -109,42 +109,35 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         self._reset_cache()
 
-    def positionValueField1(self, value: float) -> float:
+    def _positionValue(self, value: float, classes: List[QgsClassificationRange]) -> int:
 
-        class_value1 = None
-
-        for range_class in self.field_1_classes:
+        for i, range_class in enumerate(classes):
 
             if range_class.lowerBound() <= value <= range_class.upperBound():
-                class_value1 = (range_class.lowerBound() + range_class.upperBound()) / 2
+                class_value = i
 
-        position_value1 = (class_value1 - self.field_1_min) / (self.field_1_max - self.field_1_min)
+        return class_value
 
-        return position_value1
+    def positionValueField1(self, value: float) -> int:
 
-    def positionValueField2(self, value: float) -> float:
+        return self._positionValue(value, self.field_1_classes)
 
-        class_value2 = None
+    def positionValueField2(self, value: float) -> int:
 
-        for range_class in self.field_2_classes:
+        return self._positionValue(value, self.field_2_classes)
 
-            if range_class.lowerBound() <= value <= range_class.upperBound():
-                class_value2 = (range_class.lowerBound() + range_class.upperBound()) / 2
-
-        position_value2 = (class_value2 - self.field_2_min) / (self.field_2_max - self.field_2_min)
-
-        return position_value2
-
-    def getFeatureValueCombinationHash(self, value1: float, value2: float) -> int:
-        return hash(f"{value1}-{value2}")
+    def getFeatureValueCombinationHash(self, value1: float, value2: float) -> str:
+        position_value1 = self.positionValueField1(value1)
+        position_value2 = self.positionValueField2(value2)
+        return f"{position_value1}-{position_value2}"
 
     def getFeatureColor(self, value1: float, value2: float) -> QColor:
 
         position_value1 = self.positionValueField1(value1)
         position_value2 = self.positionValueField2(value2)
 
-        color1 = self.color_ramp_1.color(position_value1)
-        color2 = self.color_ramp_2.color(position_value2)
+        color1 = self.color_ramp_1.color(position_value1 / self.number_classes)
+        color2 = self.color_ramp_2.color(position_value2 / self.number_classes)
 
         result_color = self.color_mixing_method.mix_colors(color1, color2)
 
