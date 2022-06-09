@@ -400,6 +400,20 @@ class BivariateRenderer(QgsFeatureRenderer):
     def field_1_labels(self) -> List[float]:
         return self.classes_to_legend_breaks(self.field_1_classes)
 
+    def legendSymbolItems(self) -> List[QgsLegendSymbolItem]:
+        legend_items = []
+        for element in self.cached.keys():
+            legend_item = QgsLegendSymbolItem(self.cached[element], element, "")
+            legend_items.append(legend_item)
+        return legend_items
+
+    def generateCategories(self):
+
+        for x in range(self.number_classes):
+            for y in range(self.number_classes):
+                identifier = self.getFeatureValueCombinationHash(x, y)
+                self.cached[identifier] = self.symbol_for_values(x, y)
+
 
 @dataclass
 class LegendPolygon:
