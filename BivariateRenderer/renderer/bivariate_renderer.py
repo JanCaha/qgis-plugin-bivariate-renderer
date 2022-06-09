@@ -7,7 +7,7 @@ from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from qgis.core import (QgsFeatureRenderer, QgsClassificationRange, QgsFeature, QgsColorRamp,
                        QgsFillSymbol, QgsSymbolLayerUtils, QgsVectorLayer, QgsClassificationMethod,
-                       QgsClassificationEqualInterval)
+                       QgsClassificationEqualInterval, QgsLegendSymbolItem)
 
 from ..text_constants import Texts
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
@@ -126,18 +126,13 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return self._positionValue(value, self.field_2_classes)
 
-    def getFeatureValueCombinationHash(self, value1: float, value2: float) -> str:
-        position_value1 = self.positionValueField1(value1)
-        position_value2 = self.positionValueField2(value2)
-        return f"{position_value1}-{position_value2}"
+    def getFeatureValueCombinationHash(self, value1: int, value2: int) -> str:
+        return f"{value1}-{value2}"
 
-    def getFeatureColor(self, value1: float, value2: float) -> QColor:
+    def getFeatureColor(self, position_value1: int, position_value2: int) -> QColor:
 
-        position_value1 = self.positionValueField1(value1)
-        position_value2 = self.positionValueField2(value2)
-
-        color1 = self.color_ramp_1.color(position_value1 / self.number_classes)
-        color2 = self.color_ramp_2.color(position_value2 / self.number_classes)
+        color1 = self.color_ramp_1.color(position_value1 / (self.number_classes - 1))
+        color2 = self.color_ramp_2.color(position_value2 / (self.number_classes - 1))
 
         result_color = self.color_mixing_method.mix_colors(color1, color2)
 
@@ -148,11 +143,14 @@ class BivariateRenderer(QgsFeatureRenderer):
         value1 = feature.attribute(self.field_name_1)
         value2 = feature.attribute(self.field_name_2)
 
-        identifier = self.getFeatureValueCombinationHash(value1, value2)
+        position_value1 = self.positionValueField1(value1)
+        position_value2 = self.positionValueField2(value2)
+
+        identifier = self.getFeatureValueCombinationHash(position_value1, position_value2)
 
         if identifier not in self.cached:
             feature_symbol = self.get_default_symbol()
-            feature_symbol.setColor(self.getFeatureColor(value1, value2))
+            feature_symbol.setColor(self.getFeatureColor(position_value1, position_value2))
 
             self.cached[identifier] = feature_symbol.clone()
 
@@ -185,7 +183,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.field_1_classes = self.field_1_classes
         r.field_2_classes = self.field_2_classes
         r.setColorMixingMethod(self.color_mixing_method)
-        r._reset_cache()
+        r.cached = self.cached
 
         return r
 
@@ -325,11 +323,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return symbol
 
-    def get_symbol_for_values(self, value1: float, value2: float) -> QgsFillSymbol:
-
-        return self.symbol_for_values(value1, value2)
-
-    def symbol_for_values(self, value1: float, value2: float) -> QgsFillSymbol:
+    def symbol_for_values(self, value1: int, value2: int) -> QgsFillSymbol:
 
         identifier = self.getFeatureValueCombinationHash(value1, value2)
 
@@ -351,20 +345,11 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         polygons = []
 
-        x = 0
-        for field_1_cat in self.field_1_classes:
+        for x, field_1_cat in enumerate(self.field_1_classes):
 
-            y = 0
-            for field_2_cat in self.field_2_classes:
+            for y, field_2_cat in enumerate(self.field_2_classes):
 
-                polygons.append(
-                    LegendPolygon(x=x,
-                                  y=y,
-                                  symbol=self.get_symbol_for_values(
-                                      (field_1_cat.lowerBound() + field_1_cat.upperBound()) / 2,
-                                      (field_2_cat.lowerBound() + field_2_cat.upperBound()) / 2)))
-                y += 1
-            x += 1
+                polygons.append(LegendPolygon(x=x, y=y, symbol=self.symbol_for_values(x, y)))
 
         return polygons
 
