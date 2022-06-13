@@ -1,6 +1,6 @@
 from typing import Optional
 
-from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon, QColor
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, QgsVectorLayer,
                        QgsTextFormat, QgsLayoutItemRenderContext, QgsLineSymbol,
@@ -33,6 +33,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     add_axes_arrows: bool
     add_axes_texts: bool
     add_axes_values_texts: bool
+    add_colors_separators: bool
 
     y_axis_rotation: float
 
@@ -40,6 +41,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     ticks_y_precision: int
 
     space_above_ticks: int
+
+    color_separator_width: float
+    color_separator_color: QColor
 
     def __init__(self, layout: QgsLayout):
 
@@ -60,6 +64,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.add_axes_arrows = True
         self.add_axes_texts = True
         self.add_axes_values_texts = False
+        self.add_colors_separators = False
+
+        self.color_separator_width = 5
+        self.color_separator_color = QColor("#ffffff")
 
         self.y_axis_rotation = 90
 
@@ -96,6 +104,11 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         legend_render.set_space_above_ticks(self.space_above_ticks)
 
+        legend_render.add_colors_separators = self.add_colors_separators
+
+        legend_render.color_separator_width_percent = self.color_separator_width
+        legend_render.color_separator_color = self.color_separator_color
+
         return legend_render
 
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
@@ -126,6 +139,12 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("ticks_x_precision", str(self.ticks_x_precision))
         bivariate_legend_element.setAttribute("ticks_y_precision", str(self.ticks_y_precision))
         bivariate_legend_element.setAttribute("space_above_ticks", str(self.space_above_ticks))
+        bivariate_legend_element.setAttribute("draw_colors_separators",
+                                              str(self.add_colors_separators))
+        bivariate_legend_element.setAttribute("color_separator_width",
+                                              str(self.color_separator_width))
+        bivariate_legend_element.setAttribute("color_separator_color",
+                                              self.color_separator_color.name())
 
         line_symbol = doc.createElement("lineSymbol")
 
@@ -242,6 +261,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
                 self.text_values_format.readXml(text_format_elem, context)
 
+        self.add_colors_separators = element.attribute("draw_colors_separators") == "True"
+        self.color_separator_width = int(element.attribute("color_separator_width"))
+        self.color_separator_color = QColor(element.attribute("color_separator_color"))
+
         return True
 
     def set_linked_layer(self, layer: QgsVectorLayer) -> None:
@@ -316,6 +339,21 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_space_above_ticks(self, space: int) -> None:
         self.space_above_ticks = int(space)
+
+        self.refresh()
+
+    def set_color_separator_color(self, color: QColor) -> None:
+        self.color_separator_color = color
+
+        self.refresh()
+
+    def set_color_separator_width(self, width: float) -> None:
+        self.color_separator_width = width
+
+        self.refresh()
+
+    def set_draw_color_separator(self, draw: bool) -> None:
+        self.add_colors_separators = draw
 
         self.refresh()
 
