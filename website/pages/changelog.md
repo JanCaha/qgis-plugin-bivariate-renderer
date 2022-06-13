@@ -12,7 +12,7 @@
 
 - new color mixing method multiply
 
-- color mixing methods are renamed, to make them more readble
+- color mixing methods are renamed, to make them more readable
 
 - Breaking Changes in saving and loading renderer !!! Older projects will not load the renderer correctly. It is unfortunate, but it was necessary to improve the plugin.
 
