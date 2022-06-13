@@ -9,7 +9,7 @@ from qgis.core import (QgsLayoutItem, QgsProject, QgsVectorLayer, QgsMapLayer, Q
                        QgsSymbol)
 
 from qgis.gui import (QgsLayoutItemBaseWidget, QgsLayoutItemAbstractGuiMetadata, QgsFontButton,
-                      QgsSymbolButton, QgsCollapsibleGroupBoxBasic)
+                      QgsSymbolButton, QgsCollapsibleGroupBoxBasic, QgsColorButton)
 
 from ..text_constants import Texts, IDS
 from ..utils import log, get_symbol_dict, get_icon
@@ -72,6 +72,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.form_layout.addWidget(self.cb_layers)
 
         self.form_layout.addWidget(self.widget_rotate())
+
+        self.form_layout.addWidget(self.widget_spacer())
 
         self.form_layout.addWidget(self.widget_arrow_axes())
 
@@ -258,6 +260,57 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         cg_axes_value_descriptions.setLayout(cg_axes_descriptions_layout)
 
         return cg_axes_value_descriptions
+
+    def widget_spacer(self) -> QgsCollapsibleGroupBoxBasic:
+
+        cg_color_separator = QgsCollapsibleGroupBoxBasic('Color separators')
+        cg_color_separator_layout = QVBoxLayout()
+
+        self.add_color_spacer = QCheckBox("Add color separators")
+        self.add_color_spacer.setChecked(self.layout_item.add_colors_separators)
+        self.add_color_spacer.stateChanged.connect(self.pass_use_color_spacer)
+
+        self.color_spacer_width = QSpinBox()
+        self.color_spacer_width.setMinimum(1)
+        self.color_spacer_width.setMaximum(10)
+        self.color_spacer_width.setValue(self.layout_item.color_separator_width)
+        self.color_spacer_width.setSuffix("%")
+        self.color_spacer_width.valueChanged.connect(self.pass_width_percent)
+
+        self.color_spacer_color = QgsColorButton()
+        self.color_spacer_color.setColor(self.layout_item.color_separator_color)
+        self.color_spacer_color.colorChanged.connect(self.pass_color)
+
+        cg_color_separator_layout.addWidget(QLabel("Use color separator lines in legend"))
+        cg_color_separator_layout.addWidget(self.add_color_spacer)
+        cg_color_separator_layout.addWidget(QLabel("Color spacer width (in % of color rectangle)"))
+        cg_color_separator_layout.addWidget(self.color_spacer_width)
+        cg_color_separator_layout.addWidget(QLabel("Color used to create space in legend"))
+        cg_color_separator_layout.addWidget(self.color_spacer_color)
+
+        cg_color_separator.setLayout(cg_color_separator_layout)
+
+        return cg_color_separator
+
+    def pass_use_color_spacer(self):
+        self.layout_item.beginCommand(self.tr('Use color spacer'), QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.set_draw_color_separator(self.add_color_spacer.isChecked())
+        self.layout_item.endCommand()
+
+    def pass_width_percent(self):
+        self.layout_item.beginCommand(self.tr('Change color spacer width'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.set_color_separator_width(self.color_spacer_width.value())
+        self.layout_item.endCommand()
+
+    def pass_color(self):
+        self.layout_item.beginCommand(self.tr('Change color spacer color'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.set_color_separator_color(self.color_spacer_color.color())
+        self.layout_item.endCommand()
 
     def pass_space(self):
         self.layout_item.beginCommand(self.tr('Change space above ticks'),
