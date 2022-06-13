@@ -38,19 +38,15 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
                                                     field2="PERIMETER",
                                                     color_ramps=BivariateColorRampGreenPink())
 
-    categories = bivariate_renderer.getLegendCategories()
-
-    assert isinstance(categories, dict)
-    assert isinstance(categories[list(categories.keys())[0]], dict)
-    assert "color" in categories[list(categories.keys())[0]].keys()
+    bivariate_renderer.generateCategories()
 
     xml_renderer = """
 <!DOCTYPE doc>
 <renderer-v2 type="BivariateRenderer">
  <number_of_classes value="3"/>
  <classificationMethod id="EqualInterval">
-  <symmetricMode symmetrypoint="0" enabled="0" astride="0"/>
-  <labelFormat format="%1 - %2" trimtrailingzeroes="1" labelprecision="4"/>
+  <symmetricMode symmetrypoint="0" astride="0" enabled="0"/>
+  <labelFormat labelprecision="4" trimtrailingzeroes="1" format="%1 - %2"/>
   <parameters>
    <Option/>
   </parameters>
@@ -58,14 +54,14 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
  </classificationMethod>
  <field_name_1 name="AREA"/>
  <field_name_2 name="PERIMETER"/>
- <colorramp type="gradient" name="color_ramp_1">
+ <colorramp name="color_ramp_1" type="gradient">
   <Option type="Map">
-   <Option type="QString" name="color1" value="211,211,211,255"/>
-   <Option type="QString" name="color2" value="76,172,38,255"/>
-   <Option type="QString" name="direction" value="ccw"/>
-   <Option type="QString" name="discrete" value="0"/>
-   <Option type="QString" name="rampType" value="gradient"/>
-   <Option type="QString" name="spec" value="rgb"/>
+   <Option name="color1" type="QString" value="211,211,211,255"/>
+   <Option name="color2" type="QString" value="76,172,38,255"/>
+   <Option name="direction" type="QString" value="ccw"/>
+   <Option name="discrete" type="QString" value="0"/>
+   <Option name="rampType" type="QString" value="gradient"/>
+   <Option name="spec" type="QString" value="rgb"/>
   </Option>
   <prop v="211,211,211,255" k="color1"/>
   <prop v="76,172,38,255" k="color2"/>
@@ -74,14 +70,14 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
   <prop v="gradient" k="rampType"/>
   <prop v="rgb" k="spec"/>
  </colorramp>
- <colorramp type="gradient" name="color_ramp_2">
+ <colorramp name="color_ramp_2" type="gradient">
   <Option type="Map">
-   <Option type="QString" name="color1" value="211,211,211,255"/>
-   <Option type="QString" name="color2" value="208,37,140,255"/>
-   <Option type="QString" name="direction" value="ccw"/>
-   <Option type="QString" name="discrete" value="0"/>
-   <Option type="QString" name="rampType" value="gradient"/>
-   <Option type="QString" name="spec" value="rgb"/>
+   <Option name="color1" type="QString" value="211,211,211,255"/>
+   <Option name="color2" type="QString" value="208,37,140,255"/>
+   <Option name="direction" type="QString" value="ccw"/>
+   <Option name="discrete" type="QString" value="0"/>
+   <Option name="rampType" type="QString" value="gradient"/>
+   <Option name="spec" type="QString" value="rgb"/>
   </Option>
   <prop v="211,211,211,255" k="color1"/>
   <prop v="208,37,140,255" k="color2"/>
@@ -91,16 +87,27 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
   <prop v="rgb" k="spec"/>
  </colorramp>
  <ranges_1>
-  <range_1 upper="0.10833333333333334" label="0,042 - 0,1083" lower="0.042"/>
-  <range_1 upper="0.17466666666666666" label="0,1083 - 0,1747" lower="0.10833333333333334"/>
-  <range_1 upper="0.241" label="0,1747 - 0,241" lower="0.17466666666666666"/>
+  <range_1 label="0,042 - 0,1083" lower="0.042" upper="0.10833333333333334"/>
+  <range_1 label="0,1083 - 0,1747" lower="0.10833333333333334" upper="0.17466666666666666"/>
+  <range_1 label="0,1747 - 0,241" lower="0.17466666666666666" upper="0.241"/>
  </ranges_1>
  <ranges_2>
-  <range_2 upper="1.8793333333333333" label="0,999 - 1,8793" lower="0.999"/>
-  <range_2 upper="2.7596666666666665" label="1,8793 - 2,7597" lower="1.8793333333333333"/>
-  <range_2 upper="3.64" label="2,7597 - 3,64" lower="2.7596666666666665"/>
+  <range_2 label="0,999 - 1,8793" lower="0.999" upper="1.8793333333333333"/>
+  <range_2 label="1,8793 - 2,7597" lower="1.8793333333333333" upper="2.7596666666666665"/>
+  <range_2 label="2,7597 - 3,64" lower="2.7596666666666665" upper="3.64"/>
  </ranges_2>
- <color_mixing_method name="Darken blend color mixing"/>
+ <color_mixing_method name="Blend Darken"/>
+ <symbols>
+  <symbol label="0-0" color="#d3d3d3"/>
+  <symbol label="0-1" color="#d27cb0"/>
+  <symbol label="0-2" color="#d0258c"/>
+  <symbol label="1-0" color="#90c07c"/>
+  <symbol label="1-1" color="#907c7c"/>
+  <symbol label="1-2" color="#90257c"/>
+  <symbol label="2-0" color="#4cac26"/>
+  <symbol label="2-1" color="#4c7c26"/>
+  <symbol label="2-2" color="#4c2526"/>
+ </symbols>
 </renderer-v2>
 """
 
