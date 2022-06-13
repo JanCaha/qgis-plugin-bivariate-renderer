@@ -309,3 +309,39 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepa
 
     assert_images_equal("tests/images/correct/legend_with_all_rotated.png",
                         "tests/images/image.png")
+
+
+def test_legend_with_spacer(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
+                            prepare_bivariate_renderer, prepare_painter):
+
+    assert qgis_countries_layer
+    assert qgs_project
+    assert qgs_layout
+
+    image = prepare_default_QImage()
+
+    painter = prepare_painter(image)
+
+    render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
+
+    assert render_context
+
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
+
+    legend_renderer = LegendRenderer()
+
+    legend_renderer.add_colors_separators = True
+    legend_renderer.color_separator_width_percent = 5
+
+    legend_renderer.render(render_context,
+                           image.width() / render_context.scaleFactor(),
+                           image.width() / render_context.scaleFactor(),
+                           bivariate_renderer.generate_legend_polygons())
+
+    painter.end()
+
+    image.save("./tests/images/image.png", "PNG")
+
+    assert_images_equal("tests/images/correct/legend_with_spacer.png", "tests/images/image.png")
