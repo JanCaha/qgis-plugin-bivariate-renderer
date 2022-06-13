@@ -244,6 +244,16 @@ class BivariateRenderer(QgsFeatureRenderer):
         color_mixing_method_elem.setAttribute("name", self.color_mixing_method.name())
         renderer_elem.appendChild(color_mixing_method_elem)
 
+        symbols_elem = doc.createElement("symbols")
+
+        for symbol in self.cached.keys():
+            symbol_elem = doc.createElement('symbol')
+            symbol_elem.setAttribute("color", self.cached[symbol].color().name())
+            symbol_elem.setAttribute("label", symbol)
+            symbols_elem.appendChild(symbol_elem)
+
+        renderer_elem.appendChild(symbols_elem)
+
         return renderer_elem
 
     @staticmethod
@@ -254,6 +264,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setFieldName1(element.firstChildElement("field_name_1").attribute("name"))
         r.setFieldName2(element.firstChildElement("field_name_2").attribute("name"))
         element.firstChildElement("number_of_classes").attributes().item(0)
+
         r.setNumberOfClasses(int(
             element.firstChildElement("number_of_classes").attribute("value")))
 
@@ -305,6 +316,24 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         r.setColorMixingMethod(ColorMixingMethodsRegister().get_by_name(
             element.firstChildElement("color_mixing_method").attribute("name")))
+
+        symbols_elem = element.firstChildElement("symbols")
+
+        symbol_elem = symbols_elem.firstChildElement()
+
+        while not symbol_elem.isNull():
+
+            if symbol_elem.tagName() == "symbol":
+                color = QColor(symbol_elem.attribute("color"))
+                label = symbol_elem.attribute("label")
+
+                symbol = BivariateRenderer.get_default_symbol()
+                symbol.setColor(color)
+
+                r.setLegendSymbolItem(label, symbol.clone())
+                r.cached[label] = symbol
+
+            symbol_elem = symbol_elem.nextSiblingElement()
 
         return r
 
