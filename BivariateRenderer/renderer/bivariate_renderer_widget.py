@@ -1,8 +1,6 @@
 from qgis.PyQt.QtGui import (QImage, QColor, QPainter, QPixmap)
-
 from qgis.PyQt.QtWidgets import (QFormLayout, QLabel, QComboBox)
-
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal, Qt
 
 from qgis.gui import (QgsRendererWidget, QgsColorRampButton, QgsFieldComboBox, QgsDoubleSpinBox)
 
@@ -25,8 +23,6 @@ from ..text_constants import Texts
 class BivariateRendererWidget(QgsRendererWidget):
 
     # objects
-    color_ramp_1: QgsGradientColorRamp
-    color_ramp_2: QgsGradientColorRamp
     field_name_1: str
     field_name_2: str
 
@@ -35,7 +31,7 @@ class BivariateRendererWidget(QgsRendererWidget):
     register_color_ramps = BivariateColorRampsRegister()
 
     default_color_ramp_1 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
-    default_color_ramp_2 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
+    default_color_ramp_2 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_2
 
     bivariate_renderer: BivariateRenderer
 
@@ -177,6 +173,13 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_changed.connect(self.update_legend)
 
+        self.rotate_color_palette = QComboBox()
+        self.rotate_color_palette.addItem("Normal", 0)
+        self.rotate_color_palette.addItem("90° clockwise", 1)
+        self.rotate_color_palette.addItem("180° clockwise", 2)
+        self.rotate_color_palette.addItem("270° clockwise", 3)
+        self.rotate_color_palette.currentIndexChanged.connect(self.rotate_palette)
+
         self.form_layout = QFormLayout()
         self.form_layout.addRow("Color ramps", self.cb_color_ramps)
         self.form_layout.addRow("Number of classes", self.sb_number_classes)
@@ -190,10 +193,41 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout.addRow("Color Ramp 1", self.bt_color_ramp1)
         self.form_layout.addRow("Field 2", self.cb_field2)
         self.form_layout.addRow("Color Ramp 2", self.bt_color_ramp2)
+        self.form_layout.addRow("Rotate color palette", self.rotate_color_palette)
         self.form_layout.addRow("Legend", self.label_legend)
         self.setLayout(self.form_layout)
 
         self.update_legend()
+
+    def rotate_palette(self):
+        index = self.rotate_color_palette.currentIndex()
+        rotation = self.rotate_color_palette.itemData(index, Qt.UserRole)
+
+        if rotation == 0:
+            pass
+        elif rotation == 1:
+            cr1 = self.bt_color_ramp1.colorRamp()
+            cr2 = self.bt_color_ramp2.colorRamp()
+            cr1.invert()
+            self.bt_color_ramp1.setColorRamp(cr2)
+            self.bt_color_ramp2.setColorRamp(cr1)
+        elif rotation == 2:
+            cr1 = self.bt_color_ramp1.colorRamp()
+            cr2 = self.bt_color_ramp2.colorRamp()
+            cr1.invert()
+            cr2.invert()
+            self.bt_color_ramp1.setColorRamp(cr1)
+            self.bt_color_ramp2.setColorRamp(cr2)
+        elif rotation == 3:
+            cr1 = self.bt_color_ramp1.colorRamp()
+            cr2 = self.bt_color_ramp2.colorRamp()
+            cr2.invert()
+            self.bt_color_ramp1.setColorRamp(cr2)
+            self.bt_color_ramp2.setColorRamp(cr1)
+
+        self.rotate_color_palette.blockSignals(True)
+        self.rotate_color_palette.setCurrentIndex(0)
+        self.rotate_color_palette.blockSignals(False)
 
     def calculate_legend_sizes(self) -> None:
         self.legend_size = int(self.size().width() / 3)
