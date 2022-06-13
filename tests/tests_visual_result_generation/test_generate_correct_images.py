@@ -346,3 +346,35 @@ def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout, prepare_defau
     qgs_project.addMapLayer(nc_layer)
 
     save_layout_for_layer(nc_layer, "tests/images/correct/layout_polygons_render.png")
+
+
+@skip_setting
+def test_generate_legend_white_spacer(qgis_countries_layer, qgs_project, qgs_layout,
+                                      prepare_default_QImage, prepare_bivariate_renderer):
+
+    legend_size = 500
+
+    image = prepare_default_QImage(legend_size)
+
+    painter = QPainter(image)
+
+    render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
+
+    assert render_context
+
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
+
+    legend_renderer = LegendRenderer()
+
+    legend_renderer.add_colors_separators = True
+    legend_renderer.color_separator_width_percent = 5
+
+    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
+                           legend_size / render_context.scaleFactor(),
+                           bivariate_renderer.generate_legend_polygons())
+
+    painter.end()
+
+    image.save("./tests/images/correct/legend_with_spacer.png", "PNG")
