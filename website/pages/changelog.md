@@ -2,6 +2,10 @@
 
 ## 1.0.0
 
+- add option to rotate color legend in the render widget, allows more intuitive creation of legend variants
+
+- add symbology in `Layers` window that shows color combinations for categories, this is saved in project and properly restored
+
 - new default color palette when renderer is selected
 
 - new prepared palettes - now there are 12
