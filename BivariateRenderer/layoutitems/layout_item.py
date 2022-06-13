@@ -192,74 +192,39 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         line_symbol_elem = element.firstChildElement("lineSymbol")
 
-        if not line_symbol_elem.isNull():
-
-            symbolElem = line_symbol_elem.firstChildElement("symbol")
-            self.line_format = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
+        symbolElem = line_symbol_elem.firstChildElement("symbol")
+        self.line_format = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
 
         text_format_node_list = element.elementsByTagName("text-style")
 
-        if not text_format_node_list.isEmpty():
-
-            text_format_elem = text_format_node_list.at(0).toElement()
-            self.text_format.readXml(text_format_elem, context)
+        text_format_elem = text_format_node_list.at(0).toElement()
+        self.text_format.readXml(text_format_elem, context)
 
         self.text_axis_x = element.attribute("axis_x_name")
         self.text_axis_y = element.attribute("axis_y_name")
 
-        if element.hasAttribute("ticks_x_precision"):
+        self.ticks_x_precision = int(element.attribute("ticks_x_precision"))
+        self.ticks_y_precision = int(element.attribute("ticks_y_precision"))
 
-            self.ticks_x_precision = int(element.attribute("ticks_x_precision"))
-            self.ticks_y_precision = int(element.attribute("ticks_y_precision"))
+        self.space_above_ticks = int(element.attribute("space_above_ticks"))
 
-        if element.hasAttribute("space_above_ticks"):
-            self.space_above_ticks = int(element.attribute("space_above_ticks"))
+        self.legend_rotated = element.attribute("legend_rotated") == "True"
 
-        if element.hasAttribute("legend_rotated"):
+        self.add_axes_texts = element.attribute("draw_axes_text") == "True"
 
-            self.legend_rotated = element.attribute("legend_rotated") == "True"
+        self.add_axes_arrows = element.attribute("draw_axes_arrow") == "True"
 
-        else:
-            self.legend_rotated = False
+        self.y_axis_rotation = float(element.attribute("y_axis_rotation"))
 
-        if element.hasAttribute("draw_axes_text"):
-
-            self.add_axes_texts = element.attribute("draw_axes_text") == "True"
-
-        else:
-            self.add_axes_texts = True
-
-        if element.hasAttribute("draw_axes_arrow"):
-
-            self.add_axes_arrows = element.attribute("draw_axes_arrow") == "True"
-
-        else:
-            self.add_axes_arrows = True
-
-        if element.hasAttribute("y_axis_rotation"):
-
-            self.y_axis_rotation = float(element.attribute("y_axis_rotation"))
-
-        else:
-            self.y_axis_rotation = 90
-
-        if element.hasAttribute("draw_axes_values_texts"):
-
-            self.add_axes_values_texts = element.attribute("draw_axes_values_texts") == "True"
-
-        else:
-
-            self.add_axes_values_texts = False
+        self.add_axes_values_texts = element.attribute("draw_axes_values_texts") == "True"
 
         axes_values_format_elem = element.firstChildElement("axesValuesFormat")
 
-        if not axes_values_format_elem.isNull():
+        text_format_elem = axes_values_format_elem.firstChildElement("text-style")
 
-            text_format_elem = axes_values_format_elem.firstChildElement("text-style")
+        if text_format_elem:
 
-            if text_format_elem:
-
-                self.text_values_format.readXml(text_format_elem, context)
+            self.text_values_format.readXml(text_format_elem, context)
 
         self.add_colors_separators = element.attribute("draw_colors_separators") == "True"
         self.color_separator_width = int(element.attribute("color_separator_width"))
