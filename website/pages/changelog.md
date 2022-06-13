@@ -2,6 +2,8 @@
 
 ## 1.0.0
 
+- add option to add color separator to the legend, to create visual separation amongst individual colors in legend
+
 - add option to rotate color legend in the render widget, allows more intuitive creation of legend variants
 
 - add symbology in `Layers` window that shows color combinations for categories, this is saved in project and properly restored
