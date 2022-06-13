@@ -6,6 +6,8 @@ from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 
+from tests import (assert_images_equal)
+
 
 def test_widget_elements(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
 
@@ -40,3 +42,16 @@ def test_widget_values(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widg
 
     assert widget.bt_color_ramp1.colorRamp().properties() == color_ramp.color_ramp_1.properties()
     assert widget.bt_color_ramp2.colorRamp().properties() == color_ramp.color_ramp_2.properties()
+
+
+def test_visual(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
+
+    widget = prepare_bivariate_renderer_widget(nc_layer)
+
+    widget.show()
+
+    pixmap = widget.grab()
+
+    pixmap.save("tests/images/image.png", "png")
+
+    assert_images_equal("tests/images/correct/widget_renderer.png", "tests/images/image.png")
