@@ -10,10 +10,9 @@ from tests import assert_images_equal, xml_string
 import pytest
 
 
-@pytest.mark.skip(reason="Problem with comparing the outcomes")
+# @pytest.mark.skip(reason="Problem with comparing the outcomes")
 def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProject,
-                                qgs_layout: QgsLayout, prepare_bivariate_renderer,
-                                save_layout_for_layer):
+                                prepare_bivariate_renderer, save_layout_for_layer):
 
     bivariate_renderer = prepare_bivariate_renderer(nc_layer,
                                                     field1="AREA",
@@ -26,7 +25,7 @@ def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProjec
 
     rendered_layout = "./tests/images/image.png"
 
-    save_layout_for_layer(nc_layer, qgs_layout, rendered_layout)
+    save_layout_for_layer(nc_layer, rendered_layout)
 
     assert_images_equal("tests/images/correct/layout_polygons_render.png", rendered_layout)
 
