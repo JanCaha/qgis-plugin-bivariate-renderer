@@ -11,7 +11,9 @@ from qgis.PyQt.QtCore import QRectF, QSize
 
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
-from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp, BivariateColorRampGreenPink
+from BivariateRenderer.colorramps.color_ramps_register import (BivariateColorRamp,
+                                                               BivariateColorRampGreenPink,
+                                                               BivariateColorRampsRegister)
 
 
 @pytest.fixture
@@ -104,8 +106,10 @@ def prepare_bivariate_renderer():
 
         if color_ramps is None:
 
-            default_color_ramp_1 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(255, 0, 0))
-            default_color_ramp_2 = QgsGradientColorRamp(QColor(255, 255, 255), QColor(0, 0, 255))
+            color_ramp = BivariateColorRampsRegister().get_by_name("Violet - Blue")
+
+            default_color_ramp_1 = color_ramp.color_ramp_1
+            default_color_ramp_2 = color_ramp.color_ramp_2
 
         else:
 
