@@ -24,6 +24,7 @@ class LegendRenderer:
     add_axes_arrows = False
     add_axes_texts = False
     add_axes_ticks_texts = False
+    add_colors_separators = False
 
     width: float
     height: float
@@ -51,6 +52,9 @@ class LegendRenderer:
 
     _space_above_ticks: int
 
+    color_separator_width_percent: float
+    color_separator_color: QColor
+
     def __init__(self):
 
         self._painter = None
@@ -72,6 +76,9 @@ class LegendRenderer:
 
         self._numeric_format = QgsBasicNumericFormat()
         self._numeric_format_context = QgsNumericFormatContext()
+
+        self.color_separator_width_percent = 3
+        self.color_separator_color = QColor("#ffffff")
 
     def set_size_context(self, width: float, height: float) -> None:
 
@@ -541,6 +548,39 @@ class LegendRenderer:
     def set_space_above_ticks(self, space: int) -> None:
         self._space_above_ticks = int(space)
 
+    def draw_spacers(self, polygons):
+
+        self.painter.save()
+
+        spacer_size = int(self.size_constant * (self.color_separator_width_percent / 100))
+
+        if spacer_size % 2 == 0:
+            spacer_size += 1
+
+        pen = QPen(self.color_separator_color, spacer_size, Qt.SolidLine)
+
+        self.painter.setPen(pen)
+
+        for polygon in polygons:
+
+            polygon = QPolygonF(
+                QRectF(self.polygon_start_pos_x + polygon.x * self.size_constant,
+                       self.polygon_start_pos_y - (polygon.y + 1) * self.size_constant,
+                       self.size_constant, self.size_constant))
+
+            polygon = self.transform.map(polygon)
+
+            points = []
+            for i in range(polygon.count()):
+                p = polygon.at(i)
+                points.append(QgsPoint(p.x(), p.y()))
+
+            line = QgsLineString(points)
+
+            line.draw(self.painter)
+
+        self.painter.restore()
+
     def draw_debug_lines(self):
 
         self.painter.save()
@@ -609,18 +649,18 @@ class LegendRenderer:
 
         self.draw_polygons(polygons)
 
-        if self.add_axes_arrows:
+        if self.add_colors_separators:
+            self.draw_spacers(polygons)
 
+        if self.add_axes_arrows:
             self.draw_axes_arrows()
 
         # https://github.com/qgis/QGIS/blob/5e98648913b82466ca9eb42ed68f4bb0b536ae96/src/core/layout/qgslayoutitemlabel.cpp#L147
 
         if self.add_axes_texts:
-
             self.draw_axes_texts()
 
         if self.add_axes_ticks_texts:
-
             self.draw_values()
 
         # self.draw_debug_lines()
