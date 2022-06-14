@@ -649,8 +649,14 @@ class LegendRenderer:
     def render_legend(self, context: QgsRenderContext, width: float, height: float,
                       renderer: BivariateRenderer) -> None:
 
-        self.texts_axis_x_ticks = renderer.field_1_labels
-        self.texts_axis_y_ticks = renderer.field_2_labels
+        if self.use_category_midpoints:
+            self.texts_axis_x_ticks = BivariateRenderer.classes_to_legend_midpoints(
+                renderer.field_1_classes)
+            self.texts_axis_y_ticks = BivariateRenderer.classes_to_legend_midpoints(
+                renderer.field_2_classes)
+        else:
+            self.texts_axis_x_ticks = renderer.field_1_labels
+            self.texts_axis_y_ticks = renderer.field_2_labels
 
         self.render(context, width, height, renderer.generate_legend_polygons())
 
