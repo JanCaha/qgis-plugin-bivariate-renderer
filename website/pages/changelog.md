@@ -2,6 +2,12 @@
 
 ## 1.0.0
 
+- values on axis can be added either as category breaks (as were in the older version) or as category centres
+
+- allow changing of arrow widths in the legend
+
+- change arrows origin point, now they are by default aligned to category squares, but can origin in common point (as was previously)
+
 - add option to add color separator to the legend, to create visual separation amongst individual colors in legend
 
 - add option to rotate color legend in the render widget, allows more intuitive creation of legend variants
