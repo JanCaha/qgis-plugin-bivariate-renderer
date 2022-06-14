@@ -317,7 +317,11 @@ class LegendRenderer:
 
             self._transform = QTransform()
 
-            max_size = self.height + self.axis_tick_last_value_max_width / 2
+            max_size = self.height
+
+            if self.add_axes_ticks_texts:
+                if not self.use_category_midpoints:
+                    max_size = self.height + self.axis_tick_last_value_max_width / 2
 
             if self.legend_rotated:
 
