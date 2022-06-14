@@ -58,8 +58,8 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
 
         layer.addAttribute(QgsField(result_field, QVariant.String))
 
-        classes_1 = classification_alg.classes(layer, field1, number_of_classes)
-        classes_2 = classification_alg.classes(layer, field2, number_of_classes)
+        classes_1 = classification_alg.classes(layer, field1, int(number_of_classes))
+        classes_2 = classification_alg.classes(layer, field2, int(number_of_classes))
 
         field_index = layer.fields().indexOf(result_field)
 
