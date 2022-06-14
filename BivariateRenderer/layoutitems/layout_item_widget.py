@@ -341,81 +341,51 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     def pass_space(self):
         self.layout_item.beginCommand(self.tr('Change space above ticks'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_space_above_ticks(self.space_above_ticks.value())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def pass_precisions(self):
 
         self.layout_item.beginCommand(self.tr('Change ticks precisions'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_ticks_precisions(self.ticks_precision_x.value(),
                                               self.ticks_precision_y.value())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def pass_linesymbol(self):
-
         self.layout_item.beginCommand(self.tr('Change line symbol'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_line_format(self.b_line_symbol.symbol().clone())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def pass_textformat_to_item(self):
-
         self.layout_item.beginCommand(self.tr('Change text format'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_text_format(self.b_font.textFormat())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def pass_textformat_values_to_item(self):
-
         self.layout_item.beginCommand(self.tr('Change text values format'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_text_values_format(self.b_font_values.textFormat())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def update_axis_x(self):
-
         self.layout_item.beginCommand(self.tr('Change change x axis name'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_axis_x_name(self.axis_x_name.toPlainText())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def update_axis_y(self):
-
         self.layout_item.beginCommand(self.tr('Change change y axis name'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_axis_y_name(self.axis_y_name.toPlainText())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def update_rotate_legend(self):
-
         self.layout_item.beginCommand(self.tr('Change rotated legend'),
                                       QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_legend_rotated(self.rotate_legend.isChecked())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
         if self.rotate_legend.isChecked():
@@ -424,30 +394,18 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
             self.rotate_direction.setEnabled(True)
 
     def update_add_axes_text(self):
-
         self.layout_item.beginCommand(self.tr('Add axes text'), QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_draw_axes_text(self.add_axes_text.isChecked())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def update_add_axes_values_text(self):
-
         self.layout_item.beginCommand(self.tr('Add axes text'), QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_draw_axes_values(self.add_axes_values_text.isChecked())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def update_add_axes_arrow(self):
-
         self.layout_item.beginCommand(self.tr('Add axes arrow'), QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.blockSignals(True)
         self.layout_item.set_draw_axes_arrow(self.add_arrows.isChecked())
-        self.layout_item.blockSignals(False)
         self.layout_item.endCommand()
 
     def update_layer_to_work_with(self):
