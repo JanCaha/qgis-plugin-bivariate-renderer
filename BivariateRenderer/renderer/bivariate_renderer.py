@@ -83,7 +83,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.field_name_2 = field_name
         self._reset_cache()
 
-    def classes_to_legend_breaks(self, classes: List[QgsClassificationRange]) -> List[float]:
+    @staticmethod
+    def classes_to_legend_breaks(classes: List[QgsClassificationRange]) -> List[float]:
 
         values = []
 
@@ -94,6 +95,16 @@ class BivariateRenderer(QgsFeatureRenderer):
                 values.append(interval_class.lowerBound())
 
             values.append(interval_class.upperBound())
+
+        return values
+
+    @staticmethod
+    def classes_to_legend_midpoints(classes: List[QgsClassificationRange]) -> List[float]:
+
+        values = []
+
+        for interval_class in classes:
+            values.append((interval_class.lowerBound() + interval_class.upperBound()) / 2)
 
         return values
 
