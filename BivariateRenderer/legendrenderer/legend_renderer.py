@@ -26,6 +26,8 @@ class LegendRenderer:
     add_axes_ticks_texts = False
     add_colors_separators = False
 
+    arrows_common_start_point = False
+
     width: float
     height: float
 
@@ -256,13 +258,18 @@ class LegendRenderer:
         return self.width - self.all_elements_top
 
     @property
-    def point_lines_start(self) -> QPointF:
-        return QPointF(self.arrow_start_x, self.arrow_x_y)
+    def arrow_x_start_point(self) -> QPointF:
+        if self.arrows_common_start_point:
+            return QPointF(self.arrow_start_x, self.arrow_x_y)
+        else:
+            return QPointF(self.polygon_start_pos_x, self.arrow_x_y)
 
     @property
-    def point_line_x_end(self) -> QPolygonF:
-
-        x = self.width
+    def arrow_y_start_point(self) -> QPointF:
+        if self.arrows_common_start_point:
+            return QPointF(self.arrow_start_x, self.arrow_x_y)
+        else:
+            return QPointF(self.arrow_start_x, self.polygon_start_pos_y)
 
         if self.add_axes_ticks_texts:
             x = self.width + self.axis_tick_last_value_max_width / 2
