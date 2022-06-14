@@ -57,6 +57,8 @@ class LegendRenderer:
     color_separator_width_percent: float
     color_separator_color: QColor
 
+    arrow_width_percent: float
+
     use_category_midpoints: bool
 
     def __init__(self):
@@ -84,6 +86,7 @@ class LegendRenderer:
         self.color_separator_width_percent = 3
         self.color_separator_color = QColor("#ffffff")
 
+        self.arrow_width_percent = 5
 
         self.use_category_midpoints = False
 
@@ -169,7 +172,7 @@ class LegendRenderer:
 
         if self.add_axes_arrows:
 
-            return self.axis_text_tics_top + self.width * 0.025
+            return self.axis_text_tics_top + (self.arrow_width / 2)
 
         else:
 
@@ -180,7 +183,7 @@ class LegendRenderer:
 
         if self.add_axes_arrows:
 
-            return self.height - self.axis_text_tics_top - self.width * 0.025
+            return self.height - self.axis_text_tics_top - (self.arrow_width / 2)
 
         else:
 
@@ -191,7 +194,7 @@ class LegendRenderer:
 
         if self.add_axes_arrows:
 
-            return self.width * 0.05
+            return self.width * (self.arrow_width_percent / 100)
 
         else:
 
@@ -271,20 +274,13 @@ class LegendRenderer:
         else:
             return QPointF(self.arrow_start_x, self.polygon_start_pos_y)
 
-        if self.add_axes_ticks_texts:
-            x = self.width + self.axis_tick_last_value_max_width / 2
-
-        return QPointF(x, self.arrow_x_y)
+    @property
+    def arrow_x_end_point(self) -> QPolygonF:
+        return QPointF(self.width, self.arrow_x_y)
 
     @property
-    def point_line_y_end(self) -> float:
-
-        y = 0.0
-
-        if self.add_axes_ticks_texts:
-            y = -self.axis_tick_last_value_max_width / 2
-
-        return QPointF(self.arrow_start_x, y)
+    def arrow_y_end_point(self) -> float:
+        return QPointF(self.arrow_start_x, 0.0)
 
     @property
     def text_rotation_x(self) -> float:
@@ -365,13 +361,13 @@ class LegendRenderer:
 
         self.axis_line_symbol.startRender(self.context)
 
-        line_x = QPolygonF([self.point_lines_start, self.point_line_x_end])
+        line_x = QPolygonF([self.arrow_x_start_point, self.arrow_x_end_point])
 
         line_x = self.transform.map(line_x)
 
         self.axis_line_symbol.renderPolyline(line_x, None, self.context)
 
-        line_y = QPolygonF([self.point_lines_start, self.point_line_y_end])
+        line_y = QPolygonF([self.arrow_y_start_point, self.arrow_y_end_point])
 
         line_y = self.transform.map(line_y)
 
