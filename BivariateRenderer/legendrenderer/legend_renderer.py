@@ -55,6 +55,8 @@ class LegendRenderer:
     color_separator_width_percent: float
     color_separator_color: QColor
 
+    use_category_midpoints: bool
+
     def __init__(self):
 
         self._painter = None
@@ -79,6 +81,9 @@ class LegendRenderer:
 
         self.color_separator_width_percent = 3
         self.color_separator_color = QColor("#ffffff")
+
+
+        self.use_category_midpoints = False
 
     def set_size_context(self, width: float, height: float) -> None:
 
@@ -495,13 +500,21 @@ class LegendRenderer:
 
             y = self.height - self.text_height_max_with_margin
 
-        return QPointF(self.polygon_start_pos_x + index * self.size_constant, y)
+        x = self.polygon_start_pos_x + index * self.size_constant
+
+        if self.categories_midpoint:
+            x += self.size_constant / 2
+
+        return QPointF(x, y)
 
     def position_axis_tick_y(self, index: int) -> QPointF:
 
         x = self.text_height_max_with_margin + self.axis_tick_text_height
 
         y = index * self.size_constant
+
+        if self.categories_midpoint:
+            y += self.size_constant / 2
 
         if self.legend_rotated:
 
@@ -520,6 +533,10 @@ class LegendRenderer:
                     x = self.text_height_max_with_margin
 
         return QPointF(x, y)
+
+    @property
+    def categories_midpoint(self) -> bool:
+        return len(self.texts_axis_x_ticks) == math.sqrt(self._polygons_count)
 
     def draw_values(self) -> None:
 
