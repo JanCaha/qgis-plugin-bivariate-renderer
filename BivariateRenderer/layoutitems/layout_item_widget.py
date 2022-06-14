@@ -1,7 +1,5 @@
-from pathlib import Path
-
 from qgis.PyQt.QtWidgets import (QComboBox, QVBoxLayout, QLabel, QCheckBox, QPlainTextEdit,
-                                 QSpinBox)
+                                 QSpinBox, QDoubleSpinBox)
 
 from qgis.PyQt.QtGui import QIcon
 
@@ -153,10 +151,25 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.b_line_symbol.changed.connect(self.pass_linesymbol)
 
+        self.arrows_start_same_point = QCheckBox("Arrows start at common point")
+        self.arrows_start_same_point.setChecked(self.layout_item.arrows_common_start_point)
+        self.arrows_start_same_point.stateChanged.connect(self.pass_arrow_start_same_point)
+
+        self.arrow_width = QDoubleSpinBox()
+        self.arrow_width.setMinimum(0.01)
+        self.arrow_width.setMaximum(15.0)
+        self.arrow_width.setValue(self.layout_item.arrow_width)
+        self.arrow_width.setDecimals(1)
+        self.arrow_width.setSuffix("%")
+        self.arrow_width.valueChanged.connect(self.pass_arrow_width)
+
         cg_axes_arrows_layout.addWidget(QLabel("Use axis arrows in legend"))
         cg_axes_arrows_layout.addWidget(self.add_arrows)
         cg_axes_arrows_layout.addWidget(QLabel("Arrow style"))
         cg_axes_arrows_layout.addWidget(self.b_line_symbol)
+        cg_axes_arrows_layout.addWidget(QLabel("Arrow width (in % of legend)"))
+        cg_axes_arrows_layout.addWidget(self.arrow_width)
+        cg_axes_arrows_layout.addWidget(self.arrows_start_same_point)
 
         cg_axes_arrows.setLayout(cg_axes_arrows_layout)
 
@@ -164,7 +177,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     def widget_text_axes(self) -> QgsCollapsibleGroupBoxBasic:
 
-        cg_axes_descriptions = QgsCollapsibleGroupBoxBasic('Axes Descritions')
+        cg_axes_descriptions = QgsCollapsibleGroupBoxBasic('Axes Descriptions')
         cg_axes_descriptions_layout = QVBoxLayout()
 
         self.b_font = QgsFontButton()
@@ -215,39 +228,35 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.add_axes_values_text.setChecked(self.layout_item.add_axes_values_texts)
         self.add_axes_values_text.stateChanged.connect(self.update_add_axes_values_text)
 
+        self.ticks_use_midpoint = QCheckBox("Use midpoints instead of category breaks")
+        self.ticks_use_midpoint.setChecked(self.layout_item.ticks_use_category_midpoints)
+        self.ticks_use_midpoint.stateChanged.connect(self.pass_use_midpoint)
+
         self.ticks_precision_x = QSpinBox()
         self.ticks_precision_x.setMinimum(0)
         self.ticks_precision_x.setMaximum(15)
-        self.ticks_precision_x.setValue(2)
-
-        if self.layout_item.ticks_x_precision:
-            self.ticks_precision_x.setValue(self.layout_item.ticks_x_precision)
+        self.ticks_precision_x.setValue(self.layout_item.ticks_x_precision)
 
         self.ticks_precision_x.valueChanged.connect(self.pass_precisions)
 
         self.ticks_precision_y = QSpinBox()
         self.ticks_precision_y.setMinimum(0)
         self.ticks_precision_y.setMaximum(15)
-        self.ticks_precision_y.setValue(2)
-
-        if self.layout_item.ticks_y_precision:
-            self.ticks_precision_y.setValue(self.layout_item.ticks_y_precision)
+        self.ticks_precision_y.setValue(self.layout_item.ticks_y_precision)
 
         self.ticks_precision_y.valueChanged.connect(self.pass_precisions)
 
         self.space_above_ticks = QSpinBox()
         self.space_above_ticks.setMinimum(0)
         self.space_above_ticks.setMaximum(100)
-        self.space_above_ticks.setValue(10)
         self.space_above_ticks.setSuffix("px")
-
-        if self.layout_item.space_above_ticks:
-            self.space_above_ticks.setValue(int(self.layout_item.space_above_ticks))
+        self.space_above_ticks.setValue(int(self.layout_item.space_above_ticks))
 
         self.space_above_ticks.valueChanged.connect(self.pass_space)
 
         cg_axes_descriptions_layout.addWidget(QLabel("Use axes values texts in legend"))
         cg_axes_descriptions_layout.addWidget(self.add_axes_values_text)
+        cg_axes_descriptions_layout.addWidget(self.ticks_use_midpoint)
         cg_axes_descriptions_layout.addWidget(QLabel("Font"))
         cg_axes_descriptions_layout.addWidget(self.b_font_values)
         cg_axes_descriptions_layout.addWidget(QLabel("Values precision on X axis"))
@@ -292,6 +301,19 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         return cg_color_separator
 
+    def pass_arrow_width(self):
+        self.layout_item.beginCommand(self.tr('Arrow width'), QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.set_arrow_width(self.arrow_width.value())
+        self.layout_item.endCommand()
+
+    def pass_arrow_start_same_point(self):
+        self.layout_item.beginCommand(self.tr('Arrows start at the same point'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.set_arrows_common_start_point(self.arrows_start_same_point.isChecked())
+        self.layout_item.endCommand()
+
     def pass_use_color_spacer(self):
         self.layout_item.beginCommand(self.tr('Use color spacer'), QgsLayoutItem.UndoCustomCommand)
 
@@ -301,15 +323,19 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     def pass_width_percent(self):
         self.layout_item.beginCommand(self.tr('Change color spacer width'),
                                       QgsLayoutItem.UndoCustomCommand)
-
         self.layout_item.set_color_separator_width(self.color_spacer_width.value())
         self.layout_item.endCommand()
 
     def pass_color(self):
         self.layout_item.beginCommand(self.tr('Change color spacer color'),
                                       QgsLayoutItem.UndoCustomCommand)
-
         self.layout_item.set_color_separator_color(self.color_spacer_color.color())
+        self.layout_item.endCommand()
+
+    def pass_use_midpoint(self):
+        self.layout_item.beginCommand(self.tr('Use midpoints instead of category breaks'),
+                                      QgsLayoutItem.UndoCustomCommand)
+        self.layout_item.set_ticks_use_category_midpoints(self.ticks_use_midpoint.isChecked())
         self.layout_item.endCommand()
 
     def pass_space(self):
