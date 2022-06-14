@@ -45,6 +45,11 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     color_separator_width: float
     color_separator_color: QColor
 
+    arrows_common_start_point: bool
+    arrow_width: float
+
+    ticks_use_category_midpoints: bool
+
     def __init__(self, layout: QgsLayout):
 
         super().__init__(layout)
@@ -66,6 +71,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.add_axes_values_texts = False
         self.add_colors_separators = False
 
+        self.arrows_common_start_point = False
+        self.arrow_width = 5
+
         self.color_separator_width = 5
         self.color_separator_color = QColor("#ffffff")
 
@@ -75,6 +83,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.ticks_y_precision = 2
 
         self.space_above_ticks = 10
+
+        self.ticks_use_category_midpoints = False
 
     def to_legend_renderer(self) -> LegendRenderer:
 
@@ -109,6 +119,12 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.color_separator_width_percent = self.color_separator_width
         legend_render.color_separator_color = self.color_separator_color
 
+        legend_render.arrows_common_start_point = self.arrows_common_start_point
+
+        legend_render.arrow_width_percent = self.arrow_width
+
+        legend_render.use_category_midpoints = self.ticks_use_category_midpoints
+
         return legend_render
 
     def draw(self, context: QgsLayoutItemRenderContext) -> None:
@@ -139,12 +155,19 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("ticks_x_precision", str(self.ticks_x_precision))
         bivariate_legend_element.setAttribute("ticks_y_precision", str(self.ticks_y_precision))
         bivariate_legend_element.setAttribute("space_above_ticks", str(self.space_above_ticks))
+        bivariate_legend_element.setAttribute("ticks_use_category_midpoints",
+                                              str(self.ticks_use_category_midpoints))
+
         bivariate_legend_element.setAttribute("draw_colors_separators",
                                               str(self.add_colors_separators))
         bivariate_legend_element.setAttribute("color_separator_width",
                                               str(self.color_separator_width))
         bivariate_legend_element.setAttribute("color_separator_color",
                                               self.color_separator_color.name())
+
+        bivariate_legend_element.setAttribute("arrows_common_start_point",
+                                              str(self.arrows_common_start_point))
+        bivariate_legend_element.setAttribute("arrow_width", str(self.arrow_width))
 
         line_symbol = doc.createElement("lineSymbol")
 
@@ -207,12 +230,17 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.ticks_y_precision = int(element.attribute("ticks_y_precision"))
 
         self.space_above_ticks = int(element.attribute("space_above_ticks"))
+        self.ticks_use_category_midpoints = element.attribute(
+            "ticks_use_category_midpoints") == "True"
 
         self.legend_rotated = element.attribute("legend_rotated") == "True"
 
         self.add_axes_texts = element.attribute("draw_axes_text") == "True"
 
         self.add_axes_arrows = element.attribute("draw_axes_arrow") == "True"
+
+        self.arrows_common_start_point = element.attribute("arrows_common_start_point") == "True"
+        self.arrow_width = float(element.attribute("arrow_width"))
 
         self.y_axis_rotation = float(element.attribute("y_axis_rotation"))
 
@@ -319,6 +347,21 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_draw_color_separator(self, draw: bool) -> None:
         self.add_colors_separators = draw
+
+        self.refresh()
+
+    def set_arrows_common_start_point(self, use_common_point: bool) -> None:
+        self.arrows_common_start_point = use_common_point
+
+        self.refresh()
+
+    def set_arrow_width(self, width: float) -> None:
+        self.arrow_width = width
+
+        self.refresh()
+
+    def set_ticks_use_category_midpoints(self, use: bool) -> None:
+        self.ticks_use_category_midpoints = use
 
         self.refresh()
 
