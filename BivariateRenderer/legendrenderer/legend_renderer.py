@@ -454,7 +454,7 @@ class LegendRenderer:
     @property
     def axis_tick_last_y_value_width(self) -> float:
 
-        if self.add_axes_ticks_texts:
+        if self.add_axes_ticks_texts and not self.use_category_midpoints:
 
             return QgsTextRenderer.textWidth(self.context,
                                              self.text_format_ticks,
@@ -469,7 +469,7 @@ class LegendRenderer:
     @property
     def axis_tick_last_x_value_width(self) -> float:
 
-        if self.add_axes_ticks_texts:
+        if self.add_axes_ticks_texts and not self.use_category_midpoints:
 
             return QgsTextRenderer.textWidth(self.context,
                                              self.text_format_ticks,
