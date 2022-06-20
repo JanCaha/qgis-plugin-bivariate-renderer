@@ -295,7 +295,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         classification_method = self.classification_methods[
             self.cb_classification_methods.currentText()]
 
-        self.bivariate_renderer.setClassificationMethodName(classification_method)
+        self.bivariate_renderer.setClassificationMethod(classification_method)
 
         self.setField1Classes()
         self.setField2Classes()
