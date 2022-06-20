@@ -2,10 +2,11 @@ from typing import List
 import math
 
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
-from qgis.PyQt.QtGui import QPolygonF, QBrush, QPainter, QTransform, QColor, QPen
+from qgis.PyQt.QtGui import QPolygonF, QPainter, QTransform, QColor, QPen
 
 from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer,
-                       QgsBasicNumericFormat, QgsNumericFormatContext, QgsLineString, QgsPoint)
+                       QgsBasicNumericFormat, QgsNumericFormatContext, QgsLineString, QgsPoint,
+                       QgsFillSymbol)
 
 from ..renderer.bivariate_renderer import LegendPolygon, BivariateRenderer
 from ..utils import default_line_symbol
@@ -61,6 +62,10 @@ class LegendRenderer:
 
     use_category_midpoints: bool
 
+    symbol_rectangle_without_values: QgsFillSymbol
+    replace_rectangle_without_values: bool
+    use_rectangle_without_values_color_from_legend: bool
+
     def __init__(self):
 
         self._painter = None
@@ -89,6 +94,10 @@ class LegendRenderer:
         self.arrow_width_percent = 5
 
         self.use_category_midpoints = False
+
+        self.replace_rectangle_without_values = False
+        self.use_rectangle_without_values_color_from_legend = True
+        self.symbol_rectangle_without_values = QgsFillSymbol.createSimple({})
 
     def set_size_context(self, width: float, height: float) -> None:
 
@@ -346,16 +355,28 @@ class LegendRenderer:
 
         for polygon in polygons:
 
-            self.painter.setBrush(QBrush(polygon.symbol.color()))
-
-            polygon = QPolygonF(
+            polygon_draw = QPolygonF(
                 QRectF(self.polygon_start_pos_x + polygon.x * self.size_constant,
                        self.polygon_start_pos_y - (polygon.y + 1) * self.size_constant,
                        self.size_constant, self.size_constant))
 
-            polygon = self.transform.map(polygon)
+            polygon_draw = self.transform.map(polygon_draw)
 
-            self.painter.drawPolygon(polygon)
+            if self.replace_rectangle_without_values and polygon.exist_in_map is False:
+
+                if self.use_rectangle_without_values_color_from_legend:
+                    self.symbol_rectangle_without_values.setColor(polygon.symbol.color())
+
+                self.symbol_rectangle_without_values.startRender(self.context)
+                self.symbol_rectangle_without_values.renderPolygon(polygon_draw, None, None,
+                                                                   self.context)
+                self.symbol_rectangle_without_values.stopRender(self.context)
+
+            else:
+
+                polygon.symbol.startRender(self.context)
+                polygon.symbol.renderPolygon(polygon_draw, None, None, self.context)
+                polygon.symbol.stopRender(self.context)
 
     def draw_axes_arrows(self) -> None:
 
