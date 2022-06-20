@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from dataclasses import dataclass
 
 from qgis.PyQt.QtGui import QColor
@@ -43,7 +43,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.color_ramp_1 = None
         self.color_ramp_2 = None
 
-        self.cached = {}
+        self.cached_symbols: Dict[str, QgsFillSymbol] = {}
+        self.labels_existing: List[str] = []
 
     def __repr__(self) -> str:
         return f"BivariateRenderer with {self.number_classes} classes for each attribute, " \
@@ -53,7 +54,7 @@ class BivariateRenderer(QgsFeatureRenderer):
                f"field 2 vals {self.field_2_min};{self.field_2_max} "
 
     def _reset_cache(self):
-        self.cached = {}
+        self.cached_symbols = {}
 
     def setColorMixingMethod(self, method: ColorMixingMethod) -> None:
         self.color_mixing_method = method
@@ -137,8 +138,12 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return self._positionValue(value, self.field_2_classes)
 
-    def getFeatureValueCombinationHash(self, value1: int, value2: int) -> str:
-        return f"{value1}-{value2}"
+    def getFeatureCombinationHash(self, feature: QgsFeature) -> str:
+        position_value1, position_value2 = self.position_values(feature)
+        return self.getPositionValuesCombinationHash(position_value1, position_value2)
+
+    def getPositionValuesCombinationHash(self, value1: int, value2: int) -> str:
+        return f"{value1 + 1}-{value2 + 1}"
 
     def getFeatureColor(self, position_value1: int, position_value2: int) -> QColor:
 
@@ -149,31 +154,37 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return result_color
 
-    def symbolForFeature(self, feature: QgsFeature, context):
-
+    def position_values(self, feature: QgsFeature) -> Tuple[int, int]:
         value1 = feature.attribute(self.field_name_1)
         value2 = feature.attribute(self.field_name_2)
 
         position_value1 = self.positionValueField1(value1)
         position_value2 = self.positionValueField2(value2)
 
-        identifier = self.getFeatureValueCombinationHash(position_value1, position_value2)
+        return (position_value1, position_value2)
 
-        if identifier not in self.cached:
+    def symbolForFeature(self, feature: QgsFeature, context):
+
+        position_value1, position_value2 = self.position_values(feature)
+
+        identifier = self.getPositionValuesCombinationHash(position_value1, position_value2)
+
+        if identifier not in self.cached_symbols:
             feature_symbol = self.get_default_symbol()
             feature_symbol.setColor(self.getFeatureColor(position_value1, position_value2))
 
-            self.cached[identifier] = feature_symbol.clone()
+            self.cached_symbols[identifier] = feature_symbol.clone()
+            self.labels_existing.append(identifier)
 
-        self.cached[identifier].startRender(context)
+        self.cached_symbols[identifier].startRender(context)
 
-        return self.cached[identifier]
+        return self.cached_symbols[identifier]
 
     def startRender(self, context, fields):
         super().startRender(context, fields)
 
     def stopRender(self, context):
-        for s in list(self.cached.values()):
+        for s in list(self.cached_symbols.values()):
             s.stopRender(context)
         super().stopRender(context)
 
@@ -181,7 +192,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         return [self.field_name_1, self.field_name_2]
 
     def symbols(self, context):
-        return list(self.cached.values())
+        return list(self.cached_symbols.values())
 
     def clone(self) -> QgsFeatureRenderer:
         r = BivariateRenderer()
@@ -194,7 +205,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.field_1_classes = self.field_1_classes
         r.field_2_classes = self.field_2_classes
         r.setColorMixingMethod(self.color_mixing_method)
-        r.cached = self.cached
+        r.cached_symbols = self.cached_symbols
+        r.labels_existing = self.labels_existing
 
         return r
 
@@ -257,13 +269,20 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         symbols_elem = doc.createElement("symbols")
 
-        for symbol in self.cached.keys():
+        for symbol in self.cached_symbols.keys():
             symbol_elem = doc.createElement('symbol')
-            symbol_elem.setAttribute("color", self.cached[symbol].color().name())
+            symbol_elem.setAttribute("color", self.cached_symbols[symbol].color().name())
             symbol_elem.setAttribute("label", symbol)
             symbols_elem.appendChild(symbol_elem)
 
         renderer_elem.appendChild(symbols_elem)
+
+        number_classes_elem = doc.createElement('existing_labels')
+        labels = ""
+        if self.existing_labels():
+            labels = "|".join(self.labels_existing)
+        number_classes_elem.setAttribute("value", labels)
+        renderer_elem.appendChild(number_classes_elem)
 
         return renderer_elem
 
@@ -274,7 +293,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         r.setFieldName1(element.firstChildElement("field_name_1").attribute("name"))
         r.setFieldName2(element.firstChildElement("field_name_2").attribute("name"))
-        element.firstChildElement("number_of_classes").attributes().item(0)
 
         r.setNumberOfClasses(int(
             element.firstChildElement("number_of_classes").attribute("value")))
@@ -341,10 +359,16 @@ class BivariateRenderer(QgsFeatureRenderer):
                 symbol = BivariateRenderer.get_default_symbol()
                 symbol.setColor(color)
 
-                r.setLegendSymbolItem(label, symbol.clone())
-                r.cached[label] = symbol
+                r.cached_symbols[label] = symbol
 
             symbol_elem = symbol_elem.nextSiblingElement()
+
+        labels_value = element.firstChildElement("existing_labels").attribute("value")
+        labels = []
+        if labels_value != "":
+            labels = labels_value.split("|")
+
+        r.labels_existing = labels
 
         return r
 
@@ -365,21 +389,15 @@ class BivariateRenderer(QgsFeatureRenderer):
 
     def symbol_for_values(self, value1: int, value2: int) -> QgsFillSymbol:
 
-        identifier = self.getFeatureValueCombinationHash(value1, value2)
+        identifier = self.getPositionValuesCombinationHash(value1, value2)
 
-        if identifier not in self.cached:
+        if identifier not in self.cached_symbols:
             feature_symbol = self.get_default_symbol()
             feature_symbol.setColor(self.getFeatureColor(value1, value2))
 
-            self.cached[identifier] = feature_symbol.clone()
+            self.cached_symbols[identifier] = feature_symbol.clone()
 
-        return self.cached[identifier]
-
-    def legend_polygon_size(self, width: float) -> float:
-
-        size_constant = width / self.number_classes
-
-        return size_constant
+        return self.cached_symbols[identifier]
 
     def generate_legend_polygons(self) -> List[LegendPolygon]:
 
@@ -389,7 +407,16 @@ class BivariateRenderer(QgsFeatureRenderer):
 
             for y, field_2_cat in enumerate(self.field_2_classes):
 
-                polygons.append(LegendPolygon(x=x, y=y, symbol=self.symbol_for_values(x, y)))
+                exist = True
+
+                if self.getPositionValuesCombinationHash(x, y) not in self.existing_labels():
+                    exist = False
+
+                polygons.append(
+                    LegendPolygon(x=x,
+                                  y=y,
+                                  symbol=self.symbol_for_values(x, y),
+                                  exist_in_map=exist))
 
         return polygons
 
@@ -440,19 +467,25 @@ class BivariateRenderer(QgsFeatureRenderer):
     def field_1_labels(self) -> List[float]:
         return self.classes_to_legend_breaks(self.field_1_classes)
 
+    def legendSymbolItem(self, identifier: str) -> QgsLegendSymbolItem:
+        return QgsLegendSymbolItem(self.cached_symbols[identifier], identifier, "")
+
     def legendSymbolItems(self) -> List[QgsLegendSymbolItem]:
         legend_items = []
-        for element in self.cached.keys():
-            legend_item = QgsLegendSymbolItem(self.cached[element], element, "")
-            legend_items.append(legend_item)
+        for identifier in sorted(self.cached_symbols.keys()):
+            if identifier in self.labels_existing:
+                legend_items.append(self.legendSymbolItem(identifier))
         return legend_items
+
+    def existing_labels(self) -> List[str]:
+        return [x for x in sorted(self.labels_existing)]
 
     def generateCategories(self):
 
         for x in range(self.number_classes):
             for y in range(self.number_classes):
-                identifier = self.getFeatureValueCombinationHash(x, y)
-                self.cached[identifier] = self.symbol_for_values(x, y)
+                identifier = self.getPositionValuesCombinationHash(x, y)
+                self.cached_symbols[identifier] = self.symbol_for_values(x, y)
 
 
 @dataclass
@@ -461,3 +494,4 @@ class LegendPolygon:
     x: float
     y: float
     symbol: QgsFillSymbol
+    exist_in_map: bool = True
