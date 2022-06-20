@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import (QComboBox, QVBoxLayout, QLabel, QCheckBox, QPla
 from qgis.PyQt.QtGui import QIcon
 
 from qgis.core import (QgsLayoutItem, QgsProject, QgsVectorLayer, QgsMapLayer, QgsMapLayerType,
-                       QgsSymbol)
+                       Qgis)
 
 from qgis.gui import (QgsLayoutItemBaseWidget, QgsLayoutItemAbstractGuiMetadata, QgsFontButton,
                       QgsSymbolButton, QgsCollapsibleGroupBoxBasic, QgsColorButton)
@@ -143,7 +143,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.add_arrows.stateChanged.connect(self.update_add_axes_arrow)
 
         self.b_line_symbol = QgsSymbolButton(self, "Arrow")
-        self.b_line_symbol.setSymbolType(QgsSymbol.Line)
+        self.b_line_symbol.setSymbolType(Qgis.SymbolType.Line)
         self.b_line_symbol.setMinimumWidth(50)
 
         if self.layout_item.line_format:
