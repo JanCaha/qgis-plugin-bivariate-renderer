@@ -81,6 +81,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.form_layout.addWidget(self.widget_rotate_y_axis_texts())
 
+        self.form_layout.addWidget(self.widget_non_existing_symbols())
+
         self.setLayout(self.form_layout)
 
         self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
@@ -132,6 +134,37 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         cg_rotate.setLayout(cg_rotate_layout)
 
         return cg_rotate
+
+    def widget_non_existing_symbols(self) -> QgsCollapsibleGroupBoxBasic:
+
+        cg_nonexisting_symbol = QgsCollapsibleGroupBoxBasic('Symbol that do not exist in values')
+        cg_nonexisting_symbol_layout = QVBoxLayout()
+
+        self.replace_empty_symbols = QCheckBox("Replace symbols without values")
+        self.replace_empty_symbols.setChecked(self.layout_item.replace_rectangle_without_values)
+        self.replace_empty_symbols.stateChanged.connect(
+            self.pass_rectangle_without_values_settings)
+
+        self.empty_symbol = QgsSymbolButton()
+        self.empty_symbol.setMinimumWidth(50)
+        self.empty_symbol.setMaximumWidth(150)
+        self.empty_symbol.setSymbolType(Qgis.SymbolType.Fill)
+        self.empty_symbol.setSymbol(self.layout_item.symbol_rectangle_without_values.clone())
+        self.empty_symbol.changed.connect(self.pass_rectangle_without_values_settings)
+
+        self.replace_symbol_color = QCheckBox("Replace symbol color by color from legend")
+        self.replace_symbol_color.setChecked(
+            self.layout_item.use_rectangle_without_values_color_from_legend)
+        self.replace_symbol_color.stateChanged.connect(self.pass_rectangle_without_values_settings)
+
+        cg_nonexisting_symbol_layout.addWidget(self.replace_empty_symbols)
+        cg_nonexisting_symbol_layout.addWidget(QLabel("Replacement symbol"))
+        cg_nonexisting_symbol_layout.addWidget(self.empty_symbol)
+        cg_nonexisting_symbol_layout.addWidget(self.replace_symbol_color)
+
+        cg_nonexisting_symbol.setLayout(cg_nonexisting_symbol_layout)
+
+        return cg_nonexisting_symbol
 
     def widget_arrow_axes(self) -> QgsCollapsibleGroupBoxBasic:
 
@@ -300,6 +333,17 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         cg_color_separator.setLayout(cg_color_separator_layout)
 
         return cg_color_separator
+
+    def pass_rectangle_without_values_settings(self):
+
+        self.layout_item.beginCommand(self.tr('Rectangle without values settings'),
+                                      QgsLayoutItem.UndoCustomCommand)
+
+        self.layout_item.set_rectangle_without_values_settings(
+            self.replace_empty_symbols.isChecked(),
+            self.empty_symbol.symbol().clone(), self.replace_symbol_color.isChecked())
+
+        self.layout_item.endCommand()
 
     def pass_arrow_width(self):
         self.layout_item.beginCommand(self.tr('Arrow width'), QgsLayoutItem.UndoCustomCommand)

@@ -5,10 +5,10 @@ from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, QgsVectorLayer,
                        QgsTextFormat, QgsLayoutItemRenderContext, QgsLineSymbol,
                        QgsReadWriteContext, QgsSymbolLayerUtils, QgsSymbol, QgsProject,
-                       QgsMapLayerType)
+                       QgsMapLayerType, QgsFillSymbol)
 
 from ..text_constants import Texts, IDS
-from ..utils import default_line_symbol, get_icon
+from ..utils import default_line_symbol, get_icon, log, get_symbol_dict
 from ..renderer.bivariate_renderer import BivariateRenderer
 
 from ..legendrenderer.legend_renderer import LegendRenderer
@@ -28,6 +28,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     text_format: QgsTextFormat
     text_values_format: QgsTextFormat
     line_format: QgsSymbol
+
+    symbol_rectangle_without_values: QgsFillSymbol
+    replace_rectangle_without_values: bool
+    use_rectangle_without_values_color_from_legend: bool
 
     legend_rotated: bool
     add_axes_arrows: bool
@@ -86,6 +90,17 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.ticks_use_category_midpoints = False
 
+        self.symbol_rectangle_without_values = QgsFillSymbol.createSimple({
+            "color": "255,255,255,0",
+            'style': 'no',
+            'outline_color': '247,247,247,0',
+            'outline_style': 'solid',
+            'outline_width': '0'
+        })
+
+        self.replace_rectangle_without_values = False
+        self.use_rectangle_without_values_color_from_legend = False
+
     def to_legend_renderer(self) -> LegendRenderer:
 
         legend_render = LegendRenderer()
@@ -124,6 +139,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.arrow_width_percent = self.arrow_width
 
         legend_render.use_category_midpoints = self.ticks_use_category_midpoints
+
+        legend_render.replace_rectangle_without_values = self.replace_rectangle_without_values
+        legend_render.use_rectangle_without_values_color_from_legend = self.use_rectangle_without_values_color_from_legend
+        legend_render.symbol_rectangle_without_values = self.symbol_rectangle_without_values
 
         return legend_render
 
@@ -188,6 +207,21 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         text_axes_values_format.appendChild(text_elem)
 
         bivariate_legend_element.appendChild(text_axes_values_format)
+
+        bivariate_legend_element.setAttribute("replace_empty_rectangles",
+                                              str(self.replace_rectangle_without_values))
+        bivariate_legend_element.setAttribute(
+            "empty_rectangle_use_legend_color",
+            str(self.use_rectangle_without_values_color_from_legend))
+
+        empty_polygon_symbol_elem = doc.createElement("emptyPolygonSymbol")
+
+        symbol_elem = QgsSymbolLayerUtils.saveSymbol("", self.symbol_rectangle_without_values, doc,
+                                                     context)
+
+        empty_polygon_symbol_elem.appendChild(symbol_elem)
+
+        bivariate_legend_element.appendChild(empty_polygon_symbol_elem)
 
         if self.layer:
             bivariate_legend_element.setAttribute("vectorLayerId", self.layer.id())
@@ -257,6 +291,16 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.add_colors_separators = element.attribute("draw_colors_separators") == "True"
         self.color_separator_width = int(element.attribute("color_separator_width"))
         self.color_separator_color = QColor(element.attribute("color_separator_color"))
+
+        self.replace_rectangle_without_values = element.attribute(
+            "replace_empty_rectangles") == "True"
+        self.use_rectangle_without_values_color_from_legend = element.attribute(
+            "empty_rectangle_use_legend_color") == "True"
+
+        empty_polygon_symbol_elem = element.firstChildElement("emptyPolygonSymbol")
+
+        symbolElem = empty_polygon_symbol_elem.firstChildElement("symbol")
+        self.symbol_rectangle_without_values = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
 
         return True
 
@@ -362,6 +406,15 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_ticks_use_category_midpoints(self, use: bool) -> None:
         self.ticks_use_category_midpoints = use
+
+        self.refresh()
+
+    def set_rectangle_without_values_settings(self, use: bool, symbol: QgsFillSymbol,
+                                              color_from_legend: bool) -> None:
+
+        self.symbol_rectangle_without_values = symbol
+        self.replace_rectangle_without_values = use
+        self.use_rectangle_without_values_color_from_legend = color_from_legend
 
         self.refresh()
 
