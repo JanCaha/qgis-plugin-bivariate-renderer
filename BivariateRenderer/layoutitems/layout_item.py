@@ -321,7 +321,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def set_axis_texts_settings(self, draw: bool, text_format: QgsTextFormat, axis_x_text: str,
                                 axis_y_text: str) -> None:
-        self.text_format = text_format.cl
+        self.text_format = text_format
         self.add_axes_texts = draw
         self.text_axis_x = axis_x_text
         self.text_axis_y = axis_y_text
