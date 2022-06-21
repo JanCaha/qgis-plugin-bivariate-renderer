@@ -1,8 +1,8 @@
 import os
 import pytest
 
-from qgis.PyQt.QtGui import QPainter
-from qgis.core import (QgsLayoutUtils)
+from qgis.PyQt.QtGui import QPainter, QColor
+from qgis.core import (QgsLayoutUtils, QgsRenderContext)
 
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
@@ -451,3 +451,40 @@ def test_legend_ticks_midpoints(qgis_countries_layer, qgs_project, qgs_layout,
     painter.end()
 
     image.save("./tests/images/correct/legend_with_values_ticks_midpoints.png", "PNG")
+
+
+@skip_setting
+def test_generate_legend_empty_squares(qgis_countries_layer, qgs_project, qgs_layout,
+                                       prepare_default_QImage, prepare_bivariate_renderer):
+
+    legend_size = 500
+
+    image = prepare_default_QImage(legend_size)
+
+    painter = QPainter(image)
+
+    render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
+
+    assert render_context
+
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
+                                                    field1="fid",
+                                                    field2="fid")
+
+    legend_renderer = LegendRenderer()
+
+    legend_renderer.add_colors_separators = True
+    legend_renderer.color_separator_width_percent = 5
+    legend_renderer.replace_rectangle_without_values = True
+    legend_renderer.use_rectangle_without_values_color_from_legend = False
+    legend_renderer.symbol_rectangle_without_values.setColor(QColor("#ffffff"))
+
+    for feature in qgis_countries_layer.getFeatures():
+        bivariate_renderer.symbolForFeature(feature, QgsRenderContext())
+
+    legend_renderer.render_legend(render_context, legend_size / render_context.scaleFactor(),
+                                  legend_size / render_context.scaleFactor(), bivariate_renderer)
+
+    painter.end()
+
+    image.save("./tests/images/correct/legend_replaced_missing_values.png", "PNG")
