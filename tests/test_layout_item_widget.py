@@ -25,8 +25,6 @@ def test_layout_item_widget(qgis_countries_layer: QgsVectorLayer, qgs_layout, qg
     layout_item = BivariateRendererLayoutItem(qgs_layout)
     layout_item.set_linked_layer(qgis_countries_layer)
 
-    layout_item.set_line_format(default_line_symbol())
-
     assert isinstance(layout_item, BivariateRendererLayoutItem)
 
     assert isinstance(qgis_parent, QMainWindow)
@@ -66,8 +64,6 @@ def test_visual(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, q
 
     layout_item = BivariateRendererLayoutItem(qgs_layout)
     layout_item.set_linked_layer(qgis_countries_layer)
-
-    layout_item.set_line_format(default_line_symbol())
 
     widget = BivariateRendererLayoutItemWidget(None, layout_item)
 
