@@ -46,8 +46,6 @@ def test_generate_widget_layout_item(qgis_countries_layer: QgsVectorLayer, qgs_l
     layout_item = BivariateRendererLayoutItem(qgs_layout)
     layout_item.set_linked_layer(qgis_countries_layer)
 
-    layout_item.set_line_format(default_line_symbol())
-
     widget = BivariateRendererLayoutItemWidget(None, layout_item)
 
     widget.show()
