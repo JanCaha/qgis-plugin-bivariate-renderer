@@ -314,11 +314,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_text_format(self, text_format: QgsTextFormat) -> None:
-        self.text_format = text_format
-
-        self.refresh()
-
     def set_text_values_format(self, text_format: QgsTextFormat) -> None:
         self.text_values_format = text_format
 
@@ -329,13 +324,12 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_axis_x_name(self, name: str) -> None:
-        self.text_axis_x = name
-
-        self.refresh()
-
-    def set_axis_y_name(self, name: str) -> None:
-        self.text_axis_y = name
+    def set_axis_texts_settings(self, draw: bool, text_format: QgsTextFormat, axis_x_text: str,
+                                axis_y_text: str) -> None:
+        self.text_format = text_format.cl
+        self.add_axes_texts = draw
+        self.text_axis_x = axis_x_text
+        self.text_axis_y = axis_y_text
 
         self.refresh()
 
@@ -347,11 +341,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def are_labels_default(self) -> bool:
 
         return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
-
-    def set_draw_axes_text(self, draw: bool) -> None:
-        self.add_axes_texts = draw
-
-        self.refresh()
 
     def set_draw_axes_values(self, draw: bool) -> None:
         self.add_axes_values_texts = draw

@@ -215,25 +215,25 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.b_font = QgsFontButton()
         self.b_font.setTextFormat(self.layout_item.text_format)
-        self.b_font.changed.connect(self.pass_textformat_to_item)
+        self.b_font.changed.connect(self.pass_axis_texts_settings)
 
         self.add_axes_text = QCheckBox("Add axes texts")
         self.add_axes_text.setChecked(self.layout_item.add_axes_texts)
-        self.add_axes_text.stateChanged.connect(self.update_add_axes_text)
+        self.add_axes_text.stateChanged.connect(self.pass_axis_texts_settings)
 
         self.axis_x_name = QPlainTextEdit()
 
         if self.layout_item.text_axis_x:
             self.axis_x_name.setPlainText(self.layout_item.text_axis_x)
 
-        self.axis_x_name.textChanged.connect(self.update_axis_x)
+        self.axis_x_name.textChanged.connect(self.pass_axis_texts_settings)
 
         self.axis_y_name = QPlainTextEdit()
 
         if self.layout_item.text_axis_y:
             self.axis_y_name.setPlainText(self.layout_item.text_axis_y)
 
-        self.axis_y_name.textChanged.connect(self.update_axis_y)
+        self.axis_y_name.textChanged.connect(self.pass_axis_texts_settings)
 
         cg_axes_descriptions_layout.addWidget(QLabel("Use axes texts in legend"))
         cg_axes_descriptions_layout.addWidget(self.add_axes_text)
@@ -381,28 +381,19 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                                               self.ticks_precision_y.value())
         self.layout_item.endCommand()
 
-    def pass_textformat_to_item(self):
-        self.layout_item.beginCommand(self.tr('Change text format'),
+    def pass_axis_texts_settings(self):
+        self.layout_item.beginCommand(self.tr('Axis texts settings'),
                                       QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_text_format(self.b_font.textFormat())
+        self.layout_item.set_axis_texts_settings(self.add_axes_text.isChecked(),
+                                                 self.b_font.textFormat(),
+                                                 self.axis_x_name.toPlainText(),
+                                                 self.axis_y_name.toPlainText())
         self.layout_item.endCommand()
 
     def pass_textformat_values_to_item(self):
         self.layout_item.beginCommand(self.tr('Change text values format'),
                                       QgsLayoutItem.UndoCustomCommand)
         self.layout_item.set_text_values_format(self.b_font_values.textFormat())
-        self.layout_item.endCommand()
-
-    def update_axis_x(self):
-        self.layout_item.beginCommand(self.tr('Change change x axis name'),
-                                      QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_axis_x_name(self.axis_x_name.toPlainText())
-        self.layout_item.endCommand()
-
-    def update_axis_y(self):
-        self.layout_item.beginCommand(self.tr('Change change y axis name'),
-                                      QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_axis_y_name(self.axis_y_name.toPlainText())
         self.layout_item.endCommand()
 
     def update_rotate_legend(self):
@@ -415,11 +406,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
             self.rotate_direction.setEnabled(False)
         else:
             self.rotate_direction.setEnabled(True)
-
-    def update_add_axes_text(self):
-        self.layout_item.beginCommand(self.tr('Add axes text'), QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_draw_axes_text(self.add_axes_text.isChecked())
-        self.layout_item.endCommand()
 
     def update_add_axes_values_text(self):
         self.layout_item.beginCommand(self.tr('Add axes text'), QgsLayoutItem.UndoCustomCommand)
