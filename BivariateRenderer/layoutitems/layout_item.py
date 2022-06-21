@@ -314,11 +314,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_text_values_format(self, text_format: QgsTextFormat) -> None:
-        self.text_values_format = text_format
-
-        self.refresh()
-
     def set_y_axis_rotation(self, rotation: float) -> None:
         self.y_axis_rotation = rotation
 
@@ -342,19 +337,14 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
 
-    def set_draw_axes_values(self, draw: bool) -> None:
+    def set_ticks_settings(self, draw: bool, text_format: QgsTextFormat, use_midpoint: bool,
+                           axis_x_precision: int, axis_y_precision: int, space_above: int) -> None:
         self.add_axes_values_texts = draw
-
-        self.refresh()
-
-    def set_ticks_precisions(self, axis_x_precision: int, axis_y_precision: int) -> None:
+        self.text_values_format = text_format
+        self.ticks_use_category_midpoints = use_midpoint
+        self.space_above_ticks = int(space_above)
         self.ticks_x_precision = axis_x_precision
         self.ticks_y_precision = axis_y_precision
-
-        self.refresh()
-
-    def set_space_above_ticks(self, space: int) -> None:
-        self.space_above_ticks = int(space)
 
         self.refresh()
 
@@ -371,11 +361,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.arrows_common_start_point = use_common_point
         self.arrow_width = width
         self.line_format = line_format.clone()
-
-        self.refresh()
-
-    def set_ticks_use_category_midpoints(self, use: bool) -> None:
-        self.ticks_use_category_midpoints = use
 
         self.refresh()
 
