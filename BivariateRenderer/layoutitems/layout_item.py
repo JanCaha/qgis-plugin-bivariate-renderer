@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 from qgis.PyQt.QtGui import QIcon, QColor
@@ -8,7 +9,7 @@ from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, 
                        QgsMapLayerType, QgsFillSymbol)
 
 from ..text_constants import Texts, IDS
-from ..utils import default_line_symbol, get_icon, log, get_symbol_dict
+from ..utils import default_line_symbol, get_icon, load_symbol_xml
 from ..renderer.bivariate_renderer import BivariateRenderer
 
 from ..legendrenderer.legend_renderer import LegendRenderer
@@ -90,13 +91,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.ticks_use_category_midpoints = False
 
-        self.symbol_rectangle_without_values = QgsFillSymbol.createSimple({
-            "color": "255,255,255,0",
-            'style': 'no',
-            'outline_color': '247,247,247,0',
-            'outline_style': 'solid',
-            'outline_width': '0'
-        })
+        self.symbol_rectangle_without_values = load_symbol_xml(
+            Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml")
 
         self.replace_rectangle_without_values = False
         self.use_rectangle_without_values_color_from_legend = False
