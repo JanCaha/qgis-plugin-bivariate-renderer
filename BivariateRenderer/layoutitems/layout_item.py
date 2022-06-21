@@ -314,11 +314,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_line_format(self, line_format: QgsLineSymbol) -> None:
-        self.line_format = line_format.clone()
-
-        self.refresh()
-
     def set_text_format(self, text_format: QgsTextFormat) -> None:
         self.text_format = text_format
 
@@ -358,11 +353,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_draw_axes_arrow(self, draw: bool) -> None:
-        self.add_axes_arrows = draw
-
-        self.refresh()
-
     def set_draw_axes_values(self, draw: bool) -> None:
         self.add_axes_values_texts = draw
 
@@ -386,13 +376,12 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_arrows_common_start_point(self, use_common_point: bool) -> None:
+    def set_arrows_settings(self, draw: bool, line_format: QgsLineSymbol, use_common_point: bool,
+                            width: float) -> None:
+        self.add_axes_arrows = draw
         self.arrows_common_start_point = use_common_point
-
-        self.refresh()
-
-    def set_arrow_width(self, width: float) -> None:
         self.arrow_width = width
+        self.line_format = line_format.clone()
 
         self.refresh()
 

@@ -173,7 +173,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.add_arrows = QCheckBox("Add axis arrows")
         self.add_arrows.setChecked(self.layout_item.add_axes_arrows)
-        self.add_arrows.stateChanged.connect(self.update_add_axes_arrow)
+        self.add_arrows.stateChanged.connect(self.pass_arrow_settings)
 
         self.b_line_symbol = QgsSymbolButton(self, "Arrow")
         self.b_line_symbol.setSymbolType(Qgis.SymbolType.Line)
@@ -182,11 +182,11 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         if self.layout_item.line_format:
             self.b_line_symbol.setSymbol(self.layout_item.line_format.clone())
 
-        self.b_line_symbol.changed.connect(self.pass_linesymbol)
+        self.b_line_symbol.changed.connect(self.pass_arrow_settings)
 
         self.arrows_start_same_point = QCheckBox("Arrows start at common point")
         self.arrows_start_same_point.setChecked(self.layout_item.arrows_common_start_point)
-        self.arrows_start_same_point.stateChanged.connect(self.pass_arrow_start_same_point)
+        self.arrows_start_same_point.stateChanged.connect(self.pass_arrow_settings)
 
         self.arrow_width = QDoubleSpinBox()
         self.arrow_width.setMinimum(0.01)
@@ -194,7 +194,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.arrow_width.setValue(self.layout_item.arrow_width)
         self.arrow_width.setDecimals(1)
         self.arrow_width.setSuffix("%")
-        self.arrow_width.valueChanged.connect(self.pass_arrow_width)
+        self.arrow_width.valueChanged.connect(self.pass_arrow_settings)
 
         cg_axes_arrows_layout.addWidget(QLabel("Use axis arrows in legend"))
         cg_axes_arrows_layout.addWidget(self.add_arrows)
@@ -345,17 +345,12 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.layout_item.endCommand()
 
-    def pass_arrow_width(self):
-        self.layout_item.beginCommand(self.tr('Arrow width'), QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.set_arrow_width(self.arrow_width.value())
-        self.layout_item.endCommand()
-
-    def pass_arrow_start_same_point(self):
-        self.layout_item.beginCommand(self.tr('Arrows start at the same point'),
-                                      QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.set_arrows_common_start_point(self.arrows_start_same_point.isChecked())
+    def pass_arrow_settings(self):
+        self.layout_item.beginCommand(self.tr('Arrows settings'), QgsLayoutItem.UndoCustomCommand)
+        self.layout_item.set_arrows_settings(self.add_arrows.isChecked(),
+                                             self.b_line_symbol.symbol().clone(),
+                                             self.arrows_start_same_point.isChecked(),
+                                             self.arrow_width.value())
         self.layout_item.endCommand()
 
     def pass_color_spacer_settings(self):
@@ -384,12 +379,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                                       QgsLayoutItem.UndoCustomCommand)
         self.layout_item.set_ticks_precisions(self.ticks_precision_x.value(),
                                               self.ticks_precision_y.value())
-        self.layout_item.endCommand()
-
-    def pass_linesymbol(self):
-        self.layout_item.beginCommand(self.tr('Change line symbol'),
-                                      QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_line_format(self.b_line_symbol.symbol().clone())
         self.layout_item.endCommand()
 
     def pass_textformat_to_item(self):
@@ -435,11 +424,6 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     def update_add_axes_values_text(self):
         self.layout_item.beginCommand(self.tr('Add axes text'), QgsLayoutItem.UndoCustomCommand)
         self.layout_item.set_draw_axes_values(self.add_axes_values_text.isChecked())
-        self.layout_item.endCommand()
-
-    def update_add_axes_arrow(self):
-        self.layout_item.beginCommand(self.tr('Add axes arrow'), QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_draw_axes_arrow(self.add_arrows.isChecked())
         self.layout_item.endCommand()
 
     def update_layer_to_work_with(self):
