@@ -310,18 +310,18 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.add_color_spacer = QCheckBox("Add color separators")
         self.add_color_spacer.setChecked(self.layout_item.add_colors_separators)
-        self.add_color_spacer.stateChanged.connect(self.pass_use_color_spacer)
+        self.add_color_spacer.stateChanged.connect(self.pass_color_spacer_settings)
 
         self.color_spacer_width = QSpinBox()
         self.color_spacer_width.setMinimum(1)
         self.color_spacer_width.setMaximum(10)
         self.color_spacer_width.setValue(self.layout_item.color_separator_width)
         self.color_spacer_width.setSuffix("%")
-        self.color_spacer_width.valueChanged.connect(self.pass_width_percent)
+        self.color_spacer_width.valueChanged.connect(self.pass_color_spacer_settings)
 
         self.color_spacer_color = QgsColorButton()
         self.color_spacer_color.setColor(self.layout_item.color_separator_color)
-        self.color_spacer_color.colorChanged.connect(self.pass_color)
+        self.color_spacer_color.colorChanged.connect(self.pass_color_spacer_settings)
 
         cg_color_separator_layout.addWidget(QLabel("Use color separator lines in legend"))
         cg_color_separator_layout.addWidget(self.add_color_spacer)
@@ -358,22 +358,12 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.set_arrows_common_start_point(self.arrows_start_same_point.isChecked())
         self.layout_item.endCommand()
 
-    def pass_use_color_spacer(self):
-        self.layout_item.beginCommand(self.tr('Use color spacer'), QgsLayoutItem.UndoCustomCommand)
-
-        self.layout_item.set_draw_color_separator(self.add_color_spacer.isChecked())
-        self.layout_item.endCommand()
-
-    def pass_width_percent(self):
-        self.layout_item.beginCommand(self.tr('Change color spacer width'),
+    def pass_color_spacer_settings(self):
+        self.layout_item.beginCommand(self.tr('Change color spacer settings'),
                                       QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_color_separator_width(self.color_spacer_width.value())
-        self.layout_item.endCommand()
-
-    def pass_color(self):
-        self.layout_item.beginCommand(self.tr('Change color spacer color'),
-                                      QgsLayoutItem.UndoCustomCommand)
-        self.layout_item.set_color_separator_color(self.color_spacer_color.color())
+        self.layout_item.set_color_separator_settings(self.add_color_spacer.isChecked(),
+                                                      self.color_spacer_color.color(),
+                                                      self.color_spacer_width.value())
         self.layout_item.endCommand()
 
     def pass_use_midpoint(self):
