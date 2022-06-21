@@ -379,18 +379,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_color_separator_color(self, color: QColor) -> None:
-        self.color_separator_color = color
-
-        self.refresh()
-
-    def set_color_separator_width(self, width: float) -> None:
-        self.color_separator_width = width
-
-        self.refresh()
-
-    def set_draw_color_separator(self, draw: bool) -> None:
+    def set_color_separator_settings(self, draw: bool, color: QColor, width: float) -> None:
         self.add_colors_separators = draw
+        self.color_separator_color = color
+        self.color_separator_width = width
 
         self.refresh()
 
