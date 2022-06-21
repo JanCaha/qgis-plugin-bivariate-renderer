@@ -2,8 +2,10 @@ from typing import Dict, Any
 import json
 from pathlib import Path
 
-from qgis.core import (QgsMessageLog, Qgis, QgsLineSymbol, QgsSymbol)
+from qgis.core import (QgsMessageLog, Qgis, QgsLineSymbol, QgsSymbol, QgsSymbolLayerUtils,
+                       QgsReadWriteContext)
 from qgis.PyQt.QtGui import QColor, QIcon
+from qgis.PyQt.QtXml import QDomDocument
 
 from .text_constants import Texts
 
@@ -86,6 +88,30 @@ def get_icon(file_name: str) -> QIcon:
     path = path_icon(file_name)
 
     return QIcon(path.absolute().as_posix())
+
+
+def save_symbol_xml(symbol: QgsSymbol, file_name: Path) -> None:
+
+    doc = QDomDocument()
+
+    elem = QgsSymbolLayerUtils.saveSymbol('symbol', symbol, doc, QgsReadWriteContext())
+
+    doc.appendChild(elem)
+
+    xml = doc.toString()
+
+    with open(file_name, "w+") as f:
+        f.write(xml)
+
+
+def load_symbol_xml(file_name: Path) -> QgsSymbol:
+
+    with open(file_name) as file:
+        symbol_doc = file.read()
+
+    doc = QDomDocument()
+    doc.setContent(symbol_doc)
+    return QgsSymbolLayerUtils.loadSymbol(doc.documentElement(), QgsReadWriteContext())
 
 
 class Singleton(type):
