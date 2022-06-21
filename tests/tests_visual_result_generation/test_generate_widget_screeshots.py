@@ -53,3 +53,7 @@ def test_generate_widget_layout_item(qgis_countries_layer: QgsVectorLayer, qgs_l
     pixmap = widget.grab()
 
     pixmap.save("./tests/images/correct/widget_layout_item.png", "png")
+
+
+def test_z():
+    pass
