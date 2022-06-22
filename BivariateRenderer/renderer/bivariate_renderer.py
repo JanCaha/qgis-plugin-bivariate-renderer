@@ -368,7 +368,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         return self.create_render_from_element(symbology_elem, context)
 
     @staticmethod
-    def get_default_symbol():
+    def get_default_symbol() -> QgsFillSymbol:
 
         symbol = QgsFillSymbol.createSimple({
             "color": "#cccccc",
