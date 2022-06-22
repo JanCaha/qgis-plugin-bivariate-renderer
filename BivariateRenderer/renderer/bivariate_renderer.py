@@ -16,35 +16,27 @@ from ..colormixing.color_mixing_method import ColorMixingMethod, ColorMixingMeth
 
 class BivariateRenderer(QgsFeatureRenderer):
 
-    number_classes: int
-    color_ramp_1: QgsColorRamp
-    color_ramp_2: QgsColorRamp
-    field_name_1: str
-    field_name_2: str
-    field_1_classes: List[QgsClassificationRange]
-    field_2_classes: List[QgsClassificationRange]
-
-    color_mixing_method: ColorMixingMethod
-    classification_method: QgsClassificationMethod
-
     def __init__(self, syms=None):
 
         super().__init__(Texts.bivariate_renderer_short_name)
 
-        self.number_classes = 3
+        self.number_classes: int = 3
 
         self.color_mixing_method = ColorMixingMethodDarken()
 
         self.classification_method = QgsClassificationEqualInterval()
 
-        self.field_name_1 = None
-        self.field_name_2 = None
+        self.field_name_1: str = None
+        self.field_name_2: str = None
 
-        self.color_ramp_1 = None
-        self.color_ramp_2 = None
+        self.color_ramp_1: QgsColorRamp = None
+        self.color_ramp_2: QgsColorRamp = None
 
         self.cached_symbols: Dict[str, QgsFillSymbol] = {}
         self.labels_existing: List[str] = []
+
+        self.field_1_classes: List[QgsClassificationRange] = []
+        self.field_2_classes: List[QgsClassificationRange] = []
 
     def __repr__(self) -> str:
         return f"BivariateRenderer with {self.number_classes} classes for each attribute, " \
