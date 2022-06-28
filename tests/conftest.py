@@ -19,7 +19,8 @@ from BivariateRenderer.colorramps.color_ramps_register import (BivariateColorRam
 
 
 @pytest.fixture
-def qgs_project() -> QgsProject:
+def qgs_project(qgis_iface) -> QgsProject:
+    qgis_iface.newProject()
     project = QgsProject.instance()
     return project
 
