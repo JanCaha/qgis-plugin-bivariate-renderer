@@ -5,10 +5,9 @@ from typing import Optional, Union
 from pytest_qgis import clean_qgis_layer
 
 from qgis.core import (QgsProject, QgsVectorLayer, QgsLayout, QgsLayoutItemPage, QgsLayoutSize,
-                       QgsUnitTypes, QgsGradientColorRamp, QgsStyle, QgsLayoutItemMap,
-                       QgsLayoutExporter)
+                       QgsUnitTypes, QgsStyle, QgsLayoutItemMap, QgsLayoutExporter)
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt.QtGui import QImage, qRgba, QPainter, QColor
+from qgis.PyQt.QtGui import QImage, qRgba, QPainter
 from qgis.PyQt.QtCore import QRectF, QSize
 
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer

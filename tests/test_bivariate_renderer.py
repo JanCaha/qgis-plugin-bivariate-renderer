@@ -1,16 +1,13 @@
 from PyQt5.QtXml import QDomElement
-from qgis.core import (QgsVectorLayer, QgsProject, QgsLayout, QgsReadWriteContext)
+from qgis.core import (QgsVectorLayer, QgsProject, QgsReadWriteContext)
 from qgis.PyQt.QtXml import QDomDocument
 
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
-from tests import assert_images_equal, xml_string
-
-import pytest
+from tests import assert_images_equal
 
 
-# @pytest.mark.skip(reason="Problem with comparing the outcomes")
 def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProject,
                                 prepare_bivariate_renderer, save_layout_for_layer):
 
