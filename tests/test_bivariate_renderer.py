@@ -37,78 +37,69 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
                                                     field2="PERIMETER",
                                                     color_ramps=BivariateColorRampGreenPink())
 
-    bivariate_renderer.generateCategories()
-
     xml_renderer = """
-<!DOCTYPE doc>
-<renderer-v2 type="BivariateRenderer">
- <number_of_classes value="3"/>
- <classificationMethod id="EqualInterval">
-  <symmetricMode symmetrypoint="0" astride="0" enabled="0"/>
-  <labelFormat labelprecision="4" trimtrailingzeroes="1" format="%1 - %2"/>
-  <parameters>
-   <Option/>
-  </parameters>
-  <extraInformation/>
- </classificationMethod>
- <field_name_1 name="AREA"/>
- <field_name_2 name="PERIMETER"/>
- <colorramp name="color_ramp_1" type="gradient">
-  <Option type="Map">
-   <Option name="color1" type="QString" value="211,211,211,255"/>
-   <Option name="color2" type="QString" value="76,172,38,255"/>
-   <Option name="direction" type="QString" value="ccw"/>
-   <Option name="discrete" type="QString" value="0"/>
-   <Option name="rampType" type="QString" value="gradient"/>
-   <Option name="spec" type="QString" value="rgb"/>
-  </Option>
-  <prop v="211,211,211,255" k="color1"/>
-  <prop v="76,172,38,255" k="color2"/>
-  <prop v="ccw" k="direction"/>
-  <prop v="0" k="discrete"/>
-  <prop v="gradient" k="rampType"/>
-  <prop v="rgb" k="spec"/>
- </colorramp>
- <colorramp name="color_ramp_2" type="gradient">
-  <Option type="Map">
-   <Option name="color1" type="QString" value="211,211,211,255"/>
-   <Option name="color2" type="QString" value="208,37,140,255"/>
-   <Option name="direction" type="QString" value="ccw"/>
-   <Option name="discrete" type="QString" value="0"/>
-   <Option name="rampType" type="QString" value="gradient"/>
-   <Option name="spec" type="QString" value="rgb"/>
-  </Option>
-  <prop v="211,211,211,255" k="color1"/>
-  <prop v="208,37,140,255" k="color2"/>
-  <prop v="ccw" k="direction"/>
-  <prop v="0" k="discrete"/>
-  <prop v="gradient" k="rampType"/>
-  <prop v="rgb" k="spec"/>
- </colorramp>
- <ranges_1>
-  <range_1 label="0,042 - 0,1083" lower="0.042" upper="0.10833333333333334"/>
-  <range_1 label="0,1083 - 0,1747" lower="0.10833333333333334" upper="0.17466666666666666"/>
-  <range_1 label="0,1747 - 0,241" lower="0.17466666666666666" upper="0.241"/>
- </ranges_1>
- <ranges_2>
-  <range_2 label="0,999 - 1,8793" lower="0.999" upper="1.8793333333333333"/>
-  <range_2 label="1,8793 - 2,7597" lower="1.8793333333333333" upper="2.7596666666666665"/>
-  <range_2 label="2,7597 - 3,64" lower="2.7596666666666665" upper="3.64"/>
- </ranges_2>
- <color_mixing_method name="Blend Darken"/>
- <symbols>
-  <symbol label="0-0" color="#d3d3d3"/>
-  <symbol label="0-1" color="#d27cb0"/>
-  <symbol label="0-2" color="#d0258c"/>
-  <symbol label="1-0" color="#90c07c"/>
-  <symbol label="1-1" color="#907c7c"/>
-  <symbol label="1-2" color="#90257c"/>
-  <symbol label="2-0" color="#4cac26"/>
-  <symbol label="2-1" color="#4c7c26"/>
-  <symbol label="2-2" color="#4c2526"/>
- </symbols>
-</renderer-v2>
-"""
+    <!DOCTYPE doc>
+    <renderer-v2 type="BivariateRenderer">
+     <number_of_classes value="3"/>
+     <classificationMethod id="EqualInterval">
+      <symmetricMode enabled="0" astride="0" symmetrypoint="0"/>
+      <labelFormat trimtrailingzeroes="1" labelprecision="4" format="%1 - %2"/>
+      <parameters>
+       <Option/>
+      </parameters>
+      <extraInformation/>
+     </classificationMethod>
+     <field_name_1 name="AREA"/>
+     <field_name_2 name="PERIMETER"/>
+     <colorramp type="gradient" name="color_ramp_1">
+      <Option type="Map">
+       <Option type="QString" value="211,211,211,255" name="color1"/>
+       <Option type="QString" value="76,172,38,255" name="color2"/>
+       <Option type="QString" value="0" name="discrete"/>
+       <Option type="QString" value="gradient" name="rampType"/>
+      </Option>
+      <prop k="color1" v="211,211,211,255"/>
+      <prop k="color2" v="76,172,38,255"/>
+      <prop k="discrete" v="0"/>
+      <prop k="rampType" v="gradient"/>
+     </colorramp>
+     <colorramp type="gradient" name="color_ramp_2">
+      <Option type="Map">
+       <Option type="QString" value="211,211,211,255" name="color1"/>
+       <Option type="QString" value="208,37,140,255" name="color2"/>
+       <Option type="QString" value="0" name="discrete"/>
+       <Option type="QString" value="gradient" name="rampType"/>
+      </Option>
+      <prop k="color1" v="211,211,211,255"/>
+      <prop k="color2" v="208,37,140,255"/>
+      <prop k="discrete" v="0"/>
+      <prop k="rampType" v="gradient"/>
+     </colorramp>
+     <ranges_1>
+      <range_1 label="0.042 - 0.1083" lower="0.042" upper="0.10833333333333334"/>
+      <range_1 label="0.1083 - 0.1747" lower="0.10833333333333334" upper="0.17466666666666666"/>
+      <range_1 label="0.1747 - 0.241" lower="0.17466666666666666" upper="0.241"/>
+     </ranges_1>
+     <ranges_2>
+      <range_2 label="0.999 - 1.8793" lower="0.999" upper="1.8793333333333333"/>
+      <range_2 label="1.8793 - 2.7597" lower="1.8793333333333333" upper="2.7596666666666665"/>
+      <range_2 label="2.7597 - 3.64" lower="2.7596666666666665" upper="3.64"/>
+     </ranges_2>
+     <color_mixing_method name="Blend Darken"/>
+     <symbols>
+      <symbol color="#d3d3d3" label="1-1"/>
+      <symbol color="#d27cb0" label="1-2"/>
+      <symbol color="#d0258c" label="1-3"/>
+      <symbol color="#90c07c" label="2-1"/>
+      <symbol color="#907c7c" label="2-2"/>
+      <symbol color="#90257c" label="2-3"/>
+      <symbol color="#4cac26" label="3-1"/>
+      <symbol color="#4c7c26" label="3-2"/>
+      <symbol color="#4c2526" label="3-3"/>
+     </symbols>
+     <existing_labels value=""/>
+    </renderer-v2>
+    """
 
     xml = QDomDocument()
     xml.setContent(xml_renderer)
