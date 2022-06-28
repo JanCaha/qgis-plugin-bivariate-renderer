@@ -2,6 +2,8 @@ import pytest
 from pathlib import Path
 from typing import Optional, Union
 
+from pytest_qgis import clean_qgis_layer
+
 from qgis.core import (QgsProject, QgsVectorLayer, QgsLayout, QgsLayoutItemPage, QgsLayoutSize,
                        QgsUnitTypes, QgsGradientColorRamp, QgsStyle, QgsLayoutItemMap,
                        QgsLayoutExporter)
@@ -18,12 +20,14 @@ from BivariateRenderer.colorramps.color_ramps_register import (BivariateColorRam
 
 @pytest.fixture
 def qgs_project() -> QgsProject:
-    return QgsProject.instance()
+    project = QgsProject.instance()
+    return project
 
 
 @pytest.fixture
 def qgs_layout(qgs_project) -> QgsLayout:
-    return QgsLayout(qgs_project)
+    layout = QgsLayout(qgs_project)
+    return layout
 
 
 @pytest.fixture
@@ -34,10 +38,12 @@ def nc_layer_path() -> str:
     return f"{path.as_posix()}|layername=nc_data"
 
 
-@pytest.fixture
+@pytest.fixture()
+@clean_qgis_layer
 def nc_layer(nc_layer_path) -> QgsVectorLayer:
 
-    return QgsVectorLayer(nc_layer_path, "layer", "ogr")
+    layer = QgsVectorLayer(nc_layer_path, "layer", "ogr")
+    return layer
 
 
 @pytest.fixture
@@ -91,7 +97,6 @@ def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height,
     page.setPageSize(QgsLayoutSize(layout_width, layout_height, QgsUnitTypes.LayoutMillimeters))
     collection = qgs_layout.pageCollection()
     collection.addPage(page)
-
     return page
 
 
