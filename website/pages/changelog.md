@@ -2,6 +2,8 @@
 
 ## 1.0.0
 
+- add option to specify default symbol in legend for symbols that do not have values in data
+
 - values on axis can be added either as category breaks (as were in the older version) or as category centres
 
 - allow changing of arrow widths in the legend
