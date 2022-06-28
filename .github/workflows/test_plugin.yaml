@@ -27,4 +27,4 @@ jobs:
       - name: Run tests
         run: |
           PYTHONPATH=$PYTHONPATH:./qgis-plugin-bivariate-renderer
-          pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP
+          pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
