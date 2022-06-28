@@ -93,6 +93,10 @@
             
             <li class="nav-item" data-level="1"><a href="#changelog" class="nav-link">Changelog</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#100" class="nav-link">1.0.0</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#071" class="nav-link">0.7.1</a>
               <ul class="nav flex-column">
               </ul>
@@ -133,6 +137,57 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="changelog">Changelog</h1>
+<h2 id="100">1.0.0</h2>
+<ul>
+<li>
+<p>add option to specify default symbol in legend for symbols that do not have values in data</p>
+</li>
+<li>
+<p>values on axis can be added either as category breaks (as were in the older version) or as category centres</p>
+</li>
+<li>
+<p>allow changing of arrow widths in the legend</p>
+</li>
+<li>
+<p>change arrows origin point, now they are by default aligned to category squares, but can origin in common point (as was previously)</p>
+</li>
+<li>
+<p>add option to add color separator to the legend, to create visual separation amongst individual colors in legend</p>
+</li>
+<li>
+<p>add option to rotate color legend in the render widget, allows more intuitive creation of legend variants</p>
+</li>
+<li>
+<p>add symbology in <code>Layers</code> window that shows color combinations for categories, this is saved in project and properly restored</p>
+</li>
+<li>
+<p>new default color palette when renderer is selected</p>
+</li>
+<li>
+<p>new prepared palettes - now there are 12</p>
+</li>
+<li>
+<p>new color mixing method multiply</p>
+</li>
+<li>
+<p>color mixing methods are renamed, to make them more readable</p>
+</li>
+<li>
+<p>Breaking Changes in saving and loading renderer !!! Older projects will not load the renderer correctly. It is unfortunate, but it was necessary to improve the plugin.</p>
+</li>
+<li>
+<p>some elements rewritten to make them more readable and maintainable</p>
+</li>
+<li>
+<p>legend in layout will now properly update, when the renderer's settings are changed</p>
+</li>
+<li>
+<p>new icon for layout item add (with the nice green plus)</p>
+</li>
+<li>
+<p>fix error on axis label with underscore, that might not be drawn due to bad text positioning</p>
+</li>
+</ul>
 <h2 id="071">0.7.1</h2>
 <ul>
 <li>fix provider error cause by missing export</li>
