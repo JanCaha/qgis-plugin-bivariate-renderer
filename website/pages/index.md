@@ -4,6 +4,10 @@ Plugin providing bivariate render for [QGIS](https://www.qgis.org/en/site/). Exa
 
 The plugin contains all the necessary python objects to handle creation of bivariate choropleth maps. That includes polygon renderer, layout item with legend and necessary GUI widgets for them.
 
+## Availability
+
+The plugin is available in QGIS Python Plugins Repository - [Bivariate color polygon renderer](https://plugins.qgis.org/plugins/BivariateRenderer/).
+
 ## Example visualization
 
 ![](./images/example.jpg)
@@ -13,7 +17,7 @@ The plugin contains all the necessary python objects to handle creation of bivar
 If you use the plugin in your work, please cite it properly. The citation for the plugin should be:
 
 ```
-CAHA, Jan, 2022. Bivariate color polygon renderer (version 1.0).  Online. QGIS Plugin - Python. Available from: https://jancaha.github.io/qgis-plugin-bivariate-renderer/
+CAHA, Jan, 2022. Bivariate color polygon renderer (version 1.0). QGIS Plugin. Available from: https://jancaha.github.io/qgis-plugin-bivariate-renderer/
 ```
 
 ```
@@ -22,7 +26,7 @@ CAHA, Jan, 2022. Bivariate color polygon renderer (version 1.0).  Online. QGIS P
  url = {https://jancaha.github.io/qgis-plugin-bivariate-renderer/},
  author = {Caha, Jan},
  year = {2022},
- note = {QGIS Plugin - Python},
+ note = {QGIS Plugin},
 }
 ```  
 
