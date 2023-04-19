@@ -4,6 +4,7 @@ from qgis.PyQt.QtWidgets import (QComboBox, QVBoxLayout, QLabel, QCheckBox, QPla
                                  QSpinBox, QDoubleSpinBox)
 
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtCore import Qt
 
 from qgis.core import (QgsLayoutItem, QgsProject, QgsVectorLayer, QgsMapLayer, QgsMapLayerType,
                        Qgis)
@@ -64,7 +65,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.cb_layers.addItems(usable_layers)
 
         if self.layout_item.linked_layer_name:
-            self.cb_layers.setCurrentText(self.layout_item.linked_layer_name)
+            index = self.cb_layers.findData(self.layout_item.linked_layer_name, Qt.DisplayRole)
+            self.cb_layers.setCurrentIndex(index)
 
         self.form_layout = QVBoxLayout()
 
@@ -89,7 +91,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
 
-        if 0 < len(usable_layers):
+        if 1 > len(usable_layers):
             self.cb_layers.setCurrentIndex(1)
 
     def widget_rotate_y_axis_texts(self) -> QgsCollapsibleGroupBoxBasic:
