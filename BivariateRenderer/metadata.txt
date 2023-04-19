@@ -2,7 +2,7 @@
 name=Bivariate color polygon renderer
 qgisMinimumVersion=3.20
 description=Implementation of bivariate color renderer for polygon data.
-version=1.0.0
+version=1.0.1
 author=Jan Caha
 email=jan.caha@outlook.com
 
