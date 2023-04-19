@@ -92,7 +92,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.cb_layers.currentIndexChanged.connect(self.update_layer_to_work_with)
 
         if 1 > len(usable_layers):
-            self.cb_layers.setCurrentIndex(1)
+            self.cb_layers.setCurrentIndex(0)
 
     def widget_rotate_y_axis_texts(self) -> QgsCollapsibleGroupBoxBasic:
 
@@ -417,10 +417,11 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
                     self.layout_item.endCommand()
                     break
 
-        if self.layout_item.are_labels_default():
+        if self.layout_item.linked_layer:
+            if self.layout_item.are_labels_default():
 
-            self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
-            self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
+                self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
+                self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
