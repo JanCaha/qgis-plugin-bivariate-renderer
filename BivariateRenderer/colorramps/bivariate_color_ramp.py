@@ -4,8 +4,7 @@ import math
 from abc import ABC, abstractmethod
 from typing import List
 
-import numpy as np
-from qgis.core import QgsColorBrewerColorRamp, QgsGradientColorRamp, QgsSymbolLayerUtils
+from qgis.core import QgsGradientColorRamp, QgsSymbolLayerUtils
 from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
@@ -17,7 +16,7 @@ from ..utils import get_icon
 
 class BivariateColorRamp(ABC):
     _name: str = "Default Bivariate Color Ramp"
-    _icon: QIcon = QIcon()
+    _icon: QIcon
 
     def __init__(self, number_classes: int = 9) -> None:
         self._number_of_classes = number_classes
@@ -45,7 +44,7 @@ class BivariateColorRamp(ABC):
     def load(bivariate_element: QDomElement): ...
 
 
-class BivariateColorRampGradient(BivariateColorRamp, ABC):
+class BivariateColorRampGradient(BivariateColorRamp):
     _color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#000000"), QColor("#ffffff"))
     _color_ramp_2: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#ffffff"), QColor("#000000"))
 
@@ -72,6 +71,10 @@ class BivariateColorRampGradient(BivariateColorRamp, ABC):
     def set_color_ramp_2(self, color_ramp: QgsGradientColorRamp) -> None:
         self._color_ramp_2 = color_ramp
 
+    @property
+    def color_mixing_method(self) -> ColorMixingMethod:
+        return self._color_mixing_method
+
     def set_color_mixing_method(self, color_mixing_method: ColorMixingMethod) -> None:
         self._color_mixing_method = color_mixing_method
 
@@ -82,10 +85,6 @@ class BivariateColorRampGradient(BivariateColorRamp, ABC):
         result_color = self.color_mixing_method.mix_colors(color1, color2)
 
         return result_color
-
-    @property
-    def color_mixing_method(self) -> ColorMixingMethod:
-        return self._color_mixing_method
 
     def save(self, doc: QDomDocument) -> QDomElement:
         main_element = doc.createElement("BivariateColorRamp")
@@ -126,7 +125,7 @@ class BivariateColorRampGradient(BivariateColorRamp, ABC):
         return bivariate_color_ramp
 
 
-class BivariateColorRampManual(BivariateColorRamp, ABC):
+class BivariateColorRampManual(BivariateColorRamp):
     _colors: List[List[QColor]] = []
 
     def __init__(self, colors: List[List[QColor]]) -> None:
@@ -194,7 +193,7 @@ class BivariateColorRampCyanBrow(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Cyan - Brown"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#80b9b5"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#a86a25"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#a86a25"))
         self._icon = get_icon("cp_cyan_brown.png")
 
 
@@ -205,7 +204,7 @@ class BivariateColorRampTurquoiseGold(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Turquoise - Gold"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#4e9ec2"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#f6b500"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#f6b500"))
         self._icon = get_icon("cp_turquoise_gold.png")
 
 
@@ -216,7 +215,7 @@ class BivariateColorRampOrangeBlue(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Orange - Blue"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#f6742e"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#17afe7"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#17afe7"))
         self._icon = get_icon("cp_orange_blue.png")
 
 
@@ -227,7 +226,7 @@ class BivariateColorRampYellowBlue(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Yellow - Blue"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#f1d301"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#0097f1"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#0097f1"))
         self._icon = get_icon("cp_yellow_blue.png")
 
 
@@ -238,7 +237,7 @@ class BivariateColorRampLigthYellowPurple(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Ligth Yellow - Purple"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#cab55a"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#9a73af"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#9a73af"))
         self._icon = get_icon("cp_ligth_yellow_purple.png")
 
 
@@ -249,7 +248,7 @@ class BivariateColorRampCyanViolet(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Cyan - Violet"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#5bcaca"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#bf64ad"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#bf64ad"))
         self._icon = get_icon("cp_cyan_violet.png")
 
 
@@ -260,7 +259,7 @@ class BivariateColorRampBlueGreen(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Blue - Green"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#6c84b7"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#73af7f"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#73af7f"))
         self._icon = get_icon("cp_blue_green.png")
 
 
@@ -271,7 +270,7 @@ class BivariateColorRampVioletBlue(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Violet - Blue"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#ae3a4c"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#4886c2"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#4886c2"))
         self._icon = get_icon("cp_violet_blue.png")
 
 
@@ -282,7 +281,7 @@ class BivariateColorRampPinkBlue(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Pink - Blue"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#cb5b5b"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#66adc0"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#66adc0"))
         self._icon = get_icon("cp_pink_blue.png")
 
 
@@ -293,7 +292,7 @@ class BivariateColorRampGreenPink(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Green - Pink"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#4cac26"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#d0258c"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#d0258c"))
         self._icon = get_icon("cp_green_pink.png")
 
 
@@ -304,7 +303,7 @@ class BivariateColorRampGreenPurple(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Green - Purple"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#028834"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#7a3293"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#7a3293"))
         self._icon = get_icon("cp_green_purple.png")
 
 
@@ -315,5 +314,5 @@ class BivariateColorRampOrangePurple(BivariateColorRampGradient):
         super().__init__(number_classes, color_mixing_method)
         self._name = "Orange - Purple"
         self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#e95f00"))
-        self._color_ramp_1 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#5e3c96"))
+        self._color_ramp_2 = QgsGradientColorRamp(QColor("#d3d3d3"), QColor("#5e3c96"))
         self._icon = get_icon("cp_orange_purple.png")
