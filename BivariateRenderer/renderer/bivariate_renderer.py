@@ -7,12 +7,10 @@ from qgis.core import (
     QgsClassificationEqualInterval,
     QgsClassificationMethod,
     QgsClassificationRange,
-    QgsColorRamp,
     QgsFeature,
     QgsFeatureRenderer,
     QgsFillSymbol,
     QgsLegendSymbolItem,
-    QgsSymbolLayerUtils,
     QgsVectorLayer,
 )
 from qgis.PyQt.QtGui import QColor
@@ -22,9 +20,9 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import (
     BivariateColorRamp,
     BivariateColorRampCyanViolet,
     BivariateColorRampGradient,
+    BivariateColorRampManual,
 )
 
-from ..colormixing.color_mixing_method import ColorMixingMethod
 from ..text_constants import Texts
 
 
@@ -47,34 +45,23 @@ class BivariateRenderer(QgsFeatureRenderer):
 
     def __repr__(self) -> str:
         return (
-            f"BivariateRenderer with {self.bivariate_color_ramp.number_of_classes} classes for each attribute, "
+            f"BivariateRenderer "
             f"for fields {self.field_name_1} and {self.field_name_2}, "
             f"with classification method {self.classification_method.name()},"
-            f"field 1 vals {self.field_1_min};{self.field_1_max} "
-            f"field 2 vals {self.field_2_min};{self.field_2_max} "
+            f"field 1 vals {self.field_1_min};{self.field_1_max}, "
+            f"field 2 vals {self.field_2_min};{self.field_2_max}. "
+            f"With ramp {self.bivariate_color_ramp.name}."
         )
 
     def _reset_cache(self):
         self.cached_symbols = {}
 
-    def setColorMixingMethod(self, method: ColorMixingMethod) -> None:
-        self.bivariate_color_ramp.set_color_mixing_method(method)
+    def set_bivariate_color_ramp(self, color_ramp: BivariateColorRamp) -> None:
+        self.bivariate_color_ramp = color_ramp
         self._reset_cache()
 
     def setClassificationMethod(self, method: QgsClassificationMethod) -> None:
         self.classification_method = method
-        self._reset_cache()
-
-    def setNumberOfClasses(self, number: int) -> None:
-        self.bivariate_color_ramp.set_number_of_classes(int(number))
-        self._reset_cache()
-
-    def setColorRamp1(self, color_ramp: QgsColorRamp) -> None:
-        self.bivariate_color_ramp.set_color_ramp_1(color_ramp)
-        self._reset_cache()
-
-    def setColorRamp2(self, color_ramp: QgsColorRamp) -> None:
-        self.bivariate_color_ramp.set_color_ramp_2(color_ramp)
         self._reset_cache()
 
     def setFieldName1(self, field_name: str) -> None:
@@ -187,14 +174,11 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setFieldName1(self.field_name_1)
         r.setFieldName2(self.field_name_2)
         r.classification_method = self.classification_method.clone()
-        r.setNumberOfClasses(self.number_classes)
-        r.setColorRamp1(self.color_ramp_1.clone())
-        r.setColorRamp2(self.color_ramp_2.clone())
         r.field_1_classes = self.field_1_classes
         r.field_2_classes = self.field_2_classes
-        r.setColorMixingMethod(self.color_mixing_method)
         r.cached_symbols = self.cached_symbols
         r.labels_existing = self.labels_existing
+        r.bivariate_color_ramp = self.bivariate_color_ramp.clone()
 
         return r
 
@@ -329,12 +313,14 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         r.labels_existing = labels
 
-        bivariate_ramp_elem = element.firstChild("BivariateColorRamp")
+        bivariate_ramp_elem = element.firstChildElement("BivariateColorRamp")
         bivariate_ramp = None
         if not bivariate_ramp_elem.isNull():
             bivariate_ramp_type = bivariate_ramp_elem.attribute("type")
             if bivariate_ramp_type == "Gradient":
                 bivariate_ramp = BivariateColorRampGradient.load(bivariate_ramp_elem)
+            elif bivariate_ramp_type == "Manual":
+                bivariate_ramp = BivariateColorRampManual.load(bivariate_ramp_elem)
 
         if bivariate_ramp:
             r.bivariate_color_ramp = bivariate_ramp
@@ -385,15 +371,12 @@ class BivariateRenderer(QgsFeatureRenderer):
             if (
                 self.field_name_1 == other.field_name_1
                 and self.field_name_2 == other.field_name_2
-                and self.number_classes == other.number_classes
                 and
                 # self.classification_method.id() == other.classification_method.id() and
                 self.field_1_min == other.field_1_min
                 and self.field_1_max == other.field_1_max
                 and self.field_2_min == other.field_2_min
                 and self.field_2_max == other.field_2_max
-                and self.color_ramp_1.properties() == other.color_ramp_1.properties()
-                and self.color_ramp_2.properties() == other.color_ramp_2.properties()
             ):
                 return True
 
@@ -444,8 +427,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         return [x for x in sorted(self.labels_existing)]
 
     def generateCategories(self):
-        for x in range(self.number_classes):
-            for y in range(self.number_classes):
+        for x in range(self.bivariate_color_ramp.number_of_classes):
+            for y in range(self.bivariate_color_ramp.number_of_classes):
                 identifier = self.getPositionValuesCombinationHash(x, y)
                 self.cached_symbols[identifier] = self.symbol_for_values(x, y)
 
