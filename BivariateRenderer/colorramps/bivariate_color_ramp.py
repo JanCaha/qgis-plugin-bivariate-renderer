@@ -43,6 +43,9 @@ class BivariateColorRamp(ABC):
     @abstractmethod
     def load(bivariate_element: QDomElement): ...
 
+    @abstractmethod
+    def clone(self) -> BivariateColorRamp: ...
+
 
 class BivariateColorRampGradient(BivariateColorRamp):
     _color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#000000"), QColor("#ffffff"))
@@ -124,6 +127,17 @@ class BivariateColorRampGradient(BivariateColorRamp):
 
         return bivariate_color_ramp
 
+    def clone(self) -> BivariateColorRampGradient:
+        bivariate_color_ramp = BivariateColorRampGradient()
+
+        bivariate_color_ramp._name = self._name
+        bivariate_color_ramp.set_number_of_classes(self.number_of_classes)
+        bivariate_color_ramp.set_color_mixing_method(self.color_mixing_method)
+        bivariate_color_ramp.set_color_ramp_1(self.color_ramp_1.clone())
+        bivariate_color_ramp.set_color_ramp_2(self.color_ramp_2.clone())
+
+        return bivariate_color_ramp
+
 
 class BivariateColorRampManual(BivariateColorRamp):
     _colors: List[List[QColor]] = []
@@ -183,7 +197,22 @@ class BivariateColorRampManual(BivariateColorRamp):
                 else:
                     colors[i][j] = QColor(color_element.attribute("value"))
 
-        return BivariateColorRampManual(number_of_classes, colors)
+        return BivariateColorRampManual(colors)
+
+    def clone(self) -> BivariateColorRampManual:
+
+        cols = []
+        for _, colors in enumerate(self._colors):
+            cols_row = []
+            for _, color in enumerate(colors):
+                cols_row.append(QColor(color))
+            cols.append(cols_row)
+
+        bivariate_color_ramp = BivariateColorRampManual(cols)
+
+        bivariate_color_ramp._name = self._name
+
+        return bivariate_color_ramp
 
 
 class BivariateColorRampCyanBrow(BivariateColorRampGradient):
