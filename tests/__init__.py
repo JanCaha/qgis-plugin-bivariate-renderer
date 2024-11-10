@@ -1,4 +1,6 @@
+import inspect
 import tempfile
+from pathlib import Path
 from typing import Union
 
 import numpy as np
@@ -56,11 +58,19 @@ def assert_images_equal(image_1: str, image_2: str):
     if normalized_sum_sq_diff > 0.001:
         diff_mask = Image.new("RGBA", img1.size)
         pixelmatch(img1, img2, diff_mask, includeAA=True)
-        filename = tempfile.gettempdir() + '/diff_mask.png'
-        diff_mask.save(filename)
+
+        diff_image_filenaname = diff_image_name(inspect.stack()[1])
+        diff_mask.save(diff_image_filenaname)
 
         __tracebackhide__ = True
         pytest.fail(f"Images \n{image_1}\n{image_2}\ndo not look the same.\n"
-                    f"Difference is {normalized_sum_sq_diff}. Diff file {filename}.")
-    else:
-        pass
+                    f"Difference is {normalized_sum_sq_diff}. Diff file {diff_image_filenaname.as_posix()}.")
+
+
+def diff_image_name(frame: inspect.FrameInfo) -> Path:
+    """Get the filename for the diff image based on previous frame - file na function name."""
+    diff_dir = Path(tempfile.gettempdir()) / 'images_diff'
+    if not diff_dir.exists():
+        diff_dir.mkdir(exist_ok=True)
+    filename = diff_dir / f'{Path(frame.filename).stem}-{frame.function}.png'
+    return filename
