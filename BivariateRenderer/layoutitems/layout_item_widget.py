@@ -1,19 +1,20 @@
 from enum import Enum
 
-from qgis.PyQt.QtWidgets import (QComboBox, QVBoxLayout, QLabel, QCheckBox, QPlainTextEdit,
-                                 QSpinBox, QDoubleSpinBox)
-
-from qgis.PyQt.QtGui import QIcon
+from qgis.core import Qgis, QgsLayoutItem, QgsMapLayer, QgsMapLayerType, QgsProject, QgsVectorLayer
+from qgis.gui import (
+    QgsCollapsibleGroupBoxBasic,
+    QgsColorButton,
+    QgsFontButton,
+    QgsLayoutItemAbstractGuiMetadata,
+    QgsLayoutItemBaseWidget,
+    QgsSymbolButton,
+)
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QLabel, QPlainTextEdit, QSpinBox, QVBoxLayout
 
-from qgis.core import (QgsLayoutItem, QgsProject, QgsVectorLayer, QgsMapLayer, QgsMapLayerType,
-                       Qgis)
-
-from qgis.gui import (QgsLayoutItemBaseWidget, QgsLayoutItemAbstractGuiMetadata, QgsFontButton,
-                      QgsSymbolButton, QgsCollapsibleGroupBoxBasic, QgsColorButton)
-
-from ..text_constants import Texts, IDS
-from ..utils import log, get_symbol_dict, get_icon
+from ..text_constants import IDS, Texts
+from ..utils import get_icon_path, get_symbol_dict, log
 from .layout_item import BivariateRendererLayoutItem
 
 
@@ -440,7 +441,7 @@ class BivariateRendererLayoutItemGuiMetadata(QgsLayoutItemAbstractGuiMetadata):
         return BivariateRendererLayoutItemWidget(None, item)
 
     def creationIcon(self) -> QIcon:
-        return get_icon("add_legend_icon.png")
+        return QIcon(get_icon_path("add_legend_icon.png"))
 
 
 class UndoBivariateLegend(Enum):
