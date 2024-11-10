@@ -1,13 +1,12 @@
-from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QPlainTextEdit, QSpinBox, QMainWindow)
-from qgis.gui import (QgsFontButton, QgsSymbolButton)
 from qgis.core import QgsVectorLayer
+from qgis.gui import QgsFontButton, QgsSymbolButton
+from qgis.PyQt.QtWidgets import QCheckBox, QComboBox, QMainWindow, QPlainTextEdit, QSpinBox
 
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.layoutitems.layout_item_widget import BivariateRendererLayoutItemWidget
-from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.utils import default_line_symbol
-
-from tests import (assert_images_equal)
+from tests import assert_images_equal
 
 
 def test_layout_item_widget(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent,
