@@ -14,7 +14,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt.QtCore import QRectF, QSize
+from qgis.PyQt.QtCore import QLocale, QRectF, QSize
 from qgis.PyQt.QtGui import QImage, QPainter, qRgba
 
 from BivariateRenderer.colorramps.color_ramps_register import (
@@ -25,6 +25,11 @@ from BivariateRenderer.colorramps.color_ramps_register import (
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
 
+
+@pytest.fixture(autouse=True, scope="session")
+def change_locale():
+    """Sets locale to English, United Kingdom for all tests to ensure consistent results."""
+    QLocale.setDefault(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
 
 @pytest.fixture
 def qgs_project(qgis_iface) -> QgsProject:
