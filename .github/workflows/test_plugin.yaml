@@ -63,4 +63,12 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
+          pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation 
+      
+      - name: Upload Artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: warn
+          name: artifacts
+          path: /tmp/images_diff
