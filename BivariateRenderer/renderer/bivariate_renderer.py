@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from qgis.core import (
     QgsClassificationEqualInterval,
@@ -56,9 +56,10 @@ class BivariateRenderer(QgsFeatureRenderer):
     def _reset_cache(self):
         self.cached_symbols = {}
 
-    def set_bivariate_color_ramp(self, color_ramp: BivariateColorRamp) -> None:
-        self.bivariate_color_ramp = color_ramp
-        self._reset_cache()
+    def set_bivariate_color_ramp(self, color_ramp: Optional[BivariateColorRamp]) -> None:
+        if color_ramp:
+            self.bivariate_color_ramp = color_ramp
+            self._reset_cache()
 
     def setClassificationMethod(self, method: QgsClassificationMethod) -> None:
         self.classification_method = method
