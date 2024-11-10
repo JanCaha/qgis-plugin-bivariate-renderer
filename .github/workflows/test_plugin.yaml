@@ -51,8 +51,6 @@ jobs:
         run: | 
           sudo apt-get update && \
           sudo apt-get -y -q install --no-install-recommends wget software-properties-common build-essential ca-certificates python3-pip dialog apt-utils && \
-          sudo apt update && \
-          sudo apt upgrade -y -q && \
           sudo apt -y -q install qgis qgis-dev qgis-plugin-grass
 
       - name: Install Python packages 
