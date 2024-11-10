@@ -1,13 +1,11 @@
-from pathlib import Path
-
-from qgis.core import (QgsRendererAbstractMetadata)
-
+from qgis.core import QgsRendererAbstractMetadata
+from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtXml import QDomElement
 
+from ..text_constants import Texts
+from ..utils import get_icon_path
 from .bivariate_renderer import BivariateRenderer
 from .bivariate_renderer_widget import BivariateRendererWidget
-from ..text_constants import Texts
-from ..utils import get_icon
 
 
 class BivariateRendererMetadata(QgsRendererAbstractMetadata):
@@ -15,7 +13,7 @@ class BivariateRendererMetadata(QgsRendererAbstractMetadata):
     def __init__(self):
         super().__init__(Texts.bivariate_renderer_short_name, Texts.bivariate_renderer_full_name)
 
-        super().setIcon(get_icon("legend_icon.png"))
+        super().setIcon(QIcon(get_icon_path("legend_icon.png")))
 
     def name(self) -> str:
         return Texts.bivariate_renderer_short_name

@@ -83,11 +83,11 @@ def path_icon(file_name: str) -> Path:
     return Path(__file__).parent / "icons" / file_name
 
 
-def get_icon(file_name: str) -> QIcon:
+def get_icon_path(file_name: str) -> str:
 
     path = path_icon(file_name)
 
-    return QIcon(path.absolute().as_posix())
+    return path.absolute().as_posix()
 
 
 def save_symbol_xml(symbol: QgsSymbol, file_name: Path) -> None:
