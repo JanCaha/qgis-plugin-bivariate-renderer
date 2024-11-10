@@ -32,4 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     """
     #
     from .bivariate_renderer_plugin import BivariateRendererPlugin
+
     return BivariateRendererPlugin(iface)

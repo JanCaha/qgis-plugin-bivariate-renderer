@@ -1,7 +1,14 @@
-from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterVectorLayer, QgsProcessing,
-                       QgsProcessingParameterNumber, QgsProcessingParameterField,
-                       QgsProcessingParameterString, QgsField, QgsClassificationEqualInterval)
-from qgis.PyQt.QtCore import (QVariant)
+from qgis.core import (
+    QgsClassificationEqualInterval,
+    QgsField,
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterField,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterString,
+    QgsProcessingParameterVectorLayer,
+)
+from qgis.PyQt.QtCore import QVariant
 
 
 class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
@@ -15,20 +22,28 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
 
         self.addParameter(
-            QgsProcessingParameterVectorLayer(self.INPUT_LAYER, "Input polygon layer",
-                                              [QgsProcessing.TypeVectorPolygon]))
+            QgsProcessingParameterVectorLayer(
+                self.INPUT_LAYER, "Input polygon layer", [QgsProcessing.TypeVectorPolygon]
+            )
+        )
 
         self.addParameter(
-            QgsProcessingParameterField(self.FIELD_1,
-                                        "Select field 1",
-                                        parentLayerParameterName=self.INPUT_LAYER,
-                                        type=QgsProcessingParameterField.Numeric))
+            QgsProcessingParameterField(
+                self.FIELD_1,
+                "Select field 1",
+                parentLayerParameterName=self.INPUT_LAYER,
+                type=QgsProcessingParameterField.Numeric,
+            )
+        )
 
         self.addParameter(
-            QgsProcessingParameterField(self.FIELD_2,
-                                        "Select field 2",
-                                        parentLayerParameterName=self.INPUT_LAYER,
-                                        type=QgsProcessingParameterField.Numeric))
+            QgsProcessingParameterField(
+                self.FIELD_2,
+                "Select field 2",
+                parentLayerParameterName=self.INPUT_LAYER,
+                type=QgsProcessingParameterField.Numeric,
+            )
+        )
 
         self.addParameter(
             QgsProcessingParameterNumber(
@@ -37,12 +52,13 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=2,
                 maxValue=5,
-                defaultValue=3))
+                defaultValue=3,
+            )
+        )
 
         self.addParameter(
-            QgsProcessingParameterString(self.RESULT_FIELD_NAME,
-                                         "Result field name",
-                                         defaultValue="Category"))
+            QgsProcessingParameterString(self.RESULT_FIELD_NAME, "Result field name", defaultValue="Category")
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
 
@@ -85,8 +101,7 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
                 if range_class.lowerBound() <= field_2_value <= range_class.upperBound():
                     class_value_2 = i + 1
 
-            layer.changeAttributeValue(feature.id(), field_index,
-                                       "{}-{}".format(class_value_1, class_value_2))
+            layer.changeAttributeValue(feature.id(), field_index, "{}-{}".format(class_value_1, class_value_2))
 
             feedback.setProgress((number / feature_count) * 100)
 

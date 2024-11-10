@@ -1,14 +1,14 @@
 import os
+
 import pytest
+from qgis.core import QgsLayoutUtils, QgsRenderContext
+from qgis.PyQt.QtGui import QColor, QPainter
 
-from qgis.PyQt.QtGui import QPainter, QColor
-from qgis.core import (QgsLayoutUtils, QgsRenderContext)
-
-from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDarken, ColorMixingMethodDirect
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
+from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
+from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
 env_value = os.getenv("BIVARIATE_GENERATE")
 
@@ -21,8 +21,9 @@ skip_setting = pytest.mark.skipif(not generate_images, reason="do not generate w
 
 
 @skip_setting
-def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout,
-                              prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_just_legend(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -34,14 +35,15 @@ def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout,
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -49,8 +51,9 @@ def test_generate_just_legend(qgis_countries_layer, qgs_project, qgs_layout,
 
 
 @skip_setting
-def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout,
-                                     prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_legend_with_arrows(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -62,15 +65,16 @@ def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layo
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -78,9 +82,9 @@ def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layo
 
 
 @skip_setting
-def test_generate_legend_with_arrows_common_origin(qgis_countries_layer, qgs_project, qgs_layout,
-                                                   prepare_default_QImage,
-                                                   prepare_bivariate_renderer):
+def test_generate_legend_with_arrows_common_origin(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -92,16 +96,17 @@ def test_generate_legend_with_arrows_common_origin(qgis_countries_layer, qgs_pro
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
     legend_renderer.arrows_common_start_point = True
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -109,8 +114,9 @@ def test_generate_legend_with_arrows_common_origin(qgis_countries_layer, qgs_pro
 
 
 @skip_setting
-def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs_layout,
-                                          prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_legend_with_arrows_text(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -122,16 +128,17 @@ def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
     legend_renderer.add_axes_texts = True
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -139,9 +146,9 @@ def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_project, qgs
 
 
 @skip_setting
-def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_project, qgs_layout,
-                                                  prepare_default_QImage,
-                                                  prepare_bivariate_renderer):
+def test_generate_legend_with_arrows_text_rotated(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -153,17 +160,18 @@ def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_proj
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
     legend_renderer.add_axes_texts = True
     legend_renderer.legend_rotated = True
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -171,8 +179,9 @@ def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_proj
 
 
 @skip_setting
-def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout,
-                                prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_legend_darken(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -184,15 +193,16 @@ def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout,
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
     bivariate_renderer.color_mixing_method = ColorMixingMethodDarken()
 
     legend_renderer = LegendRenderer()
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -200,8 +210,9 @@ def test_generate_legend_darken(qgis_countries_layer, qgs_project, qgs_layout,
 
 
 @skip_setting
-def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_layout,
-                                       prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_legend_direct_mixing(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -213,15 +224,16 @@ def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_la
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
     legend_renderer = LegendRenderer()
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -229,13 +241,19 @@ def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_project, qgs_la
 
 
 @skip_setting
-def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project, layout_page_a4,
-                                   prepare_bivariate_renderer, layout_space, export_page_to_image):
+def test_generate_legend_in_layout(
+    qgis_countries_layer,
+    qgs_layout,
+    qgs_project,
+    layout_page_a4,
+    prepare_bivariate_renderer,
+    layout_space,
+    export_page_to_image,
+):
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(
+        qgis_countries_layer, field1="fid", field2="fid", color_ramp=BivariateColorRampGreenPink()
+    )
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
@@ -248,13 +266,13 @@ def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project
 
     qgs_layout.addItem(layout_item)
 
-    export_page_to_image(qgs_layout, layout_page_a4,
-                         "./tests/images/correct/layout_item_legend.png")
+    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_legend.png")
 
 
 @skip_setting
-def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
-                      prepare_bivariate_renderer):
+def test_legend_ticks(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -266,9 +284,7 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout, prepare_def
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
@@ -280,10 +296,12 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout, prepare_def
     legend_renderer.texts_axis_x_ticks = bivariate_renderer.field_1_labels
     legend_renderer.texts_axis_y_ticks = bivariate_renderer.field_2_labels
 
-    legend_renderer.render(render_context,
-                           image.width() / render_context.scaleFactor(),
-                           image.width() / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        image.width() / render_context.scaleFactor(),
+        image.width() / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -291,8 +309,7 @@ def test_legend_ticks(qgis_countries_layer, qgs_project, qgs_layout, prepare_def
 
 
 @skip_setting
-def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
-                    prepare_bivariate_renderer):
+def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer):
 
     legend_size = 500
 
@@ -304,9 +321,7 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_defau
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
     legend_renderer.add_axes_arrows = True
@@ -316,10 +331,12 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_defau
     legend_renderer.texts_axis_x_ticks = bivariate_renderer.field_1_labels
     legend_renderer.texts_axis_y_ticks = bivariate_renderer.field_2_labels
 
-    legend_renderer.render(render_context,
-                           image.width() / render_context.scaleFactor(),
-                           image.width() / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        image.width() / render_context.scaleFactor(),
+        image.width() / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -327,8 +344,9 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_defau
 
 
 @skip_setting
-def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage,
-                            prepare_bivariate_renderer):
+def test_legend_all_rotated(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -340,9 +358,7 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepa
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
@@ -354,10 +370,12 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepa
     legend_renderer.texts_axis_x_ticks = bivariate_renderer.field_1_labels
     legend_renderer.texts_axis_y_ticks = bivariate_renderer.field_2_labels
 
-    legend_renderer.render(render_context,
-                           image.width() / render_context.scaleFactor(),
-                           image.width() / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        image.width() / render_context.scaleFactor(),
+        image.width() / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -365,13 +383,13 @@ def test_legend_all_rotated(qgis_countries_layer, qgs_project, qgs_layout, prepa
 
 
 @skip_setting
-def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout, prepare_default_QImage,
-                                prepare_bivariate_renderer, save_layout_for_layer):
+def test_layer_bivariate_render(
+    nc_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer, save_layout_for_layer
+):
 
-    bivariate_renderer = prepare_bivariate_renderer(nc_layer,
-                                                    field1="AREA",
-                                                    field2="PERIMETER",
-                                                    color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
 
     nc_layer.setRenderer(bivariate_renderer)
 
@@ -381,8 +399,9 @@ def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout, prepare_defau
 
 
 @skip_setting
-def test_generate_legend_white_spacer(qgis_countries_layer, qgs_project, qgs_layout,
-                                      prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_legend_white_spacer(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -394,18 +413,19 @@ def test_generate_legend_white_spacer(qgis_countries_layer, qgs_project, qgs_lay
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
 
     legend_renderer.add_colors_separators = True
     legend_renderer.color_separator_width_percent = 5
 
-    legend_renderer.render(render_context, legend_size / render_context.scaleFactor(),
-                           legend_size / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -413,8 +433,9 @@ def test_generate_legend_white_spacer(qgis_countries_layer, qgs_project, qgs_lay
 
 
 @skip_setting
-def test_legend_ticks_midpoints(qgis_countries_layer, qgs_project, qgs_layout,
-                                prepare_default_QImage, prepare_bivariate_renderer):
+def test_legend_ticks_midpoints(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -426,9 +447,7 @@ def test_legend_ticks_midpoints(qgis_countries_layer, qgs_project, qgs_layout,
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     bivariate_renderer.color_mixing_method = ColorMixingMethodDirect()
 
@@ -439,14 +458,18 @@ def test_legend_ticks_midpoints(qgis_countries_layer, qgs_project, qgs_layout,
     legend_renderer.add_axes_ticks_texts = True
     legend_renderer.use_category_midpoints = True
     legend_renderer.texts_axis_x_ticks = BivariateRenderer.classes_to_legend_midpoints(
-        bivariate_renderer.field_1_classes)
+        bivariate_renderer.field_1_classes
+    )
     legend_renderer.texts_axis_y_ticks = BivariateRenderer.classes_to_legend_midpoints(
-        bivariate_renderer.field_2_classes)
+        bivariate_renderer.field_2_classes
+    )
 
-    legend_renderer.render(render_context,
-                           image.width() / render_context.scaleFactor(),
-                           image.width() / render_context.scaleFactor(),
-                           bivariate_renderer.generate_legend_polygons())
+    legend_renderer.render(
+        render_context,
+        image.width() / render_context.scaleFactor(),
+        image.width() / render_context.scaleFactor(),
+        bivariate_renderer.generate_legend_polygons(),
+    )
 
     painter.end()
 
@@ -454,8 +477,9 @@ def test_legend_ticks_midpoints(qgis_countries_layer, qgs_project, qgs_layout,
 
 
 @skip_setting
-def test_generate_legend_empty_squares(qgis_countries_layer, qgs_project, qgs_layout,
-                                       prepare_default_QImage, prepare_bivariate_renderer):
+def test_generate_legend_empty_squares(
+    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
+):
 
     legend_size = 500
 
@@ -467,9 +491,7 @@ def test_generate_legend_empty_squares(qgis_countries_layer, qgs_project, qgs_la
 
     assert render_context
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid")
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
 
     legend_renderer = LegendRenderer()
 
@@ -482,8 +504,12 @@ def test_generate_legend_empty_squares(qgis_countries_layer, qgs_project, qgs_la
     for feature in qgis_countries_layer.getFeatures():
         bivariate_renderer.symbolForFeature(feature, QgsRenderContext())
 
-    legend_renderer.render_legend(render_context, legend_size / render_context.scaleFactor(),
-                                  legend_size / render_context.scaleFactor(), bivariate_renderer)
+    legend_renderer.render_legend(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        bivariate_renderer,
+    )
 
     painter.end()
 

@@ -1,24 +1,23 @@
-from qgis.PyQt.QtWidgets import (QComboBox, QCheckBox, QPlainTextEdit, QSpinBox, QMainWindow)
-from qgis.gui import (QgsFontButton, QgsSymbolButton)
 from qgis.core import QgsVectorLayer
+from qgis.gui import QgsFontButton, QgsSymbolButton
+from qgis.PyQt.QtWidgets import QCheckBox, QComboBox, QMainWindow, QPlainTextEdit, QSpinBox
 
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.layoutitems.layout_item_widget import BivariateRendererLayoutItemWidget
-from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.utils import default_line_symbol
+from tests import assert_images_equal
 
-from tests import (assert_images_equal)
 
-
-def test_layout_item_widget(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent,
-                            qgs_project, prepare_bivariate_renderer):
+def test_layout_item_widget(
+    qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, qgs_project, prepare_bivariate_renderer
+):
 
     qgs_project.addMapLayer(qgis_countries_layer)
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(
+        qgis_countries_layer, field1="fid", field2="fid", color_ramp=BivariateColorRampGreenPink()
+    )
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
@@ -50,15 +49,13 @@ def test_layout_item_widget(qgis_countries_layer: QgsVectorLayer, qgs_layout, qg
     assert isinstance(widget.layout_item, BivariateRendererLayoutItem)
 
 
-def test_visual(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, qgs_project,
-                prepare_bivariate_renderer):
+def test_visual(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, qgs_project, prepare_bivariate_renderer):
 
     qgs_project.addMapLayer(qgis_countries_layer)
 
-    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
-                                                    field1="fid",
-                                                    field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(
+        qgis_countries_layer, field1="fid", field2="fid", color_ramp=BivariateColorRampGreenPink()
+    )
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 

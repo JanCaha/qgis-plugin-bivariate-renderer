@@ -1,12 +1,11 @@
-from qgis.core import (QgsVectorLayer, QgsClassificationMethod, QgsTextFormat)
-from qgis.gui import (QgsFieldComboBox, QgsDoubleSpinBox, QgsColorRampButton)
-from qgis.PyQt.QtWidgets import (QComboBox, QLabel, QFormLayout)
+from qgis.core import QgsClassificationMethod, QgsTextFormat, QgsVectorLayer
+from qgis.gui import QgsColorRampButton, QgsDoubleSpinBox, QgsFieldComboBox
+from qgis.PyQt.QtWidgets import QComboBox, QFormLayout, QLabel
 
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
-
-from tests import (assert_images_equal)
+from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
+from tests import assert_images_equal
 
 
 def test_widget_elements(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):

@@ -1,8 +1,8 @@
 from pathlib import Path
 
+from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
-from qgis.core import QgsProcessingProvider
 from BivariateRenderer.tools.tool_calculate_categories import CalculateCategoriesAlgorithm
 
 
@@ -33,7 +33,7 @@ class BivariateRendererProvider(QgsProcessingProvider):
         string should be a unique, short, character only string, eg "qgis" or
         "gdal". This string should not be localised.
         """
-        return 'bivariatepolygonrenderer'
+        return "bivariatepolygonrenderer"
 
     def name(self):
         """

@@ -24,9 +24,11 @@ class ColorMixingMethodDirect(ColorMixingMethod):
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
-        return QColor(int((color1.red() + color2.red()) / 2),
-                      int((color1.green() + color2.green()) / 2),
-                      int((color1.blue() + color2.blue()) / 2))
+        return QColor(
+            int((color1.red() + color2.red()) / 2),
+            int((color1.green() + color2.green()) / 2),
+            int((color1.blue() + color2.blue()) / 2),
+        )
 
 
 class ColorMixingMethodDarken(ColorMixingMethod):
@@ -39,8 +41,9 @@ class ColorMixingMethodDarken(ColorMixingMethod):
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
-        return QColor(min(color1.red(), color2.red()), min(color1.green(), color2.green()),
-                      min(color1.blue(), color2.blue()))
+        return QColor(
+            min(color1.red(), color2.red()), min(color1.green(), color2.green()), min(color1.blue(), color2.blue())
+        )
 
 
 class ColorMixingMethodMultiply(ColorMixingMethod):
@@ -53,6 +56,8 @@ class ColorMixingMethodMultiply(ColorMixingMethod):
 
     def mix_colors(self, color1: QColor, color2: QColor) -> QColor:
 
-        return QColor(int((color1.redF() * color2.redF()) * 255),
-                      int((color1.greenF() * color2.greenF()) * 255),
-                      int((color1.blueF() * color2.blueF()) * 255))
+        return QColor(
+            int((color1.redF() * color2.redF()) * 255),
+            int((color1.greenF() * color2.greenF()) * 255),
+            int((color1.blueF() * color2.blueF()) * 255),
+        )

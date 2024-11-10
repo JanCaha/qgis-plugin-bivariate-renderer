@@ -1,23 +1,26 @@
-from qgis.PyQt.QtGui import (QImage, QColor, QPainter, QPixmap)
-from qgis.PyQt.QtWidgets import (QFormLayout, QLabel, QComboBox)
-from qgis.PyQt.QtCore import pyqtSignal, Qt
+from qgis.core import (
+    QgsClassificationEqualInterval,
+    QgsClassificationJenks,
+    QgsClassificationLogarithmic,
+    QgsClassificationPrettyBreaks,
+    QgsClassificationQuantile,
+    QgsFieldProxyModel,
+    QgsGradientColorRamp,
+    QgsRenderContext,
+)
+from qgis.gui import QgsColorRampButton, QgsDoubleSpinBox, QgsFieldComboBox, QgsRendererWidget
+from qgis.PyQt.QtCore import Qt, pyqtSignal
+from qgis.PyQt.QtGui import QColor, QImage, QPainter, QPixmap
+from qgis.PyQt.QtWidgets import QComboBox, QFormLayout, QLabel
 
-from qgis.gui import (QgsRendererWidget, QgsColorRampButton, QgsFieldComboBox, QgsDoubleSpinBox)
-
-from qgis.core import (QgsGradientColorRamp, QgsClassificationJenks,
-                       QgsClassificationEqualInterval, QgsClassificationQuantile,
-                       QgsClassificationPrettyBreaks, QgsClassificationLogarithmic,
-                       QgsFieldProxyModel, QgsRenderContext)
-
-from .bivariate_renderer import BivariateRenderer
-from ..legendrenderer.legend_renderer import LegendRenderer
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
+from ..colorramps.bivariate_color_ramp import BivariateColorRamp, BivariateColorRampGradient
 from ..colorramps.color_ramps_register import BivariateColorRampsRegister
-from .bivariate_legend import BivariateLegendViewerLegend
-
-from ..utils import (log)
-
+from ..legendrenderer.legend_renderer import LegendRenderer
 from ..text_constants import Texts
+from ..utils import log
+from .bivariate_legend import BivariateLegendViewerLegend
+from .bivariate_renderer import BivariateRenderer
 
 
 class BivariateRendererWidget(QgsRendererWidget):
@@ -33,6 +36,10 @@ class BivariateRendererWidget(QgsRendererWidget):
     default_color_ramp_1 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
     default_color_ramp_2 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_2
 
+    bivariate_color_ramp = BivariateColorRampGradient(9)
+    bivariate_color_ramp.set_color_ramp_1(default_color_ramp_1)
+    bivariate_color_ramp.set_color_ramp_2(default_color_ramp_2)
+
     bivariate_renderer: BivariateRenderer
 
     legend_renderer: LegendRenderer
@@ -42,7 +49,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         QgsClassificationJenks().name(): QgsClassificationJenks(),
         QgsClassificationQuantile().name(): QgsClassificationQuantile(),
         QgsClassificationPrettyBreaks().name(): QgsClassificationPrettyBreaks(),
-        QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic()
+        QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic(),
     }
 
     scale_factor = 1
@@ -58,6 +65,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         else:
             self.bivariate_renderer = renderer.clone()
             self.bivariate_renderer.generateCategories()
+            self.bivariate_color_ramp = self.bivariate_renderer.bivariate_color_ramp
 
         self.legend_renderer = LegendRenderer()
 
@@ -103,20 +111,18 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.sb_number_classes.setMinimum(2)
         self.sb_number_classes.setMaximum(5)
         self.sb_number_classes.setSingleStep(1)
-        self.sb_number_classes.valueChanged.connect(self.setNumberOfClasses)
-        self.sb_number_classes.setValue(self.bivariate_renderer.number_classes)
+        self.sb_number_classes.setValue(self.bivariate_renderer.bivariate_color_ramp.number_of_classes)
 
         self.cb_classification_methods = QComboBox()
         self.cb_classification_methods.addItems(list(self.classification_methods.keys()))
-        self.cb_classification_methods.currentIndexChanged.connect(self.setClassificationMethod)
 
         if self.bivariate_renderer.classification_method:
 
-            if self.bivariate_renderer.classification_method.name() in list(
-                    self.classification_methods.keys()):
+            if self.bivariate_renderer.classification_method.name() in list(self.classification_methods.keys()):
 
-                index = list(self.classification_methods.keys()).\
-                    index(self.bivariate_renderer.classification_method.name())
+                index = list(self.classification_methods.keys()).index(
+                    self.bivariate_renderer.classification_method.name()
+                )
 
             else:
 
@@ -129,12 +135,13 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.cb_classification_methods.setCurrentIndex(0)
 
         self.cb_colormixing_methods = QComboBox()
-        self.cb_colormixing_methods.addItems(self.register_color_mixing.names)
-        self.cb_colormixing_methods.currentIndexChanged.connect(self.setColorMixingMethod)
 
-        if self.bivariate_renderer.color_mixing_method:
+        self.cb_colormixing_methods.addItems(self.register_color_mixing.names)
+
+        if self.bivariate_renderer.bivariate_color_ramp.color_mixing_method:
             self.cb_colormixing_methods.setCurrentText(
-                self.bivariate_renderer.color_mixing_method.name())
+                self.bivariate_renderer.bivariate_color_ramp.color_mixing_method.name()
+            )
         else:
             self.cb_colormixing_methods.setCurrentIndex(1)
 
@@ -154,18 +161,16 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.cb_color_ramps.currentIndexChanged.connect(self.change_color_ramps)
 
         self.bt_color_ramp1 = QgsColorRampButton()
-        self.bt_color_ramp1.colorRampChanged.connect(self.setColorRamp1)
 
-        if self.bivariate_renderer.color_ramp_1:
-            self.bt_color_ramp1.setColorRamp(self.bivariate_renderer.color_ramp_1)
+        if self.bivariate_renderer.bivariate_color_ramp.color_ramp_1:
+            self.bt_color_ramp1.setColorRamp(self.bivariate_renderer.bivariate_color_ramp.color_ramp_1)
         else:
             self.bt_color_ramp1.setColorRamp(self.default_color_ramp_1)
 
         self.bt_color_ramp2 = QgsColorRampButton()
-        self.bt_color_ramp2.colorRampChanged.connect(self.setColorRamp2)
 
-        if self.bivariate_renderer.color_ramp_2:
-            self.bt_color_ramp2.setColorRamp(self.bivariate_renderer.color_ramp_2)
+        if self.bivariate_renderer.bivariate_color_ramp.color_ramp_2:
+            self.bt_color_ramp2.setColorRamp(self.bivariate_renderer.bivariate_color_ramp.color_ramp_2)
         else:
             self.bt_color_ramp2.setColorRamp(self.default_color_ramp_2)
 
@@ -186,7 +191,8 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout.addRow(
             QLabel(
                 "Data are categorized using Equal Interval classification\nmethod into provided number of categories for both fields."
-            ))
+            )
+        )
         # self.form_layout.addRow("Select classification method:", self.cb_classification_methods)
         self.form_layout.addRow("Color mixing method", self.cb_colormixing_methods)
         self.form_layout.addRow("Field 1", self.cb_field1)
@@ -196,6 +202,14 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.form_layout.addRow("Rotate color palette", self.rotate_color_palette)
         self.form_layout.addRow("Legend", self.label_legend)
         self.setLayout(self.form_layout)
+
+        self.sb_number_classes.valueChanged.connect(self.update_bivariate_color_ramp)
+        self.cb_classification_methods.currentIndexChanged.connect(self.update_bivariate_color_ramp)
+        self.bt_color_ramp1.colorRampChanged.connect(self.update_bivariate_color_ramp)
+        self.bt_color_ramp2.colorRampChanged.connect(self.update_bivariate_color_ramp)
+        self.cb_colormixing_methods.currentIndexChanged.connect(self.update_bivariate_color_ramp)
+
+        self.update_bivariate_color_ramp()
 
         self.update_legend()
 
@@ -261,8 +275,9 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_renderer.set_space_above_ticks(self.text_ticks_size / 2)
 
-        self.legend_renderer.render(context, self.legend_size, self.legend_size,
-                                    self.bivariate_renderer.generate_legend_polygons())
+        self.legend_renderer.render(
+            context, self.legend_size, self.legend_size, self.bivariate_renderer.generate_legend_polygons()
+        )
 
         painter.end()
 
@@ -274,43 +289,24 @@ class BivariateRendererWidget(QgsRendererWidget):
         legend = BivariateLegendViewerLegend(self.bivariate_renderer, self.vectorLayer())
         self.vectorLayer().setLegend(legend)
 
-    def setNumberOfClasses(self) -> None:
+    def update_bivariate_color_ramp(self) -> None:
+        self.bivariate_color_ramp.set_number_of_classes(int(self.sb_number_classes.value()))
 
-        self.bivariate_renderer.setNumberOfClasses(int(self.sb_number_classes.value()))
+        self.bivariate_color_ramp.set_color_mixing_method(
+            self.register_color_mixing.get_by_name(self.cb_colormixing_methods.currentText())
+        )
 
-        self.setField1Classes()
-        self.setField2Classes()
+        self.bivariate_color_ramp.set_color_ramp_1(self.bt_color_ramp1.colorRamp())
+        self.bivariate_color_ramp.set_color_ramp_2(self.bt_color_ramp2.colorRamp())
 
-        self.legend_changed.emit()
+        self.bivariate_renderer.set_bivariate_color_ramp(self.bivariate_color_ramp)
 
-    def setColorMixingMethod(self) -> None:
-
-        self.bivariate_renderer.setColorMixingMethod(
-            self.register_color_mixing.get_by_name(self.cb_colormixing_methods.currentText()))
-
-        self.legend_changed.emit()
-
-    def setClassificationMethod(self) -> None:
-
-        classification_method = self.classification_methods[
-            self.cb_classification_methods.currentText()]
+        classification_method = self.classification_methods[self.cb_classification_methods.currentText()]
 
         self.bivariate_renderer.setClassificationMethod(classification_method)
 
         self.setField1Classes()
         self.setField2Classes()
-
-        self.legend_changed.emit()
-
-    def setColorRamp1(self) -> None:
-
-        self.bivariate_renderer.setColorRamp1(self.bt_color_ramp1.colorRamp())
-
-        self.legend_changed.emit()
-
-    def setColorRamp2(self) -> None:
-
-        self.bivariate_renderer.setColorRamp2(self.bt_color_ramp2.colorRamp())
 
         self.legend_changed.emit()
 
@@ -354,5 +350,14 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         if name != "":
             bivariate_color_ramp = self.register_color_ramps.get_by_name(name)
+            self.bivariate_color_ramp = bivariate_color_ramp
+            self.bivariate_renderer.set_bivariate_color_ramp(bivariate_color_ramp)
+
+            self.bt_color_ramp1.blockSignals(True)
+            self.bt_color_ramp2.blockSignals(True)
             self.bt_color_ramp1.setColorRamp(bivariate_color_ramp.color_ramp_1)
             self.bt_color_ramp2.setColorRamp(bivariate_color_ramp.color_ramp_2)
+            self.bt_color_ramp1.blockSignals(False)
+            self.bt_color_ramp2.blockSignals(False)
+
+            self.legend_changed.emit()

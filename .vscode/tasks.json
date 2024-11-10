@@ -21,7 +21,7 @@
         {
             "label": "Run Pytest image generation",
             "type": "shell",
-            "command": "BIVARIATE_GENERATE=True pytest tests/tests_visual_result_generation -rP -vv -s",
+            "command": "BIVARIATE_GENERATE=True QT_QPA_PLATFORM=offscreen pytest tests/tests_visual_result_generation -rP -vv -s",
             "group": {
                 "kind": "test",
                 "isDefault": false

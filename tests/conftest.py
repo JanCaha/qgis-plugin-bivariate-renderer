@@ -1,20 +1,35 @@
-import pytest
 from pathlib import Path
 from typing import Optional, Union
 
-from pytest_qgis import clean_qgis_layer
-
-from qgis.core import (QgsProject, QgsVectorLayer, QgsLayout, QgsLayoutItemPage, QgsLayoutSize,
-                       QgsUnitTypes, QgsStyle, QgsLayoutItemMap, QgsLayoutExporter)
+import pytest
+from qgis.core import (
+    QgsLayout,
+    QgsLayoutExporter,
+    QgsLayoutItemMap,
+    QgsLayoutItemPage,
+    QgsLayoutSize,
+    QgsProject,
+    QgsStyle,
+    QgsUnitTypes,
+    QgsVectorLayer,
+)
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt.QtGui import QImage, qRgba, QPainter
-from qgis.PyQt.QtCore import QRectF, QSize
+from qgis.PyQt.QtCore import QLocale, QRectF, QSize
+from qgis.PyQt.QtGui import QImage, QPainter, qRgba
 
+from BivariateRenderer.colorramps.color_ramps_register import (
+    BivariateColorRamp,
+    BivariateColorRampGreenPink,
+    BivariateColorRampsRegister,
+)
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
-from BivariateRenderer.colorramps.color_ramps_register import (BivariateColorRamp,
-                                                               BivariateColorRampGreenPink,
-                                                               BivariateColorRampsRegister)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def change_locale():
+    """Sets locale to English, United Kingdom for all tests to ensure consistent results."""
+    QLocale.setDefault(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
 
 
 @pytest.fixture
@@ -39,7 +54,6 @@ def nc_layer_path() -> str:
 
 
 @pytest.fixture()
-@clean_qgis_layer
 def nc_layer(nc_layer_path) -> QgsVectorLayer:
 
     layer = QgsVectorLayer(nc_layer_path, "layer", "ogr")
@@ -90,8 +104,7 @@ def layout_space(layout_height, layout_width) -> QRectF:
 
 
 @pytest.fixture
-def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height,
-                   layout_width) -> QgsLayoutItemPage:
+def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height, layout_width) -> QgsLayoutItemPage:
 
     page = QgsLayoutItemPage(qgs_layout)
     page.setPageSize(QgsLayoutSize(layout_width, layout_height, QgsUnitTypes.LayoutMillimeters))
@@ -104,28 +117,18 @@ def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height,
 def prepare_bivariate_renderer():
 
     def return_bivariate_renderer(
-            layer: QgsVectorLayer,
-            field1: str = "",
-            field2: str = "",
-            color_ramps: Optional[BivariateColorRamp] = None) -> BivariateRenderer:
+        layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramp: Optional[BivariateColorRamp] = None
+    ) -> BivariateRenderer:
 
-        if color_ramps is None:
+        color_ramp_bivariate = BivariateColorRampsRegister().get_by_name("Violet - Blue")
 
-            color_ramp = BivariateColorRampsRegister().get_by_name("Violet - Blue")
-
-            default_color_ramp_1 = color_ramp.color_ramp_1
-            default_color_ramp_2 = color_ramp.color_ramp_2
-
-        else:
-
-            default_color_ramp_1 = color_ramps.color_ramp_1
-            default_color_ramp_2 = color_ramps.color_ramp_2
+        if color_ramp:
+            color_ramp_bivariate = color_ramp
 
         bivariate_renderer = BivariateRenderer()
         bivariate_renderer.setFieldName1(field1)
         bivariate_renderer.setFieldName2(field2)
-        bivariate_renderer.setColorRamp1(default_color_ramp_1)
-        bivariate_renderer.setColorRamp2(default_color_ramp_2)
+        bivariate_renderer.set_bivariate_color_ramp(color_ramp_bivariate)
         bivariate_renderer.setField1ClassificationData(layer, bivariate_renderer.field_name_1)
         bivariate_renderer.setField2ClassificationData(layer, bivariate_renderer.field_name_2)
 
@@ -138,14 +141,11 @@ def prepare_bivariate_renderer():
 def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
 
     def return_bivariate_renderer_widget(layer: QgsVectorLayer) -> BivariateRendererWidget:
-        bivariate_renderer = prepare_bivariate_renderer(layer,
-                                                        field1="AREA",
-                                                        field2="PERIMETER",
-                                                        color_ramps=BivariateColorRampGreenPink())
+        bivariate_renderer = prepare_bivariate_renderer(
+            layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+        )
 
-        widget = BivariateRendererWidget(layer=layer,
-                                         style=QgsStyle(),
-                                         renderer=bivariate_renderer)
+        widget = BivariateRendererWidget(layer=layer, style=QgsStyle(), renderer=bivariate_renderer)
 
         return widget
 
@@ -155,12 +155,14 @@ def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
 @pytest.fixture
 def save_layout_for_layer(qgs_layout, layout_page_a4, layout_space, export_page_to_image):
 
-    def function_to_run(layer: QgsVectorLayer,
-                        image_path: Union[str, Path],
-                        qgs_layout: QgsLayout = qgs_layout,
-                        page=layout_page_a4,
-                        layout_space=layout_space,
-                        export_page_to_image=export_page_to_image) -> None:
+    def function_to_run(
+        layer: QgsVectorLayer,
+        image_path: Union[str, Path],
+        qgs_layout: QgsLayout = qgs_layout,
+        page=layout_page_a4,
+        layout_space=layout_space,
+        export_page_to_image=export_page_to_image,
+    ) -> None:
 
         canvas = QgsMapCanvas()
 
@@ -183,10 +185,9 @@ def save_layout_for_layer(qgs_layout, layout_page_a4, layout_space, export_page_
 @pytest.fixture
 def export_page_to_image(layout_dpmm):
 
-    def function_to_run(qgs_layout: QgsLayout,
-                        page: QgsLayoutItemPage,
-                        image_path: Union[Path, str],
-                        DPMM=layout_dpmm) -> None:
+    def function_to_run(
+        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM=layout_dpmm
+    ) -> None:
 
         if isinstance(image_path, Path):
             image_path = image_path.as_posix()
