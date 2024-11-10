@@ -136,7 +136,7 @@ def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
 
     def return_bivariate_renderer_widget(layer: QgsVectorLayer) -> BivariateRendererWidget:
         bivariate_renderer = prepare_bivariate_renderer(
-            layer, field1="AREA", field2="PERIMETER", color_ramps=BivariateColorRampGreenPink()
+            layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
         )
 
         widget = BivariateRendererWidget(layer=layer, style=QgsStyle(), renderer=bivariate_renderer)
