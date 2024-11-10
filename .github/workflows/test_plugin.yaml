@@ -7,6 +7,11 @@ on:
     - "tests/**"
     - ".github/workflows/test_plugin.yaml"
 
+env:
+  DEBIAN_FRONTEND: noninteractive
+  QT_QPA_PLATFORM: offscreen
+  XDG_RUNTIME_DIR: /tmp
+  PYTHONPATH: /usr/share/qgis/python/plugins:/usr/share/qgis/python:./qgis-plugin-bivariate-renderer
 
 jobs:
 
@@ -14,17 +19,51 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    container: cahik/vscode-ubuntu-qgis-testing:v2
-
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       
-      - name: Print dir
-        run: dir
+      - name: Prepare QGIS
+        run: |
+          sudo gpg -k && \
+          KEYRING=/usr/share/keyrings/qgis-archive-keyring.gpg && \
+          wget -O $KEYRING https://download.qgis.org/downloads/qgis-archive-keyring.gpg && \
+          touch /etc/apt/sources.list.d/qgis.sources && \
+          echo 'Types: deb deb-src' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
+          echo 'URIs: https://qgis.org/ubuntugis' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
+          echo 'Suites: '$(lsb_release -c -s) | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
+          echo 'Architectures: '$(dpkg --print-architecture) | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
+          echo 'Components: main' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
+          echo 'Signed-By: '$KEYRING | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
+          LASTSUPPORTED=focal && \
+          KEYRING=/usr/share/keyrings/ubuntugis-archive-keyring.gpg && \
+          sudo gpg --no-default-keyring --keyring $KEYRING --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 6B827C12C2D425E227EDCA75089EBE08314DF160 && \
+          echo 'Types: deb deb-src' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
+          echo 'URIs:https://ppa.launchpadcontent.net/ubuntugis/ubuntugis-unstable/ubuntu' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
+          echo 'Suites: '$(lsb_release -c -s)| sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
+          echo 'Architectures: '$(dpkg --print-architecture) | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
+          echo 'Components: main' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
+          echo 'Signed-By: '$KEYRING | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \ 
+
+      - name: Install
+        run: | 
+          export DEBIAN_FRONTEND=noninteractive && \
+          echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+          apt-get update && \
+          apt-get -y -q install --no-install-recommends wget software-properties-common build-essential ca-certificates python3-pip dialog apt-utils && \
+          sudo apt update && \
+          sudo apt upgrade -y -q && \
+          sudo apt -y -q install qgis qgis-dev qgis-plugin-grass
+
+      - name: Install Python packages 
+        run: |
+          pip install --no-cache-dir pytest pytest-qgis pytest-cov pillow flake8 mypy pycodestyle pb_tool pytest-qt pixelmatch --break-system-packages   
+
+      - name: Print Dir
+        run: |
+          ls -la
 
       - name: Run tests
         run: |
-          PYTHONPATH=$PYTHONPATH:./qgis-plugin-bivariate-renderer
           pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
