@@ -1,0 +1,34 @@
+[options.extras_require]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-qgis"
+]
+
+[flake8]
+exclude = [
+    ".git", 
+    "__pycache__", 
+    "tests/*"
+]
+max-line-length = 120
+
+
+[tool.pytest.ini_options]
+addopts = "-vv -rP -s --cov=BivariateRenderer --cov-report=term-missing:skip-covered --ignore=tests/tests_visual_result_generation"
+testpaths = [
+    "tests"
+]
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 120
+skip_gitignore = true
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = ""
