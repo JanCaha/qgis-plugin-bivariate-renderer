@@ -45,7 +45,7 @@ jobs:
           echo 'Suites: '$(lsb_release -c -s)| sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
           echo 'Architectures: '$(dpkg --print-architecture) | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
           echo 'Components: main' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'Signed-By: '$KEYRING | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \ 
+          echo 'Signed-By: '$KEYRING | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources
 
       - name: Install
         run: | 
