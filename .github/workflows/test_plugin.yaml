@@ -29,7 +29,7 @@ jobs:
           sudo gpg -k && \
           KEYRING=/usr/share/keyrings/qgis-archive-keyring.gpg && \
           wget -O $KEYRING https://download.qgis.org/downloads/qgis-archive-keyring.gpg && \
-          touch /etc/apt/sources.list.d/qgis.sources && \
+          sudo touch /etc/apt/sources.list.d/qgis.sources && \
           echo 'Types: deb deb-src' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
           echo 'URIs: https://qgis.org/ubuntugis' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
           echo 'Suites: '$(lsb_release -c -s) | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
@@ -39,6 +39,7 @@ jobs:
           LASTSUPPORTED=focal && \
           KEYRING=/usr/share/keyrings/ubuntugis-archive-keyring.gpg && \
           sudo gpg --no-default-keyring --keyring $KEYRING --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 6B827C12C2D425E227EDCA75089EBE08314DF160 && \
+          sudo touch /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
           echo 'Types: deb deb-src' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
           echo 'URIs:https://ppa.launchpadcontent.net/ubuntugis/ubuntugis-unstable/ubuntu' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
           echo 'Suites: '$(lsb_release -c -s)| sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
