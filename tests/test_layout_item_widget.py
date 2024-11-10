@@ -18,7 +18,7 @@ def test_layout_item_widget(qgis_countries_layer: QgsVectorLayer, qgs_layout, qg
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
                                                     field1="fid",
                                                     field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
@@ -58,7 +58,7 @@ def test_visual(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, q
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
                                                     field1="fid",
                                                     field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
