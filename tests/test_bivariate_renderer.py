@@ -7,13 +7,13 @@ from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from tests import assert_images_equal
 
 
-def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProject,
-                                prepare_bivariate_renderer, save_layout_for_layer):
+def test_layer_bivariate_render(
+    nc_layer: QgsVectorLayer, qgs_project: QgsProject, prepare_bivariate_renderer, save_layout_for_layer
+):
 
-    bivariate_renderer = prepare_bivariate_renderer(nc_layer,
-                                                    field1="AREA",
-                                                    field2="PERIMETER",
-                                                    color_ramp=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
 
     nc_layer.setRenderer(bivariate_renderer)
 
@@ -28,10 +28,9 @@ def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProjec
 
 def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
 
-    bivariate_renderer = prepare_bivariate_renderer(nc_layer,
-                                                    field1="AREA",
-                                                    field2="PERIMETER",
-                                                    color_ramp=BivariateColorRampGreenPink())
+    bivariate_renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
 
     xml_renderer = """
     <!DOCTYPE doc>
@@ -101,11 +100,9 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     xml.setContent(xml_renderer)
     element = xml.documentElement()
 
-    renderer_from_xml = BivariateRenderer.create_render_from_element(element,
-                                                                     QgsReadWriteContext())
+    renderer_from_xml = BivariateRenderer.create_render_from_element(element, QgsReadWriteContext())
 
     assert renderer_from_xml
     assert bivariate_renderer == renderer_from_xml
 
-    assert isinstance(bivariate_renderer.save(QDomDocument("doc"), QgsReadWriteContext()),
-                      QDomElement)
+    assert isinstance(bivariate_renderer.save(QDomDocument("doc"), QgsReadWriteContext()), QDomElement)

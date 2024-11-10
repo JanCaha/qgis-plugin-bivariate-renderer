@@ -1,7 +1,6 @@
-from typing import List, Dict
+from typing import Dict, List
 
-from qgis.core import (QgsDefaultVectorLayerLegend, QgsVectorLayer, QgsLayerTreeModelLegendNode,
-                       QgsSymbolLegendNode)
+from qgis.core import QgsDefaultVectorLayerLegend, QgsLayerTreeModelLegendNode, QgsSymbolLegendNode, QgsVectorLayer
 
 from .bivariate_renderer import BivariateRenderer
 
@@ -13,8 +12,7 @@ class BivariateLegendViewerLegend(QgsDefaultVectorLayerLegend):
         self.bivariate_renderer = bivariate_renderer
         self.layer = layer
 
-    def createLayerTreeModelLegendNodes(self,
-                                        layer_tree_layer) -> List[QgsLayerTreeModelLegendNode]:
+    def createLayerTreeModelLegendNodes(self, layer_tree_layer) -> List[QgsLayerTreeModelLegendNode]:
 
         items: Dict[str, QgsSymbolLegendNode] = {}
 
@@ -23,9 +21,9 @@ class BivariateLegendViewerLegend(QgsDefaultVectorLayerLegend):
             label = self.bivariate_renderer.getFeatureCombinationHash(feature)
 
             if label not in items.keys():
-                legend_item = QgsSymbolLegendNode(layer_tree_layer,
-                                                  self.bivariate_renderer.legendSymbolItem(label),
-                                                  self)
+                legend_item = QgsSymbolLegendNode(
+                    layer_tree_layer, self.bivariate_renderer.legendSymbolItem(label), self
+                )
                 legend_item.setUserLabel(label)
                 items[label] = legend_item
 

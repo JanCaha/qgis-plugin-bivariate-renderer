@@ -1,9 +1,8 @@
-from typing import Dict, Any
 import json
 from pathlib import Path
+from typing import Any, Dict
 
-from qgis.core import (QgsMessageLog, Qgis, QgsLineSymbol, QgsSymbol, QgsSymbolLayerUtils,
-                       QgsReadWriteContext)
+from qgis.core import Qgis, QgsLineSymbol, QgsMessageLog, QgsReadWriteContext, QgsSymbol, QgsSymbolLayerUtils
 from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.PyQt.QtXml import QDomDocument
 
@@ -17,17 +16,15 @@ def log(text: Any) -> None:
 # these two functions are taken from
 # https://github.com/TomasdelaBarra/QTRANUS/blob/c32c11f02faec561b1825479b3251c096c5f36ea/add_linktype_dialog.py
 def get_symbol_object(symbol_obj: Dict) -> QgsLineSymbol:
-    """ Return dictionary with objects of symbol"""
+    """Return dictionary with objects of symbol"""
 
-    from qgis.core import (QgsArrowSymbolLayer, QgsSimpleLineSymbolLayer, QgsLineSymbol)
+    from qgis.core import QgsArrowSymbolLayer, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
     # symbol_obj = json.loads(symbol_srt.replace("'", '"').replace("ArrowLine", "Arrow"))
     symbol_layers = QgsLineSymbol()
 
-    for layer_symbol in symbol_obj['layers_list']:
-        obj_symbol = eval(
-            f"Qgs{layer_symbol['type_layer']}SymbolLayer.create({layer_symbol['properties_layer']})"
-        )
+    for layer_symbol in symbol_obj["layers_list"]:
+        obj_symbol = eval(f"Qgs{layer_symbol['type_layer']}SymbolLayer.create({layer_symbol['properties_layer']})")
         symbol_layers.appendSymbolLayer(obj_symbol)
 
     symbol_layers.deleteSymbolLayer(0)
@@ -36,17 +33,19 @@ def get_symbol_object(symbol_obj: Dict) -> QgsLineSymbol:
 
 
 def get_symbol_dict(symbol: QgsSymbol) -> Dict:
-    """ Return dictionary with main elements of symbol """
+    """Return dictionary with main elements of symbol"""
     symbol_dict = dict()
 
-    symbol_dict['type'] = symbol.type()
-    symbol_dict['layers_list'] = []
+    symbol_dict["type"] = symbol.type()
+    symbol_dict["layers_list"] = []
 
     for index in range(0, symbol.symbolLayerCount()):
-        symbol_dict['layers_list'].append({
-            'type_layer': symbol.symbolLayer(index).layerType().split(':')[0],
-            'properties_layer': symbol.symbolLayer(index).properties(),
-        })
+        symbol_dict["layers_list"].append(
+            {
+                "type_layer": symbol.symbolLayer(index).layerType().split(":")[0],
+                "properties_layer": symbol.symbolLayer(index).properties(),
+            }
+        )
 
     return symbol_dict
 
@@ -71,8 +70,7 @@ def load_json(content: str) -> Dict:
 
 def default_line_symbol() -> QgsLineSymbol:
 
-    line_symbol = get_symbol_object(
-        load_json(read_file_content(path_data("axis_line_symbol.json"))))
+    line_symbol = get_symbol_object(load_json(read_file_content(path_data("axis_line_symbol.json"))))
     line_symbol.setColor(QColor(0, 0, 0))
 
     return line_symbol
@@ -94,7 +92,7 @@ def save_symbol_xml(symbol: QgsSymbol, file_name: Path) -> None:
 
     doc = QDomDocument()
 
-    elem = QgsSymbolLayerUtils.saveSymbol('symbol', symbol, doc, QgsReadWriteContext())
+    elem = QgsSymbolLayerUtils.saveSymbol("symbol", symbol, doc, QgsReadWriteContext())
 
     doc.appendChild(elem)
 

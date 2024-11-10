@@ -1,14 +1,21 @@
-from typing import List
 import math
+from typing import List
 
+from qgis.core import (
+    QgsBasicNumericFormat,
+    QgsFillSymbol,
+    QgsLineString,
+    QgsLineSymbol,
+    QgsNumericFormatContext,
+    QgsPoint,
+    QgsRenderContext,
+    QgsTextFormat,
+    QgsTextRenderer,
+)
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
-from qgis.PyQt.QtGui import QPolygonF, QPainter, QTransform, QColor, QPen
+from qgis.PyQt.QtGui import QColor, QPainter, QPen, QPolygonF, QTransform
 
-from qgis.core import (QgsTextFormat, QgsLineSymbol, QgsRenderContext, QgsTextRenderer,
-                       QgsBasicNumericFormat, QgsNumericFormatContext, QgsLineString, QgsPoint,
-                       QgsFillSymbol)
-
-from ..renderer.bivariate_renderer import LegendPolygon, BivariateRenderer
+from ..renderer.bivariate_renderer import BivariateRenderer, LegendPolygon
 from ..utils import default_line_symbol
 
 
@@ -128,13 +135,9 @@ class LegendRenderer:
 
         if self.add_axes_texts:
 
-            self._text_height_x = QgsTextRenderer.textHeight(self.context,
-                                                             self.text_format,
-                                                             textLines=text_axis_x)
+            self._text_height_x = QgsTextRenderer.textHeight(self.context, self.text_format, textLines=text_axis_x)
 
-            self._text_height_y = QgsTextRenderer.textHeight(self.context,
-                                                             self.text_format,
-                                                             textLines=text_axis_y)
+            self._text_height_y = QgsTextRenderer.textHeight(self.context, self.text_format, textLines=text_axis_y)
 
         else:
 
@@ -332,15 +335,16 @@ class LegendRenderer:
 
                 size = self.height - max_size
 
-                scale_factor_orig = self.height / math.sqrt(
-                    math.pow(max_size, 2) + math.pow(max_size, 2))
+                scale_factor_orig = self.height / math.sqrt(math.pow(max_size, 2) + math.pow(max_size, 2))
                 scale_factor = (int(scale_factor_orig * 100) / 100) - 0.02
 
                 self._transform.translate(self.width / 2, self.height / 2)
                 self._transform.rotate(-45)
                 self._transform.scale(scale_factor, scale_factor)
-                self._transform.translate(-(self.width / 2) - (size / 2) * scale_factor_orig,
-                                          -(self.height / 2) + (size / 2) * scale_factor_orig)
+                self._transform.translate(
+                    -(self.width / 2) - (size / 2) * scale_factor_orig,
+                    -(self.height / 2) + (size / 2) * scale_factor_orig,
+                )
 
             else:
 
@@ -356,9 +360,13 @@ class LegendRenderer:
         for polygon in polygons:
 
             polygon_draw = QPolygonF(
-                QRectF(self.polygon_start_pos_x + polygon.x * self.size_constant,
-                       self.polygon_start_pos_y - (polygon.y + 1) * self.size_constant,
-                       self.size_constant, self.size_constant))
+                QRectF(
+                    self.polygon_start_pos_x + polygon.x * self.size_constant,
+                    self.polygon_start_pos_y - (polygon.y + 1) * self.size_constant,
+                    self.size_constant,
+                    self.size_constant,
+                )
+            )
 
             polygon_draw = self.transform.map(polygon_draw)
 
@@ -368,8 +376,7 @@ class LegendRenderer:
                     self.symbol_rectangle_without_values.setColor(polygon.symbol.color())
 
                 self.symbol_rectangle_without_values.startRender(self.context)
-                self.symbol_rectangle_without_values.renderPolygon(polygon_draw, None, None,
-                                                                   self.context)
+                self.symbol_rectangle_without_values.renderPolygon(polygon_draw, None, None, self.context)
                 self.symbol_rectangle_without_values.stopRender(self.context)
 
             else:
@@ -400,10 +407,7 @@ class LegendRenderer:
     def axis_text_max_lines(self) -> int:
         return max(len(self._text_axis_x), len(self._text_axis_y))
 
-    def add_empty_lines(self,
-                        text: List[str],
-                        number_of_lines: int,
-                        add_before_text: bool = False) -> List[str]:
+    def add_empty_lines(self, text: List[str], number_of_lines: int, add_before_text: bool = False) -> List[str]:
 
         if add_before_text:
 
@@ -413,10 +417,7 @@ class LegendRenderer:
 
             return text + ["\n"] * number_of_lines
 
-    def add_lines_if_shorter(self,
-                             text: List[str],
-                             required_length: int,
-                             add_before_text: bool = False) -> List[str]:
+    def add_lines_if_shorter(self, text: List[str], required_length: int, add_before_text: bool = False) -> List[str]:
 
         if len(text) == required_length:
 
@@ -436,18 +437,29 @@ class LegendRenderer:
 
         rotated_counterclockwise = self._text_rotation_y == 90
 
-        return self.add_lines_if_shorter(self._text_axis_y, self.axis_text_max_lines,
-                                         rotated_counterclockwise)
+        return self.add_lines_if_shorter(self._text_axis_y, self.axis_text_max_lines, rotated_counterclockwise)
 
     def draw_axes_texts(self) -> None:
 
-        QgsTextRenderer.drawText(self.transform.map(self.text_position_x), self.text_rotation_x,
-                                 QgsTextRenderer.AlignCenter, self.text_axis_x, self.context,
-                                 self.text_format, QgsTextRenderer.AlignBottom)
+        QgsTextRenderer.drawText(
+            self.transform.map(self.text_position_x),
+            self.text_rotation_x,
+            QgsTextRenderer.AlignCenter,
+            self.text_axis_x,
+            self.context,
+            self.text_format,
+            QgsTextRenderer.AlignBottom,
+        )
 
-        QgsTextRenderer.drawText(self.transform.map(self.text_position_y), self.text_rotation_y,
-                                 QgsTextRenderer.AlignCenter, self.text_axis_y, self.context,
-                                 self.text_format, QgsTextRenderer.AlignBottom)
+        QgsTextRenderer.drawText(
+            self.transform.map(self.text_position_y),
+            self.text_rotation_y,
+            QgsTextRenderer.AlignCenter,
+            self.text_axis_y,
+            self.context,
+            self.text_format,
+            QgsTextRenderer.AlignBottom,
+        )
 
     def format_tick_value(self, value: float, precision: int) -> List[str]:
 
@@ -462,11 +474,11 @@ class LegendRenderer:
 
         if self.add_axes_ticks_texts:
 
-            return QgsTextRenderer.textHeight(self.context,
-                                              self.text_format_ticks,
-                                              textLines=self.format_tick_value(
-                                                  self.texts_axis_x_ticks[0],
-                                                  self.ticks_x_precision))
+            return QgsTextRenderer.textHeight(
+                self.context,
+                self.text_format_ticks,
+                textLines=self.format_tick_value(self.texts_axis_x_ticks[0], self.ticks_x_precision),
+            )
 
         else:
 
@@ -477,11 +489,11 @@ class LegendRenderer:
 
         if self.add_axes_ticks_texts and not self.use_category_midpoints:
 
-            return QgsTextRenderer.textWidth(self.context,
-                                             self.text_format_ticks,
-                                             textLines=self.format_tick_value(
-                                                 max(self.texts_axis_y_ticks),
-                                                 self.ticks_y_precision))
+            return QgsTextRenderer.textWidth(
+                self.context,
+                self.text_format_ticks,
+                textLines=self.format_tick_value(max(self.texts_axis_y_ticks), self.ticks_y_precision),
+            )
 
         else:
 
@@ -492,11 +504,11 @@ class LegendRenderer:
 
         if self.add_axes_ticks_texts and not self.use_category_midpoints:
 
-            return QgsTextRenderer.textWidth(self.context,
-                                             self.text_format_ticks,
-                                             textLines=self.format_tick_value(
-                                                 max(self.texts_axis_x_ticks),
-                                                 self.ticks_x_precision))
+            return QgsTextRenderer.textWidth(
+                self.context,
+                self.text_format_ticks,
+                textLines=self.format_tick_value(max(self.texts_axis_x_ticks), self.ticks_x_precision),
+            )
 
         else:
 
@@ -574,21 +586,29 @@ class LegendRenderer:
 
                 text_position = self.position_axis_tick_x(i)
 
-                QgsTextRenderer.drawText(self.transform.map(text_position), self.text_rotation_x,
-                                         QgsTextRenderer.AlignCenter,
-                                         self.format_tick_value(value, self.ticks_x_precision),
-                                         self.context, self.text_format_ticks,
-                                         QgsTextRenderer.AlignBottom)
+                QgsTextRenderer.drawText(
+                    self.transform.map(text_position),
+                    self.text_rotation_x,
+                    QgsTextRenderer.AlignCenter,
+                    self.format_tick_value(value, self.ticks_x_precision),
+                    self.context,
+                    self.text_format_ticks,
+                    QgsTextRenderer.AlignBottom,
+                )
 
             for i, value in enumerate(self.texts_axis_y_ticks):
 
                 text_position = self.position_axis_tick_y(len(self.texts_axis_y_ticks) - i - 1)
 
-                QgsTextRenderer.drawText(self.transform.map(text_position), self.text_rotation_y,
-                                         QgsTextRenderer.AlignCenter,
-                                         self.format_tick_value(value, self.ticks_y_precision),
-                                         self.context, self.text_format_ticks,
-                                         QgsTextRenderer.AlignBottom)
+                QgsTextRenderer.drawText(
+                    self.transform.map(text_position),
+                    self.text_rotation_y,
+                    QgsTextRenderer.AlignCenter,
+                    self.format_tick_value(value, self.ticks_y_precision),
+                    self.context,
+                    self.text_format_ticks,
+                    QgsTextRenderer.AlignBottom,
+                )
 
     def set_space_above_ticks(self, space: int) -> None:
         self._space_above_ticks = int(space)
@@ -609,9 +629,13 @@ class LegendRenderer:
         for polygon in polygons:
 
             polygon = QPolygonF(
-                QRectF(self.polygon_start_pos_x + polygon.x * self.size_constant,
-                       self.polygon_start_pos_y - (polygon.y + 1) * self.size_constant,
-                       self.size_constant, self.size_constant))
+                QRectF(
+                    self.polygon_start_pos_x + polygon.x * self.size_constant,
+                    self.polygon_start_pos_y - (polygon.y + 1) * self.size_constant,
+                    self.size_constant,
+                    self.size_constant,
+                )
+            )
 
             polygon = self.transform.map(polygon)
 
@@ -634,16 +658,13 @@ class LegendRenderer:
 
         self.painter.setPen(pen)
 
-        line = QgsLineString([
-            QgsPoint(0, self.height - self.text_height_max),
-            QgsPoint(self.width, self.height - self.text_height_max)
-        ])
+        line = QgsLineString(
+            [QgsPoint(0, self.height - self.text_height_max), QgsPoint(self.width, self.height - self.text_height_max)]
+        )
 
         line.draw(self.painter)
 
-        line = QgsLineString(
-            [QgsPoint(self.text_height_max, 0),
-             QgsPoint(self.text_height_max, self.height)])
+        line = QgsLineString([QgsPoint(self.text_height_max, 0), QgsPoint(self.text_height_max, self.height)])
 
         line.draw(self.painter)
 
@@ -652,37 +673,35 @@ class LegendRenderer:
 
         self.painter.setPen(pen)
 
-        line = QgsLineString([
-            QgsPoint(0, self.height - self.axis_text_tics_top),
-            QgsPoint(self.width, self.height - self.axis_text_tics_top)
-        ])
+        line = QgsLineString(
+            [
+                QgsPoint(0, self.height - self.axis_text_tics_top),
+                QgsPoint(self.width, self.height - self.axis_text_tics_top),
+            ]
+        )
 
         line.draw(self.painter)
 
-        line = QgsLineString(
-            [QgsPoint(self.axis_text_tics_top, 0),
-             QgsPoint(self.axis_text_tics_top, self.height)])
+        line = QgsLineString([QgsPoint(self.axis_text_tics_top, 0), QgsPoint(self.axis_text_tics_top, self.height)])
 
         line.draw(self.painter)
 
         self.painter.restore()
 
-    def render_legend(self, context: QgsRenderContext, width: float, height: float,
-                      renderer: BivariateRenderer) -> None:
+    def render_legend(
+        self, context: QgsRenderContext, width: float, height: float, renderer: BivariateRenderer
+    ) -> None:
 
         if self.use_category_midpoints:
-            self.texts_axis_x_ticks = BivariateRenderer.classes_to_legend_midpoints(
-                renderer.field_1_classes)
-            self.texts_axis_y_ticks = BivariateRenderer.classes_to_legend_midpoints(
-                renderer.field_2_classes)
+            self.texts_axis_x_ticks = BivariateRenderer.classes_to_legend_midpoints(renderer.field_1_classes)
+            self.texts_axis_y_ticks = BivariateRenderer.classes_to_legend_midpoints(renderer.field_2_classes)
         else:
             self.texts_axis_x_ticks = renderer.field_1_labels
             self.texts_axis_y_ticks = renderer.field_2_labels
 
         self.render(context, width, height, renderer.generate_legend_polygons())
 
-    def render(self, context: QgsRenderContext, width: float, height: float,
-               polygons: List[LegendPolygon]) -> None:
+    def render(self, context: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]) -> None:
 
         self.context = context
 

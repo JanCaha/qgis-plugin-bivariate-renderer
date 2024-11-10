@@ -102,7 +102,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.ticks_use_category_midpoints = False
 
         self.symbol_rectangle_without_values = load_symbol_xml(
-            Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml")
+            Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml"
+        )
 
         self.replace_rectangle_without_values = False
         self.use_rectangle_without_values_color_from_legend = False
@@ -147,7 +148,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.use_category_midpoints = self.ticks_use_category_midpoints
 
         legend_render.replace_rectangle_without_values = self.replace_rectangle_without_values
-        legend_render.use_rectangle_without_values_color_from_legend = self.use_rectangle_without_values_color_from_legend
+        legend_render.use_rectangle_without_values_color_from_legend = (
+            self.use_rectangle_without_values_color_from_legend
+        )
         legend_render.symbol_rectangle_without_values = self.symbol_rectangle_without_values
 
         return legend_render
@@ -162,11 +165,11 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         if self.renderer:
 
-            legend_render.render_legend(render_context, item_size.width(), item_size.height(),
-                                        self.renderer)
+            legend_render.render_legend(render_context, item_size.width(), item_size.height(), self.renderer)
 
-    def writePropertiesToElement(self, bivariate_legend_element: QDomElement, doc: QDomDocument,
-                                 context: QgsReadWriteContext) -> bool:
+    def writePropertiesToElement(
+        self, bivariate_legend_element: QDomElement, doc: QDomDocument, context: QgsReadWriteContext
+    ) -> bool:
 
         bivariate_legend_element.setAttribute("axis_x_name", self.text_axis_x)
         bivariate_legend_element.setAttribute("axis_y_name", self.text_axis_y)
@@ -174,24 +177,18 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         bivariate_legend_element.setAttribute("legend_rotated", str(self.legend_rotated))
         bivariate_legend_element.setAttribute("draw_axes_text", str(self.add_axes_texts))
         bivariate_legend_element.setAttribute("draw_axes_arrow", str(self.add_axes_arrows))
-        bivariate_legend_element.setAttribute("draw_axes_values_texts",
-                                              str(self.add_axes_values_texts))
+        bivariate_legend_element.setAttribute("draw_axes_values_texts", str(self.add_axes_values_texts))
         bivariate_legend_element.setAttribute("y_axis_rotation", str(self.y_axis_rotation))
         bivariate_legend_element.setAttribute("ticks_x_precision", str(self.ticks_x_precision))
         bivariate_legend_element.setAttribute("ticks_y_precision", str(self.ticks_y_precision))
         bivariate_legend_element.setAttribute("space_above_ticks", str(self.space_above_ticks))
-        bivariate_legend_element.setAttribute("ticks_use_category_midpoints",
-                                              str(self.ticks_use_category_midpoints))
+        bivariate_legend_element.setAttribute("ticks_use_category_midpoints", str(self.ticks_use_category_midpoints))
 
-        bivariate_legend_element.setAttribute("draw_colors_separators",
-                                              str(self.add_colors_separators))
-        bivariate_legend_element.setAttribute("color_separator_width",
-                                              str(self.color_separator_width))
-        bivariate_legend_element.setAttribute("color_separator_color",
-                                              self.color_separator_color.name())
+        bivariate_legend_element.setAttribute("draw_colors_separators", str(self.add_colors_separators))
+        bivariate_legend_element.setAttribute("color_separator_width", str(self.color_separator_width))
+        bivariate_legend_element.setAttribute("color_separator_color", self.color_separator_color.name())
 
-        bivariate_legend_element.setAttribute("arrows_common_start_point",
-                                              str(self.arrows_common_start_point))
+        bivariate_legend_element.setAttribute("arrows_common_start_point", str(self.arrows_common_start_point))
         bivariate_legend_element.setAttribute("arrow_width", str(self.arrow_width))
 
         line_symbol = doc.createElement("lineSymbol")
@@ -214,16 +211,14 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         bivariate_legend_element.appendChild(text_axes_values_format)
 
-        bivariate_legend_element.setAttribute("replace_empty_rectangles",
-                                              str(self.replace_rectangle_without_values))
+        bivariate_legend_element.setAttribute("replace_empty_rectangles", str(self.replace_rectangle_without_values))
         bivariate_legend_element.setAttribute(
-            "empty_rectangle_use_legend_color",
-            str(self.use_rectangle_without_values_color_from_legend))
+            "empty_rectangle_use_legend_color", str(self.use_rectangle_without_values_color_from_legend)
+        )
 
         empty_polygon_symbol_elem = doc.createElement("emptyPolygonSymbol")
 
-        symbol_elem = QgsSymbolLayerUtils.saveSymbol("", self.symbol_rectangle_without_values, doc,
-                                                     context)
+        symbol_elem = QgsSymbolLayerUtils.saveSymbol("", self.symbol_rectangle_without_values, doc, context)
 
         empty_polygon_symbol_elem.appendChild(symbol_elem)
 
@@ -234,8 +229,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         return True
 
-    def readPropertiesFromElement(self, element: QDomElement, document: QDomDocument,
-                                  context: QgsReadWriteContext) -> bool:
+    def readPropertiesFromElement(
+        self, element: QDomElement, document: QDomDocument, context: QgsReadWriteContext
+    ) -> bool:
 
         if self.linked_layer:
             self.layer = None
@@ -270,8 +266,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.ticks_y_precision = int(element.attribute("ticks_y_precision"))
 
         self.space_above_ticks = int(element.attribute("space_above_ticks"))
-        self.ticks_use_category_midpoints = element.attribute(
-            "ticks_use_category_midpoints") == "True"
+        self.ticks_use_category_midpoints = element.attribute("ticks_use_category_midpoints") == "True"
 
         self.legend_rotated = element.attribute("legend_rotated") == "True"
 
@@ -298,10 +293,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.color_separator_width = int(element.attribute("color_separator_width"))
         self.color_separator_color = QColor(element.attribute("color_separator_color"))
 
-        self.replace_rectangle_without_values = element.attribute(
-            "replace_empty_rectangles") == "True"
-        self.use_rectangle_without_values_color_from_legend = element.attribute(
-            "empty_rectangle_use_legend_color") == "True"
+        self.replace_rectangle_without_values = element.attribute("replace_empty_rectangles") == "True"
+        self.use_rectangle_without_values_color_from_legend = (
+            element.attribute("empty_rectangle_use_legend_color") == "True"
+        )
 
         empty_polygon_symbol_elem = element.firstChildElement("emptyPolygonSymbol")
 
@@ -325,8 +320,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_axis_texts_settings(self, draw: bool, text_format: QgsTextFormat, axis_x_text: str,
-                                axis_y_text: str) -> None:
+    def set_axis_texts_settings(
+        self, draw: bool, text_format: QgsTextFormat, axis_x_text: str, axis_y_text: str
+    ) -> None:
         self.text_format = text_format
         self.add_axes_texts = draw
         self.text_axis_x = axis_x_text
@@ -343,8 +339,15 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         return self.text_axis_x == "Axis X" and self.text_axis_y == "Axis Y"
 
-    def set_ticks_settings(self, draw: bool, text_format: QgsTextFormat, use_midpoint: bool,
-                           axis_x_precision: int, axis_y_precision: int, space_above: int) -> None:
+    def set_ticks_settings(
+        self,
+        draw: bool,
+        text_format: QgsTextFormat,
+        use_midpoint: bool,
+        axis_x_precision: int,
+        axis_y_precision: int,
+        space_above: int,
+    ) -> None:
         self.add_axes_values_texts = draw
         self.text_values_format = text_format
         self.ticks_use_category_midpoints = use_midpoint
@@ -361,8 +364,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_arrows_settings(self, draw: bool, line_format: QgsLineSymbol, use_common_point: bool,
-                            width: float) -> None:
+    def set_arrows_settings(self, draw: bool, line_format: QgsLineSymbol, use_common_point: bool, width: float) -> None:
         self.add_axes_arrows = draw
         self.arrows_common_start_point = use_common_point
         self.arrow_width = width
@@ -370,8 +372,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.refresh()
 
-    def set_rectangle_without_values_settings(self, use: bool, symbol: QgsFillSymbol,
-                                              color_from_legend: bool) -> None:
+    def set_rectangle_without_values_settings(self, use: bool, symbol: QgsFillSymbol, color_from_legend: bool) -> None:
 
         self.symbol_rectangle_without_values = symbol
         self.replace_rectangle_without_values = use
@@ -415,8 +416,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 class BivariateRendererLayoutItemMetadata(QgsLayoutItemAbstractMetadata):
 
     def __init__(self):
-        super().__init__(IDS.plot_item_bivariate_renderer_legend,
-                         Texts.plot_item_bivariate_renderer)
+        super().__init__(IDS.plot_item_bivariate_renderer_legend, Texts.plot_item_bivariate_renderer)
 
     def createItem(self, layout):
         return BivariateRendererLayoutItem(layout)

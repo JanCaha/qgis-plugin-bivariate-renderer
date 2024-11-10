@@ -25,11 +25,10 @@
 from qgis.core import QgsApplication
 from qgis.gui import QgsGui
 
-from .renderer.bivariate_renderer_metadata import BivariateRendererMetadata
-
+from .bivariate_renderer_provider import BivariateRendererProvider
 from .layoutitems.layout_item import BivariateRendererLayoutItemMetadata
 from .layoutitems.layout_item_widget import BivariateRendererLayoutItemGuiMetadata
-from .bivariate_renderer_provider import BivariateRendererProvider
+from .renderer.bivariate_renderer_metadata import BivariateRendererMetadata
 
 
 class BivariateRendererPlugin:
@@ -45,8 +44,7 @@ class BivariateRendererPlugin:
         self.bivariate_renderer_layout_item_metadata = BivariateRendererLayoutItemMetadata()
 
         # TODO disconnect
-        QgsApplication.layoutItemRegistry().addLayoutItemType(
-            self.bivariate_renderer_layout_item_metadata)
+        QgsApplication.layoutItemRegistry().addLayoutItemType(self.bivariate_renderer_layout_item_metadata)
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -54,8 +52,7 @@ class BivariateRendererPlugin:
         QgsApplication.rendererRegistry().addRenderer(self.bivariate_renderer_metadata)
 
         # TODO disconnect
-        QgsGui.layoutItemGuiRegistry().addLayoutItemGuiMetadata(
-            self.bivariate_renderer_layout_item_gui_metadata)
+        QgsGui.layoutItemGuiRegistry().addLayoutItemGuiMetadata(self.bivariate_renderer_layout_item_gui_metadata)
 
         self.initProcessing()
 

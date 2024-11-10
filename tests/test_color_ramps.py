@@ -1,14 +1,22 @@
 import pytest
-
 from qgis.core import QgsGradientColorRamp
 from qgis.PyQt.QtGui import QIcon
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import (
-    BivariateColorRamp, BivariateColorRampBlueGreen, BivariateColorRampCyanBrow,
-    BivariateColorRampCyanViolet, BivariateColorRampGreenPink, BivariateColorRampGreenPurple,
-    BivariateColorRampLigthYellowPurple, BivariateColorRampOrangeBlue,
-    BivariateColorRampOrangePurple, BivariateColorRampPinkBlue, BivariateColorRampTurquoiseGold,
-    BivariateColorRampVioletBlue, BivariateColorRampYellowBlue)
+    BivariateColorRamp,
+    BivariateColorRampBlueGreen,
+    BivariateColorRampCyanBrow,
+    BivariateColorRampCyanViolet,
+    BivariateColorRampGreenPink,
+    BivariateColorRampGreenPurple,
+    BivariateColorRampLigthYellowPurple,
+    BivariateColorRampOrangeBlue,
+    BivariateColorRampOrangePurple,
+    BivariateColorRampPinkBlue,
+    BivariateColorRampTurquoiseGold,
+    BivariateColorRampVioletBlue,
+    BivariateColorRampYellowBlue,
+)
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampsRegister
 
 color_ramps = [
@@ -24,7 +32,7 @@ color_ramps = [
     BivariateColorRampPinkBlue(),
     BivariateColorRampTurquoiseGold(),
     BivariateColorRampVioletBlue(),
-    BivariateColorRampYellowBlue()
+    BivariateColorRampYellowBlue(),
 ]
 
 

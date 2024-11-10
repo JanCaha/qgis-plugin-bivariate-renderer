@@ -31,6 +31,7 @@ def change_locale():
     """Sets locale to English, United Kingdom for all tests to ensure consistent results."""
     QLocale.setDefault(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
 
+
 @pytest.fixture
 def qgs_project(qgis_iface) -> QgsProject:
     qgis_iface.newProject()
