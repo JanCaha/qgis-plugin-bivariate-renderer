@@ -17,7 +17,7 @@ jobs:
 
   Tests-plugin-BivariateRenderer:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
 
@@ -57,7 +57,7 @@ jobs:
 
       - name: Install Python packages 
         run: |
-          pip install --no-cache-dir pytest pytest-qgis pytest-cov pillow flake8 mypy pycodestyle pb_tool pytest-qt pixelmatch --break-system-packages   
+          pip install --no-cache-dir pytest pytest-qgis pytest-cov pillow flake8 mypy pycodestyle pb_tool pytest-qt pixelmatch --break-system-packages
 
       - name: Print Dir
         run: |
