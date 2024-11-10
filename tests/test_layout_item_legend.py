@@ -1,7 +1,6 @@
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
-
-from tests import (assert_images_equal)
+from tests import assert_images_equal
 
 
 def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project, layout_page_a4,
@@ -10,7 +9,7 @@ def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
                                                     field1="fid",
                                                     field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 

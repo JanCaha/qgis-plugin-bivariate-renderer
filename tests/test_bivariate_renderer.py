@@ -1,10 +1,9 @@
 from PyQt5.QtXml import QDomElement
-from qgis.core import (QgsVectorLayer, QgsProject, QgsReadWriteContext)
+from qgis.core import QgsProject, QgsReadWriteContext, QgsVectorLayer
 from qgis.PyQt.QtXml import QDomDocument
 
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-
 from tests import assert_images_equal
 
 
@@ -14,7 +13,7 @@ def test_layer_bivariate_render(nc_layer: QgsVectorLayer, qgs_project: QgsProjec
     bivariate_renderer = prepare_bivariate_renderer(nc_layer,
                                                     field1="AREA",
                                                     field2="PERIMETER",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     nc_layer.setRenderer(bivariate_renderer)
 
@@ -32,7 +31,7 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     bivariate_renderer = prepare_bivariate_renderer(nc_layer,
                                                     field1="AREA",
                                                     field2="PERIMETER",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     xml_renderer = """
     <!DOCTYPE doc>
