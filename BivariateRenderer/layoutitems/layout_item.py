@@ -404,7 +404,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def icon(self) -> QIcon:
 
-        return get_icon("legend_icon.png")
+        return QIcon(get_icon_path("legend_icon.png"))
 
     def beginCommand(self, commandText: str, command) -> None:
         if not isinstance(command, int):
