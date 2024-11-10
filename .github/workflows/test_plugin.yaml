@@ -49,8 +49,8 @@ jobs:
 
       - name: Install
         run: | 
-          export DEBIAN_FRONTEND=noninteractive && \
-          echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
+          sudo export DEBIAN_FRONTEND=noninteractive && \
+          sudo echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections && \
           sudo apt-get update && \
           sudo apt-get -y -q install --no-install-recommends wget software-properties-common build-essential ca-certificates python3-pip dialog apt-utils && \
           sudo apt update && \
