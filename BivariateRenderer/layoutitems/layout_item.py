@@ -1,18 +1,28 @@
 from pathlib import Path
 from typing import Optional
 
-from qgis.PyQt.QtGui import QIcon, QColor
+from qgis.core import (
+    QgsFillSymbol,
+    QgsLayout,
+    QgsLayoutItem,
+    QgsLayoutItemAbstractMetadata,
+    QgsLayoutItemRenderContext,
+    QgsLineSymbol,
+    QgsMapLayerType,
+    QgsProject,
+    QgsReadWriteContext,
+    QgsSymbol,
+    QgsSymbolLayerUtils,
+    QgsTextFormat,
+    QgsVectorLayer,
+)
+from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
-from qgis.core import (QgsLayoutItem, QgsLayout, QgsLayoutItemAbstractMetadata, QgsVectorLayer,
-                       QgsTextFormat, QgsLayoutItemRenderContext, QgsLineSymbol,
-                       QgsReadWriteContext, QgsSymbolLayerUtils, QgsSymbol, QgsProject,
-                       QgsMapLayerType, QgsFillSymbol)
-
-from ..text_constants import Texts, IDS
-from ..utils import default_line_symbol, get_icon, load_symbol_xml
-from ..renderer.bivariate_renderer import BivariateRenderer
 
 from ..legendrenderer.legend_renderer import LegendRenderer
+from ..renderer.bivariate_renderer import BivariateRenderer
+from ..text_constants import IDS, Texts
+from ..utils import default_line_symbol, get_icon_path, load_symbol_xml
 
 DEFAULT_AXIS_X_TEXT = "Axis X"
 DEFAULT_AXIS_Y_TEXT = "Axis Y"
