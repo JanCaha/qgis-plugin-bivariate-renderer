@@ -1,6 +1,6 @@
 import os
-import pytest
 
+import pytest
 from qgis.core import QgsVectorLayer
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
@@ -39,7 +39,7 @@ def test_generate_widget_layout_item(qgis_countries_layer: QgsVectorLayer, qgs_l
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
                                                     field1="fid",
                                                     field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 

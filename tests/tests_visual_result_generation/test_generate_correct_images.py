@@ -1,14 +1,14 @@
 import os
+
 import pytest
+from qgis.core import QgsLayoutUtils, QgsRenderContext
+from qgis.PyQt.QtGui import QColor, QPainter
 
-from qgis.PyQt.QtGui import QPainter, QColor
-from qgis.core import (QgsLayoutUtils, QgsRenderContext)
-
-from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDarken, ColorMixingMethodDirect
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
+from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
+from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
 env_value = os.getenv("BIVARIATE_GENERATE")
 
@@ -235,7 +235,7 @@ def test_generate_legend_in_layout(qgis_countries_layer, qgs_layout, qgs_project
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer,
                                                     field1="fid",
                                                     field2="fid",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
@@ -371,7 +371,7 @@ def test_layer_bivariate_render(nc_layer, qgs_project, qgs_layout, prepare_defau
     bivariate_renderer = prepare_bivariate_renderer(nc_layer,
                                                     field1="AREA",
                                                     field2="PERIMETER",
-                                                    color_ramps=BivariateColorRampGreenPink())
+                                                    color_ramp=BivariateColorRampGreenPink())
 
     nc_layer.setRenderer(bivariate_renderer)
 
