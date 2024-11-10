@@ -111,26 +111,18 @@ def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height, layout_wid
 def prepare_bivariate_renderer():
 
     def return_bivariate_renderer(
-        layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramps: Optional[BivariateColorRamp] = None
+        layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramp: Optional[BivariateColorRamp] = None
     ) -> BivariateRenderer:
 
-        if color_ramps is None:
+        color_ramp_bivariate = BivariateColorRampsRegister().get_by_name("Violet - Blue")
 
-            color_ramp = BivariateColorRampsRegister().get_by_name("Violet - Blue")
-
-            default_color_ramp_1 = color_ramp.color_ramp_1
-            default_color_ramp_2 = color_ramp.color_ramp_2
-
-        else:
-
-            default_color_ramp_1 = color_ramps.color_ramp_1
-            default_color_ramp_2 = color_ramps.color_ramp_2
+        if color_ramp:
+            color_ramp_bivariate = color_ramp
 
         bivariate_renderer = BivariateRenderer()
         bivariate_renderer.setFieldName1(field1)
         bivariate_renderer.setFieldName2(field2)
-        bivariate_renderer.setColorRamp1(default_color_ramp_1)
-        bivariate_renderer.setColorRamp2(default_color_ramp_2)
+        bivariate_renderer.set_bivariate_color_ramp(color_ramp_bivariate)
         bivariate_renderer.setField1ClassificationData(layer, bivariate_renderer.field_name_1)
         bivariate_renderer.setField2ClassificationData(layer, bivariate_renderer.field_name_2)
 

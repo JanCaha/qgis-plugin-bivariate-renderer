@@ -1,13 +1,12 @@
+import tempfile
 from typing import Union
-import pytest
-
-from qgis.core import (QgsReadWriteContext, QgsTextFormat)
-
-from qgis.PyQt.QtXml import QDomElement, QDomDocument
-
-from PIL import Image
 
 import numpy as np
+import pytest
+from PIL import Image
+from pixelmatch.contrib.PIL import pixelmatch
+from qgis.core import QgsReadWriteContext, QgsTextFormat
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
@@ -55,8 +54,13 @@ def assert_images_equal(image_1: str, image_2: str):
         normalized_sum_sq_diff = 0
 
     if normalized_sum_sq_diff > 0.001:
+        diff_mask = Image.new("RGBA", img1.size)
+        pixelmatch(img1, img2, diff_mask, includeAA=True)
+        filename = tempfile.gettempdir() + '/diff_mask.png'
+        diff_mask.save(filename)
+
         __tracebackhide__ = True
         pytest.fail(f"Images \n{image_1}\n{image_2}\ndo not look the same.\n"
-                    f"Difference is {normalized_sum_sq_diff}.")
+                    f"Difference is {normalized_sum_sq_diff}. Diff file {filename}.")
     else:
         pass
