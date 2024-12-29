@@ -408,16 +408,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     def field_1_labels(self) -> List[float]:
         return self.classes_to_legend_breaks(self.field_1_classes)
 
-    def legendSymbolItem(self, identifier: str) -> QgsLegendSymbolItem:
-        return QgsLegendSymbolItem(self.cached_symbols[identifier], identifier, "")
-
-    def legendSymbolItems(self) -> List[QgsLegendSymbolItem]:
-        legend_items = []
-        for identifier in sorted(self.cached_symbols.keys()):
-            if identifier in self.labels_existing:
-                legend_items.append(self.legendSymbolItem(identifier))
-        return legend_items
-
     def existing_labels(self) -> List[str]:
         return [x for x in sorted(self.labels_existing)]
 
