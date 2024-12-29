@@ -149,9 +149,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return self.cached_symbols[identifier]
 
-    def startRender(self, context, fields):
-        super().startRender(context, fields)
-
     def stopRender(self, context):
         for s in list(self.cached_symbols.values()):
             s.stopRender(context)
