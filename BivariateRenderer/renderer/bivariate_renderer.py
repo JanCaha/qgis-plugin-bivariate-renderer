@@ -101,6 +101,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         self._reset_cache()
 
     def _positionValue(self, value: float, classes: List[QgsClassificationRange]) -> int:
+        class_value = -1
         for i, range_class in enumerate(classes):
             if range_class.lowerBound() <= value <= range_class.upperBound():
                 class_value = i
