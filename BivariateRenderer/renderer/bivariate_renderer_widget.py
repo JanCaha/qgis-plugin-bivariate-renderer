@@ -5,7 +5,6 @@ from qgis.core import (
     QgsClassificationPrettyBreaks,
     QgsClassificationQuantile,
     QgsFieldProxyModel,
-    QgsGradientColorRamp,
     QgsRenderContext,
 )
 from qgis.gui import QgsColorRampButton, QgsDoubleSpinBox, QgsFieldComboBox, QgsRendererWidget
@@ -14,12 +13,11 @@ from qgis.PyQt.QtGui import QColor, QImage, QPainter, QPixmap
 from qgis.PyQt.QtWidgets import QComboBox, QFormLayout, QLabel
 
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
-from ..colorramps.bivariate_color_ramp import BivariateColorRamp, BivariateColorRampGradient
+from ..colorramps.bivariate_color_ramp import BivariateColorRampGradient
 from ..colorramps.color_ramps_register import BivariateColorRampsRegister
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..text_constants import Texts
 from ..utils import log
-from .bivariate_legend import BivariateLegendViewerLegend
 from .bivariate_renderer import BivariateRenderer
 
 
@@ -282,12 +280,6 @@ class BivariateRendererWidget(QgsRendererWidget):
         painter.end()
 
         self.label_legend.setPixmap(QPixmap.fromImage(image))
-
-        self.updateLayerLegend()
-
-    def updateLayerLegend(self):
-        legend = BivariateLegendViewerLegend(self.bivariate_renderer, self.vectorLayer())
-        self.vectorLayer().setLegend(legend)
 
     def update_bivariate_color_ramp(self) -> None:
         self.bivariate_color_ramp.set_number_of_classes(int(self.sb_number_classes.value()))
