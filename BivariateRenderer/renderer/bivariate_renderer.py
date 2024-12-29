@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from qgis.core import (
@@ -10,10 +9,13 @@ from qgis.core import (
     QgsFeature,
     QgsFeatureRenderer,
     QgsFillSymbol,
-    QgsLegendSymbolItem,
+    QgsImageLegendNode,
+    QgsLayerTreeLayer,
+    QgsLayerTreeModelLegendNode,
+    QgsRenderContext,
     QgsVectorLayer,
 )
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtGui import QColor, QImage, QPainter
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import (
@@ -23,7 +25,9 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import (
     BivariateColorRampManual,
 )
 
+from ..legendrenderer.legend_renderer import LegendRenderer
 from ..text_constants import Texts
+from .bivariate_renderer_utils import LegendPolygon
 
 
 class BivariateRenderer(QgsFeatureRenderer):
@@ -423,10 +427,33 @@ class BivariateRenderer(QgsFeatureRenderer):
                 identifier = self.getPositionValuesCombinationHash(x, y)
                 self.cached_symbols[identifier] = self.symbol_for_values(x, y)
 
+    def legend_image(self) -> QImage:
 
-@dataclass
-class LegendPolygon:
-    x: float
-    y: float
-    symbol: QgsFillSymbol
-    exist_in_map: bool = True
+        size = 200
+
+        image = QImage(size, size, QImage.Format_ARGB32)
+        image.fill(QColor(0, 0, 0, 0))
+
+        painter = QPainter(image)
+
+        context = QgsRenderContext.fromQPainter(painter)
+        context.setScaleFactor(1)
+
+        legend_renderer = LegendRenderer()
+        legend_renderer.axis_title_x = self.field_name_1
+        legend_renderer.axis_title_y = self.field_name_2
+        legend_renderer.text_format.setSize(50)
+        legend_renderer.add_axes_texts = True
+        legend_renderer.add_axes_arrows = True
+        # legend_renderer.replace_rectangle_without_values = True
+        # legend_renderer.symbol_rectangle_without_values = load_symbol_xml(
+        #     Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml"
+        # )
+        legend_renderer.render(context, size, size, self.generate_legend_polygons())
+
+        painter.end()
+
+        return image
+
+    def createLegendNodes(self, nodeLayer: QgsLayerTreeLayer) -> List[QgsLayerTreeModelLegendNode]:
+        return [QgsImageLegendNode(nodeLayer, self.legend_image(), nodeLayer)]
