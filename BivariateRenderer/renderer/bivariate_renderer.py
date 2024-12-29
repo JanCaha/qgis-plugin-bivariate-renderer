@@ -86,15 +86,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return values
 
-    @staticmethod
-    def classes_to_legend_midpoints(classes: List[QgsClassificationRange]) -> List[float]:
-        values = []
-
-        for interval_class in classes:
-            values.append((interval_class.lowerBound() + interval_class.upperBound()) / 2)
-
-        return values
-
     def setField1ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
         self.field_1_classes = self.classification_method.classes(
             layer, attribute, self.bivariate_color_ramp.number_of_classes
