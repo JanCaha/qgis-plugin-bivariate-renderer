@@ -3,7 +3,6 @@ from qgis.PyQt.QtGui import QColor
 
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDirect
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
 from BivariateRenderer.utils import get_symbol_dict
 from tests import assert_images_equal, xml_string
