@@ -27,15 +27,16 @@ from ..text_constants import Texts
 
 
 class BivariateRenderer(QgsFeatureRenderer):
-    def __init__(self, syms=None):
+
+    def __init__(self) -> None:
         super().__init__(Texts.bivariate_renderer_short_name)
 
         self.classification_method = QgsClassificationEqualInterval()
 
         self.bivariate_color_ramp: BivariateColorRamp = BivariateColorRampCyanViolet()
 
-        self.field_name_1: str = None
-        self.field_name_2: str = None
+        self.field_name_1: str = ""
+        self.field_name_2: str = ""
 
         self.cached_symbols: Dict[str, QgsFillSymbol] = {}
         self.labels_existing: List[str] = []
