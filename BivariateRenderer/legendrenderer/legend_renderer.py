@@ -3,6 +3,7 @@ from typing import List
 
 from qgis.core import (
     QgsBasicNumericFormat,
+    QgsClassificationRange,
     QgsFillSymbol,
     QgsLineString,
     QgsLineSymbol,
@@ -15,7 +16,7 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QPointF, QRectF, Qt
 from qgis.PyQt.QtGui import QColor, QPainter, QPen, QPolygonF, QTransform
 
-from ..renderer.bivariate_renderer import BivariateRenderer, LegendPolygon
+from ..renderer.bivariate_renderer_utils import LegendPolygon, classes_to_legend_midpoints
 from ..utils import default_line_symbol
 
 
@@ -72,6 +73,9 @@ class LegendRenderer:
     symbol_rectangle_without_values: QgsFillSymbol
     replace_rectangle_without_values: bool
     use_rectangle_without_values_color_from_legend: bool
+
+    _text_height_x: float
+    _text_height_y: float
 
     def __init__(self):
 
@@ -689,17 +693,25 @@ class LegendRenderer:
         self.painter.restore()
 
     def render_legend(
-        self, context: QgsRenderContext, width: float, height: float, renderer: BivariateRenderer
+        self,
+        context: QgsRenderContext,
+        width: float,
+        height: float,
+        legend_polygons: List[LegendPolygon],
+        field_1_classes: List[QgsClassificationRange] = None,
+        field_2_classes: List[QgsClassificationRange] = None,
+        field_1_labels: List[float] = None,
+        field_2_labels: List[float] = None,
     ) -> None:
 
         if self.use_category_midpoints:
-            self.texts_axis_x_ticks = BivariateRenderer.classes_to_legend_midpoints(renderer.field_1_classes)
-            self.texts_axis_y_ticks = BivariateRenderer.classes_to_legend_midpoints(renderer.field_2_classes)
+            self.texts_axis_x_ticks = classes_to_legend_midpoints(field_1_classes)
+            self.texts_axis_y_ticks = classes_to_legend_midpoints(field_2_classes)
         else:
-            self.texts_axis_x_ticks = renderer.field_1_labels
-            self.texts_axis_y_ticks = renderer.field_2_labels
+            self.texts_axis_x_ticks = field_1_labels
+            self.texts_axis_y_ticks = field_2_labels
 
-        self.render(context, width, height, renderer.generate_legend_polygons())
+        self.render(context, width, height, legend_polygons)
 
     def render(self, context: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]) -> None:
 
