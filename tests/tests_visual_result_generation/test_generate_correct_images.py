@@ -8,7 +8,7 @@ from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodD
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
+from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
 
 env_value = os.getenv("BIVARIATE_GENERATE")
 
@@ -457,12 +457,8 @@ def test_legend_ticks_midpoints(
     legend_renderer.legend_rotated = False
     legend_renderer.add_axes_ticks_texts = True
     legend_renderer.use_category_midpoints = True
-    legend_renderer.texts_axis_x_ticks = BivariateRenderer.classes_to_legend_midpoints(
-        bivariate_renderer.field_1_classes
-    )
-    legend_renderer.texts_axis_y_ticks = BivariateRenderer.classes_to_legend_midpoints(
-        bivariate_renderer.field_2_classes
-    )
+    legend_renderer.texts_axis_x_ticks = classes_to_legend_midpoints(bivariate_renderer.field_1_classes)
+    legend_renderer.texts_axis_y_ticks = classes_to_legend_midpoints(bivariate_renderer.field_2_classes)
 
     legend_renderer.render(
         render_context,
@@ -508,7 +504,11 @@ def test_generate_legend_empty_squares(
         render_context,
         legend_size / render_context.scaleFactor(),
         legend_size / render_context.scaleFactor(),
-        bivariate_renderer,
+        bivariate_renderer.generate_legend_polygons(),
+        bivariate_renderer.field_1_classes,
+        bivariate_renderer.field_2_classes,
+        bivariate_renderer.field_1_labels,
+        bivariate_renderer.field_2_labels,
     )
 
     painter.end()

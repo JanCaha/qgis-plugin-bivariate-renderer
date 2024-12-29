@@ -165,7 +165,16 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         if self.renderer:
 
-            legend_render.render_legend(render_context, item_size.width(), item_size.height(), self.renderer)
+            legend_render.render_legend(
+                render_context,
+                item_size.width(),
+                item_size.height(),
+                self.renderer.generate_legend_polygons(),
+                self.renderer.field_1_classes,
+                self.renderer.field_2_classes,
+                self.renderer.field_1_labels,
+                self.renderer.field_2_labels,
+            )
 
     def writePropertiesToElement(
         self, bivariate_legend_element: QDomElement, doc: QDomDocument, context: QgsReadWriteContext
