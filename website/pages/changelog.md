@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- create proper legend as image
+
 ## 1.0.0
 
 - add option to specify default symbol in legend for symbols that do not have values in data
