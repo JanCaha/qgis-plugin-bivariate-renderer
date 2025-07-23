@@ -1,7 +1,7 @@
 name: Generate Tests Graphical Results for Plugin BivariateRenderer
 
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 env:
   DEBIAN_FRONTEND: noninteractive
