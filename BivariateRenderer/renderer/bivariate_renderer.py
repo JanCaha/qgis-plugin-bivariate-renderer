@@ -13,6 +13,7 @@ from qgis.core import (
     QgsLayerTreeLayer,
     QgsLayerTreeModelLegendNode,
     QgsRenderContext,
+    QgsSymbolLayerUtils,
     QgsVectorLayer,
 )
 from qgis.PyQt.QtGui import QColor, QImage, QPainter
@@ -27,6 +28,7 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import (
 
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..text_constants import Texts
+from ..utils import default_fill_symbol
 from .bivariate_renderer_utils import LegendPolygon
 
 
@@ -47,6 +49,8 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         self.field_1_classes: List[QgsClassificationRange] = []
         self.field_2_classes: List[QgsClassificationRange] = []
+
+        self.polygon_symbol = default_fill_symbol()
 
     def __repr__(self) -> str:
         return (
@@ -143,7 +147,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         identifier = self.getPositionValuesCombinationHash(position_value1, position_value2)
 
         if identifier not in self.cached_symbols:
-            feature_symbol = self.get_default_symbol()
+            feature_symbol = default_fill_symbol()
             feature_symbol.setColor(self.getFeatureColor(position_value1, position_value2))
 
             self.cached_symbols[identifier] = feature_symbol.clone()
@@ -174,6 +178,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.cached_symbols = self.cached_symbols
         r.labels_existing = self.labels_existing
         r.bivariate_color_ramp = self.bivariate_color_ramp.clone()
+        r.polygon_symbol = self.polygon_symbol.clone()
 
         return r
 
@@ -238,6 +243,9 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.appendChild(self.bivariate_color_ramp.save(doc))
 
+        main_symbol_elem = QgsSymbolLayerUtils.saveSymbol("main_symbol", self.polygon_symbol, doc, context)
+        renderer_elem.appendChild(main_symbol_elem)
+
         return renderer_elem
 
     @staticmethod
@@ -294,7 +302,7 @@ class BivariateRenderer(QgsFeatureRenderer):
                 color = QColor(symbol_elem.attribute("color"))
                 label = symbol_elem.attribute("label")
 
-                symbol = BivariateRenderer.get_default_symbol()
+                symbol = default_fill_symbol()
                 symbol.setColor(color)
 
                 r.cached_symbols[label] = symbol
@@ -320,24 +328,22 @@ class BivariateRenderer(QgsFeatureRenderer):
         if bivariate_ramp:
             r.bivariate_color_ramp = bivariate_ramp
 
+        main_symbol_elem = QgsSymbolLayerUtils.loadSymbol(element.firstChildElement("main_symbol"), context)
+        if not main_symbol_elem:
+            main_symbol_elem = QgsFillSymbol.createSimple({})
+
+        r.polygon_symbol = main_symbol_elem
+
         return r
 
     def load(self, symbology_elem: QDomElement, context):
         return self.create_render_from_element(symbology_elem, context)
 
-    @staticmethod
-    def get_default_symbol() -> QgsFillSymbol:
-        symbol = QgsFillSymbol.createSimple(
-            {"color": "#cccccc", "outline_width": "0.0", "outline_color": "0,0,0", "outline_style": "no"}
-        )
-
-        return symbol
-
     def symbol_for_values(self, value1: int, value2: int) -> QgsFillSymbol:
         identifier = self.getPositionValuesCombinationHash(value1, value2)
 
         if identifier not in self.cached_symbols:
-            feature_symbol = self.get_default_symbol()
+            feature_symbol = self.polygon_symbol.clone()
             feature_symbol.setColor(self.getFeatureColor(value1, value2))
 
             self.cached_symbols[identifier] = feature_symbol.clone()

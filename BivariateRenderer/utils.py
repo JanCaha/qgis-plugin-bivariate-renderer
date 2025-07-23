@@ -2,15 +2,23 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 
-from qgis.core import Qgis, QgsLineSymbol, QgsMessageLog, QgsReadWriteContext, QgsSymbol, QgsSymbolLayerUtils
-from qgis.PyQt.QtGui import QColor, QIcon
+from qgis.core import (
+    Qgis,
+    QgsFillSymbol,
+    QgsLineSymbol,
+    QgsMessageLog,
+    QgsReadWriteContext,
+    QgsSymbol,
+    QgsSymbolLayerUtils,
+)
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtXml import QDomDocument
 
 from .text_constants import Texts
 
 
 def log(text: Any) -> None:
-    QgsMessageLog.logMessage(str(text), Texts.plugin_name, Qgis.Info)
+    QgsMessageLog.logMessage(str(text), Texts.plugin_name, Qgis.MessageLevel.Info)
 
 
 # these two functions are taken from
@@ -69,6 +77,7 @@ def load_json(content: str) -> Dict:
 
 
 def default_line_symbol() -> QgsLineSymbol:
+    """Return a default line symbol with specific properties."""
 
     line_symbol = get_symbol_object(load_json(read_file_content(path_data("axis_line_symbol.json"))))
     line_symbol.setColor(QColor(0, 0, 0))
@@ -89,7 +98,7 @@ def get_icon_path(file_name: str) -> str:
 
 
 def save_symbol_xml(symbol: QgsSymbol, file_name: Path) -> None:
-
+    """Save a QgsSymbol to an XML file."""
     doc = QDomDocument()
 
     elem = QgsSymbolLayerUtils.saveSymbol("symbol", symbol, doc, QgsReadWriteContext())
@@ -103,16 +112,41 @@ def save_symbol_xml(symbol: QgsSymbol, file_name: Path) -> None:
 
 
 def load_symbol_xml(file_name: Path) -> QgsSymbol:
-
+    """Load a QgsSymbol from an XML file."""
     with open(file_name) as file:
         symbol_doc = file.read()
 
     doc = QDomDocument()
     doc.setContent(symbol_doc)
-    return QgsSymbolLayerUtils.loadSymbol(doc.documentElement(), QgsReadWriteContext())
+
+    symbol = QgsSymbolLayerUtils.loadSymbol(doc.documentElement(), QgsReadWriteContext())
+
+    if symbol is None:
+        raise ValueError("Failed to load a valid QgsSymbol.")
+
+    return symbol
+
+
+def default_fill_symbol() -> QgsFillSymbol:
+    """Return a default fill symbol with specific properties."""
+
+    symbol = QgsFillSymbol.createSimple(
+        {
+            "color": "#cccccc",
+            "outline_width": "0.0",
+            "outline_color": "0,0,0",
+            "outline_style": "no",
+        }
+    )
+
+    if symbol is None:
+        raise ValueError("Failed to create a valid QgsFillSymbol.")
+
+    return symbol
 
 
 class Singleton(type):
+    """A metaclass for creating singleton classes."""
 
     _instances = {}
 

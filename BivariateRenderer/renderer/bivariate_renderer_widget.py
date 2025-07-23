@@ -1,4 +1,5 @@
 from qgis.core import (
+    Qgis,
     QgsClassificationEqualInterval,
     QgsClassificationJenks,
     QgsClassificationLogarithmic,
@@ -6,18 +7,19 @@ from qgis.core import (
     QgsClassificationQuantile,
     QgsFieldProxyModel,
     QgsRenderContext,
+    QgsSymbol,
 )
-from qgis.gui import QgsColorRampButton, QgsDoubleSpinBox, QgsFieldComboBox, QgsRendererWidget
+from qgis.gui import QgsColorRampButton, QgsDoubleSpinBox, QgsFieldComboBox, QgsRendererWidget, QgsSymbolButton
 from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor, QImage, QPainter, QPixmap
-from qgis.PyQt.QtWidgets import QComboBox, QFormLayout, QLabel
+from qgis.PyQt.QtWidgets import QComboBox, QFormLayout, QLabel, QMessageBox
 
 from ..colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
 from ..colorramps.bivariate_color_ramp import BivariateColorRampGradient
 from ..colorramps.color_ramps_register import BivariateColorRampsRegister
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..text_constants import Texts
-from ..utils import log
+from ..utils import default_fill_symbol, log
 from .bivariate_renderer import BivariateRenderer
 
 
@@ -53,6 +55,8 @@ class BivariateRendererWidget(QgsRendererWidget):
     scale_factor = 1
 
     legend_changed = pyqtSignal()
+
+    base_symbol: QgsSymbol = default_fill_symbol()
 
     def __init__(self, layer, style, renderer: BivariateRenderer):
 
@@ -183,7 +187,14 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.rotate_color_palette.addItem("270° clockwise", 3)
         self.rotate_color_palette.currentIndexChanged.connect(self.rotate_palette)
 
+        self.symbol_selector = QgsSymbolButton(self, "Main symbol selection")
+        self.symbol_selector.setMinimumWidth(200)
+        self.base_symbol = self.bivariate_renderer.polygon_symbol
+        self.symbol_selector.setSymbol(self.base_symbol.clone())
+        self.symbol_selector.changed.connect(self.update_base_symbol)
+
         self.form_layout = QFormLayout()
+        self.form_layout.addRow("Default Symbol", self.symbol_selector)
         self.form_layout.addRow("Color ramps", self.cb_color_ramps)
         self.form_layout.addRow("Number of classes", self.sb_number_classes)
         self.form_layout.addRow(
@@ -206,6 +217,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.bt_color_ramp1.colorRampChanged.connect(self.update_bivariate_color_ramp)
         self.bt_color_ramp2.colorRampChanged.connect(self.update_bivariate_color_ramp)
         self.cb_colormixing_methods.currentIndexChanged.connect(self.update_bivariate_color_ramp)
+        self.symbol_selector.changed.connect(self.update_bivariate_color_ramp)
 
         self.update_bivariate_color_ramp()
 
@@ -300,6 +312,8 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.setField1Classes()
         self.setField2Classes()
 
+        self.bivariate_renderer.polygon_symbol = self.base_symbol
+
         self.legend_changed.emit()
 
     def setFieldName1(self) -> None:
@@ -353,3 +367,17 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.bt_color_ramp2.blockSignals(False)
 
             self.legend_changed.emit()
+
+    def update_base_symbol(self):
+        symbol = self.symbol_selector.symbol().clone()
+        types = all([x.layerType() == "SimpleFill" for x in symbol.symbolLayers()])
+        if symbol.symbolLayerCount() > 1 or types is False:
+            QMessageBox.warning(
+                self,
+                "Incorrect symbol definition",
+                "For Bivariate Renderer, the symbol must have exactly one fill symbol layer. More complex symbols are not supported.\n\n"
+                "This should only be used for the border of the polygons definition.",
+            )
+            self.symbol_selector.setSymbol(self.base_symbol.clone())
+        else:
+            self.base_symbol = symbol
