@@ -1,5 +1,9 @@
 name: Generate Tests Graphical Results for Plugin BivariateRenderer
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch
 
