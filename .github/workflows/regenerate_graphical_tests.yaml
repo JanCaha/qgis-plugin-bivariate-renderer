@@ -1,5 +1,9 @@
 name: Generate Tests Graphical Results for Plugin BivariateRenderer
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch
 
@@ -63,6 +67,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add tests/tests_visual_result_generation/results/*
+          git add tests/tests_visual_result_generation/images/correct/*
           git commit -m "Update graphical test results [CI skip]" || echo "No changes to commit"
           git push
