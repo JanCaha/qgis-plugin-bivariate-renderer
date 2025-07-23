@@ -12,7 +12,7 @@ env:
   
 jobs:
 
-  Tests-plugin-BivariateRenderer:
+  Generate-Tests-Graphical-Results-for-plugin-BivariateRenderer:
 
     runs-on: ubuntu-24.04
 
