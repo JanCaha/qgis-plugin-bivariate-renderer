@@ -14,4 +14,3 @@ def test_generate_xml(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
 
     xml = xml_string(bivariate_renderer)
     assert isinstance(xml, str)
-    print(xml)
