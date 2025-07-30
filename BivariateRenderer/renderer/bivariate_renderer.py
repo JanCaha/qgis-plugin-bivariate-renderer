@@ -404,9 +404,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     def field_1_labels(self) -> List[float]:
         return self.classes_to_legend_breaks(self.field_1_classes)
 
-    def existing_labels(self) -> List[str]:
-        return [x for x in sorted(self.labels_existing)]
-
     def generateCategories(self):
         for x in range(self.bivariate_color_ramp.number_of_classes):
             for y in range(self.bivariate_color_ramp.number_of_classes):
