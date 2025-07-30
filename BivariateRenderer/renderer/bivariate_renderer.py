@@ -230,13 +230,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.appendChild(symbols_elem)
 
-        number_classes_elem = doc.createElement("existing_labels")
-        labels = ""
-        if self.existing_labels():
-            labels = "|".join(self.labels_existing)
-        number_classes_elem.setAttribute("value", labels)
-        renderer_elem.appendChild(number_classes_elem)
-
         renderer_elem.appendChild(self.bivariate_color_ramp.save(doc))
 
         main_symbol_elem = QgsSymbolLayerUtils.saveSymbol("main_symbol", self.polygon_symbol, doc, context)
@@ -302,15 +295,9 @@ class BivariateRenderer(QgsFeatureRenderer):
                 symbol.setColor(color)
 
                 r.cached_symbols[label] = symbol
+                r.labels_existing.append(label)
 
             symbol_elem = symbol_elem.nextSiblingElement()
-
-        labels_value = element.firstChildElement("existing_labels").attribute("value")
-        labels = []
-        if labels_value != "":
-            labels = labels_value.split("|")
-
-        r.labels_existing = labels
 
         bivariate_ramp_elem = element.firstChildElement("BivariateColorRamp")
         bivariate_ramp = None
