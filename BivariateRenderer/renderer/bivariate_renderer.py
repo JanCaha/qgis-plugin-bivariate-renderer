@@ -431,10 +431,6 @@ class BivariateRenderer(QgsFeatureRenderer):
         legend_renderer.text_format.setSize(50)
         legend_renderer.add_axes_texts = True
         legend_renderer.add_axes_arrows = True
-        # legend_renderer.replace_rectangle_without_values = True
-        # legend_renderer.symbol_rectangle_without_values = load_symbol_xml(
-        #     Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml"
-        # )
         legend_renderer.render(context, size, size, self.generate_legend_polygons())
 
         painter.end()
