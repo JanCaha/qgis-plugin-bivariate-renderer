@@ -122,10 +122,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     def positionValueField2(self, value: float) -> int:
         return self._positionValue(value, self.field_2_classes)
 
-    def getFeatureCombinationHash(self, feature: QgsFeature) -> str:
-        position_value1, position_value2 = self.position_values(feature)
-        return self.getPositionValuesCombinationHash(position_value1, position_value2)
-
     def getPositionValuesCombinationHash(self, value1: int, value2: int) -> str:
         return f"{value1 + 1}-{value2 + 1}"
 
