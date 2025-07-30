@@ -22,7 +22,7 @@ from qgis.PyQt.QtXml import QDomDocument, QDomElement
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..renderer.bivariate_renderer import BivariateRenderer
 from ..text_constants import IDS, Texts
-from ..utils import default_line_symbol, get_icon_path, load_symbol_xml
+from ..utils import default_line_symbol, default_missing_values_symbol, get_icon_path
 
 DEFAULT_AXIS_X_TEXT = "Axis X"
 DEFAULT_AXIS_Y_TEXT = "Axis Y"
@@ -101,9 +101,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         self.ticks_use_category_midpoints = False
 
-        self.symbol_rectangle_without_values = load_symbol_xml(
-            Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml"
-        )
+        self.symbol_rectangle_without_values = default_missing_values_symbol()
 
         self.replace_rectangle_without_values = False
         self.use_rectangle_without_values_color_from_legend = False
