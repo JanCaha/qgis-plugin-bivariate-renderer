@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import QPointF, QRectF, Qt
 from qgis.PyQt.QtGui import QColor, QPainter, QPen, QPolygonF, QTransform
 
 from ..renderer.bivariate_renderer_utils import LegendPolygon, classes_to_legend_midpoints
-from ..utils import default_line_symbol
+from ..utils import default_line_symbol, default_missing_values_symbol, only_color_fill_symbol
 
 
 class LegendRenderer:
@@ -108,7 +108,7 @@ class LegendRenderer:
 
         self.replace_rectangle_without_values = False
         self.use_rectangle_without_values_color_from_legend = True
-        self.symbol_rectangle_without_values = QgsFillSymbol.createSimple({})
+        self.symbol_rectangle_without_values = default_missing_values_symbol().clone()
 
     def set_size_context(self, width: float, height: float) -> None:
 
@@ -353,7 +353,6 @@ class LegendRenderer:
             else:
 
                 scale_factor = self.height / max_size
-
                 self._transform.scale(scale_factor, scale_factor)
                 self._transform.translate(0, self.axis_tick_last_value_max_width / 2)
 
@@ -361,8 +360,11 @@ class LegendRenderer:
 
     def draw_polygons(self, polygons: List[LegendPolygon]) -> None:
 
+        symbol = only_color_fill_symbol()
+
         for polygon in polygons:
 
+            # Create the polygon rectangle
             polygon_draw = QPolygonF(
                 QRectF(
                     self.polygon_start_pos_x + polygon.x * self.size_constant,
@@ -385,9 +387,10 @@ class LegendRenderer:
 
             else:
 
-                polygon.symbol.startRender(self.context)
-                polygon.symbol.renderPolygon(polygon_draw, None, None, self.context)
-                polygon.symbol.stopRender(self.context)
+                symbol.setColor(polygon.symbol.color())
+                symbol.startRender(self.context)
+                symbol.renderPolygon(polygon_draw, None, None, self.context)
+                symbol.stopRender(self.context)
 
     def draw_axes_arrows(self) -> None:
 
