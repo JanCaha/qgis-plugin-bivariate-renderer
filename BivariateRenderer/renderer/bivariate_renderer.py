@@ -194,6 +194,14 @@ class BivariateRenderer(QgsFeatureRenderer):
         field_2_elem.setAttribute("name", self.field_name_2)
         renderer_elem.appendChild(field_2_elem)
 
+        base_symbol_elem = doc.createElement("polygonSymbol")
+
+        base_symbol = QgsSymbolLayerUtils.saveSymbol("", self.polygon_symbol, doc, context)
+
+        base_symbol_elem.appendChild(base_symbol)
+
+        renderer_elem.appendChild(base_symbol_elem)
+
         ranges_elem1 = doc.createElement("ranges_1")
 
         for class_range in self.field_1_classes:
@@ -232,9 +240,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.appendChild(self.bivariate_color_ramp.save(doc))
 
-        main_symbol_elem = QgsSymbolLayerUtils.saveSymbol("main_symbol", self.polygon_symbol, doc, context)
-        renderer_elem.appendChild(main_symbol_elem)
-
         return renderer_elem
 
     @staticmethod
@@ -246,6 +251,14 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         method_elem = element.firstChildElement("classificationMethod")
         r.setClassificationMethod(QgsClassificationMethod.create(method_elem, context))
+
+        polygon_symbol_elem = element.firstChildElement("polygonSymbol")
+        polygon_symbol = polygon_symbol_elem.firstChildElement("symbol")
+
+        if polygon_symbol.isNull():
+            r.polygon_symbol = default_fill_symbol()
+        else:
+            r.polygon_symbol = QgsSymbolLayerUtils.loadSymbol(polygon_symbol, context)
 
         ranges_field_1 = element.firstChildElement("ranges_1")
 
@@ -291,7 +304,7 @@ class BivariateRenderer(QgsFeatureRenderer):
                 color = QColor(symbol_elem.attribute("color"))
                 label = symbol_elem.attribute("label")
 
-                symbol = default_fill_symbol()
+                symbol = r.polygon_symbol.clone()
                 symbol.setColor(color)
 
                 r.cached_symbols[label] = symbol
@@ -310,12 +323,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         if bivariate_ramp:
             r.bivariate_color_ramp = bivariate_ramp
-
-        main_symbol_elem = QgsSymbolLayerUtils.loadSymbol(element.firstChildElement("main_symbol"), context)
-        if not main_symbol_elem:
-            main_symbol_elem = QgsFillSymbol.createSimple({})
-
-        r.polygon_symbol = main_symbol_elem
 
         return r
 
