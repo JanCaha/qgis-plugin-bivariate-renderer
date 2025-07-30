@@ -242,8 +242,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self, element: QDomElement, document: QDomDocument, context: QgsReadWriteContext
     ) -> bool:
 
-        if self.linked_layer:
-            self.layer = None
+        self.layer = None
 
         if element.hasAttribute("vectorLayerId"):
 
