@@ -64,6 +64,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
     def _reset_cache(self):
         self.cached_symbols = {}
+        self.labels_existing = []
 
     def set_bivariate_color_ramp(self, color_ramp: Optional[BivariateColorRamp]) -> None:
         if color_ramp:
@@ -147,6 +148,8 @@ class BivariateRenderer(QgsFeatureRenderer):
             feature_symbol.setColor(self.getFeatureColor(position_value1, position_value2))
 
             self.cached_symbols[identifier] = feature_symbol.clone()
+
+        if identifier not in self.labels_existing:
             self.labels_existing.append(identifier)
 
         self.cached_symbols[identifier].startRender(context)
@@ -347,7 +350,7 @@ class BivariateRenderer(QgsFeatureRenderer):
             for y, field_2_cat in enumerate(self.field_2_classes):
                 exist = True
 
-                if self.getPositionValuesCombinationHash(x, y) not in self.existing_labels():
+                if self.getPositionValuesCombinationHash(x, y) not in self.labels_existing:
                     exist = False
 
                 polygons.append(LegendPolygon(x=x, y=y, symbol=self.symbol_for_values(x, y), exist_in_map=exist))
