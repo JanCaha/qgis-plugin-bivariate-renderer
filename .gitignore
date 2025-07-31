@@ -8,3 +8,4 @@ __pycache__
 /tests/data/*-wal
 /.vscode/*.log
 /dev_tests/*
+/build
