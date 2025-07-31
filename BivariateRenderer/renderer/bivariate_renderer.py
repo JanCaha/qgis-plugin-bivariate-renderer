@@ -13,6 +13,7 @@ from qgis.core import (
     QgsLayerTreeLayer,
     QgsLayerTreeModelLegendNode,
     QgsRenderContext,
+    QgsSymbolLayerUtils,
     QgsVectorLayer,
 )
 from qgis.PyQt.QtGui import QColor, QImage, QPainter
@@ -27,6 +28,7 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import (
 
 from ..legendrenderer.legend_renderer import LegendRenderer
 from ..text_constants import Texts
+from ..utils import default_fill_symbol
 from .bivariate_renderer_utils import LegendPolygon
 
 
@@ -48,6 +50,8 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.field_1_classes: List[QgsClassificationRange] = []
         self.field_2_classes: List[QgsClassificationRange] = []
 
+        self.polygon_symbol = default_fill_symbol()
+
     def __repr__(self) -> str:
         return (
             f"BivariateRenderer "
@@ -60,6 +64,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
     def _reset_cache(self):
         self.cached_symbols = {}
+        self.labels_existing = []
 
     def set_bivariate_color_ramp(self, color_ramp: Optional[BivariateColorRamp]) -> None:
         if color_ramp:
@@ -118,10 +123,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     def positionValueField2(self, value: float) -> int:
         return self._positionValue(value, self.field_2_classes)
 
-    def getFeatureCombinationHash(self, feature: QgsFeature) -> str:
-        position_value1, position_value2 = self.position_values(feature)
-        return self.getPositionValuesCombinationHash(position_value1, position_value2)
-
     def getPositionValuesCombinationHash(self, value1: int, value2: int) -> str:
         return f"{value1 + 1}-{value2 + 1}"
 
@@ -143,10 +144,12 @@ class BivariateRenderer(QgsFeatureRenderer):
         identifier = self.getPositionValuesCombinationHash(position_value1, position_value2)
 
         if identifier not in self.cached_symbols:
-            feature_symbol = self.get_default_symbol()
+            feature_symbol = default_fill_symbol()
             feature_symbol.setColor(self.getFeatureColor(position_value1, position_value2))
 
             self.cached_symbols[identifier] = feature_symbol.clone()
+
+        if identifier not in self.labels_existing:
             self.labels_existing.append(identifier)
 
         self.cached_symbols[identifier].startRender(context)
@@ -174,6 +177,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.cached_symbols = self.cached_symbols
         r.labels_existing = self.labels_existing
         r.bivariate_color_ramp = self.bivariate_color_ramp.clone()
+        r.polygon_symbol = self.polygon_symbol.clone()
 
         return r
 
@@ -192,6 +196,14 @@ class BivariateRenderer(QgsFeatureRenderer):
         field_2_elem = doc.createElement("field_name_2")
         field_2_elem.setAttribute("name", self.field_name_2)
         renderer_elem.appendChild(field_2_elem)
+
+        base_symbol_elem = doc.createElement("polygonSymbol")
+
+        base_symbol = QgsSymbolLayerUtils.saveSymbol("", self.polygon_symbol, doc, context)
+
+        base_symbol_elem.appendChild(base_symbol)
+
+        renderer_elem.appendChild(base_symbol_elem)
 
         ranges_elem1 = doc.createElement("ranges_1")
 
@@ -229,13 +241,6 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         renderer_elem.appendChild(symbols_elem)
 
-        number_classes_elem = doc.createElement("existing_labels")
-        labels = ""
-        if self.existing_labels():
-            labels = "|".join(self.labels_existing)
-        number_classes_elem.setAttribute("value", labels)
-        renderer_elem.appendChild(number_classes_elem)
-
         renderer_elem.appendChild(self.bivariate_color_ramp.save(doc))
 
         return renderer_elem
@@ -249,6 +254,14 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         method_elem = element.firstChildElement("classificationMethod")
         r.setClassificationMethod(QgsClassificationMethod.create(method_elem, context))
+
+        polygon_symbol_elem = element.firstChildElement("polygonSymbol")
+        polygon_symbol = polygon_symbol_elem.firstChildElement("symbol")
+
+        if polygon_symbol.isNull():
+            r.polygon_symbol = default_fill_symbol()
+        else:
+            r.polygon_symbol = QgsSymbolLayerUtils.loadSymbol(polygon_symbol, context)
 
         ranges_field_1 = element.firstChildElement("ranges_1")
 
@@ -294,19 +307,13 @@ class BivariateRenderer(QgsFeatureRenderer):
                 color = QColor(symbol_elem.attribute("color"))
                 label = symbol_elem.attribute("label")
 
-                symbol = BivariateRenderer.get_default_symbol()
+                symbol = r.polygon_symbol.clone()
                 symbol.setColor(color)
 
                 r.cached_symbols[label] = symbol
+                r.labels_existing.append(label)
 
             symbol_elem = symbol_elem.nextSiblingElement()
-
-        labels_value = element.firstChildElement("existing_labels").attribute("value")
-        labels = []
-        if labels_value != "":
-            labels = labels_value.split("|")
-
-        r.labels_existing = labels
 
         bivariate_ramp_elem = element.firstChildElement("BivariateColorRamp")
         bivariate_ramp = None
@@ -325,19 +332,11 @@ class BivariateRenderer(QgsFeatureRenderer):
     def load(self, symbology_elem: QDomElement, context):
         return self.create_render_from_element(symbology_elem, context)
 
-    @staticmethod
-    def get_default_symbol() -> QgsFillSymbol:
-        symbol = QgsFillSymbol.createSimple(
-            {"color": "#cccccc", "outline_width": "0.0", "outline_color": "0,0,0", "outline_style": "no"}
-        )
-
-        return symbol
-
     def symbol_for_values(self, value1: int, value2: int) -> QgsFillSymbol:
         identifier = self.getPositionValuesCombinationHash(value1, value2)
 
         if identifier not in self.cached_symbols:
-            feature_symbol = self.get_default_symbol()
+            feature_symbol = self.polygon_symbol.clone()
             feature_symbol.setColor(self.getFeatureColor(value1, value2))
 
             self.cached_symbols[identifier] = feature_symbol.clone()
@@ -351,7 +350,7 @@ class BivariateRenderer(QgsFeatureRenderer):
             for y, field_2_cat in enumerate(self.field_2_classes):
                 exist = True
 
-                if self.getPositionValuesCombinationHash(x, y) not in self.existing_labels():
+                if self.getPositionValuesCombinationHash(x, y) not in self.labels_existing:
                     exist = False
 
                 polygons.append(LegendPolygon(x=x, y=y, symbol=self.symbol_for_values(x, y), exist_in_map=exist))
@@ -408,9 +407,6 @@ class BivariateRenderer(QgsFeatureRenderer):
     def field_1_labels(self) -> List[float]:
         return self.classes_to_legend_breaks(self.field_1_classes)
 
-    def existing_labels(self) -> List[str]:
-        return [x for x in sorted(self.labels_existing)]
-
     def generateCategories(self):
         for x in range(self.bivariate_color_ramp.number_of_classes):
             for y in range(self.bivariate_color_ramp.number_of_classes):
@@ -435,10 +431,6 @@ class BivariateRenderer(QgsFeatureRenderer):
         legend_renderer.text_format.setSize(50)
         legend_renderer.add_axes_texts = True
         legend_renderer.add_axes_arrows = True
-        # legend_renderer.replace_rectangle_without_values = True
-        # legend_renderer.symbol_rectangle_without_values = load_symbol_xml(
-        #     Path(__file__).parent.parent / "data" / "empty_rectangle_fill_symbol.xml"
-        # )
         legend_renderer.render(context, size, size, self.generate_legend_polygons())
 
         painter.end()

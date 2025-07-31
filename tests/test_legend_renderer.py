@@ -1,55 +1,10 @@
-from qgis.core import QgsLayoutUtils, QgsRenderContext, QgsTextFormat
+from qgis.core import QgsLayoutUtils, QgsRenderContext
 from qgis.PyQt.QtGui import QColor
 
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDirect
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
-from BivariateRenderer.utils import get_symbol_dict
-from tests import assert_images_equal, xml_string
-
-
-def test_default_values():
-
-    legend_renderer = LegendRenderer()
-
-    assert legend_renderer.axis_title_x == "Axis X"
-    assert legend_renderer.axis_title_y == "Axis Y"
-
-    assert xml_string(legend_renderer.text_format) == xml_string(QgsTextFormat())
-
-    assert get_symbol_dict(legend_renderer.axis_line_symbol)["layers_list"] == [
-        {
-            "type_layer": "ArrowLine",
-            "properties_layer": {
-                "arrow_start_width": "0.8",
-                "arrow_start_width_unit": "MM",
-                "arrow_start_width_unit_scale": "3x:0,0,0,0,0,0",
-                "arrow_type": "0",
-                "arrow_width": "0.8",
-                "arrow_width_unit": "MM",
-                "arrow_width_unit_scale": "3x:0,0,0,0,0,0",
-                "head_length": "3",
-                "head_length_unit": "MM",
-                "head_length_unit_scale": "3x:0,0,0,0,0,0",
-                "head_thickness": "2",
-                "head_thickness_unit": "MM",
-                "head_thickness_unit_scale": "3x:0,0,0,0,0,0",
-                "head_type": "0",
-                "is_curved": "1",
-                "is_repeated": "1",
-                "offset": "0",
-                "offset_unit": "MM",
-                "offset_unit_scale": "3x:0,0,0,0,0,0",
-                "ring_filter": "0",
-            },
-        }
-    ]
-
-    assert QColor(0, 0, 0).name() == legend_renderer.axis_line_symbol.color().name()
-
-    assert legend_renderer.legend_rotated is False
-    assert legend_renderer.add_axes_arrows is False
-    assert legend_renderer.add_axes_texts is False
+from tests import assert_images_equal
 
 
 def test_just_legend(

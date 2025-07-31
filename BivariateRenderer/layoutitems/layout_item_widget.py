@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QLabel, QPlainTextEdit, QSpinBox, QVBoxLayout
 
 from ..text_constants import IDS, Texts
-from ..utils import get_icon_path, get_symbol_dict, log
+from ..utils import get_icon_path
 from .layout_item import BivariateRendererLayoutItem
 
 

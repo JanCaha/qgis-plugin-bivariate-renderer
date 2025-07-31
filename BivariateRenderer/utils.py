@@ -1,79 +1,66 @@
-import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-from qgis.core import Qgis, QgsLineSymbol, QgsMessageLog, QgsReadWriteContext, QgsSymbol, QgsSymbolLayerUtils
-from qgis.PyQt.QtGui import QColor, QIcon
-from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import (
+    Qgis,
+    QgsArrowSymbolLayer,
+    QgsFillSymbol,
+    QgsLinePatternFillSymbolLayer,
+    QgsLineSymbol,
+    QgsMessageLog,
+    QgsRenderContext,
+    QgsSimpleFillSymbolLayer,
+    QgsVectorLayer,
+)
+from qgis.PyQt.QtCore import Qt
 
 from .text_constants import Texts
 
 
 def log(text: Any) -> None:
-    QgsMessageLog.logMessage(str(text), Texts.plugin_name, Qgis.Info)
-
-
-# these two functions are taken from
-# https://github.com/TomasdelaBarra/QTRANUS/blob/c32c11f02faec561b1825479b3251c096c5f36ea/add_linktype_dialog.py
-def get_symbol_object(symbol_obj: Dict) -> QgsLineSymbol:
-    """Return dictionary with objects of symbol"""
-
-    from qgis.core import QgsArrowSymbolLayer, QgsLineSymbol, QgsSimpleLineSymbolLayer
-
-    # symbol_obj = json.loads(symbol_srt.replace("'", '"').replace("ArrowLine", "Arrow"))
-    symbol_layers = QgsLineSymbol()
-
-    for layer_symbol in symbol_obj["layers_list"]:
-        obj_symbol = eval(f"Qgs{layer_symbol['type_layer']}SymbolLayer.create({layer_symbol['properties_layer']})")
-        symbol_layers.appendSymbolLayer(obj_symbol)
-
-    symbol_layers.deleteSymbolLayer(0)
-
-    return symbol_layers
-
-
-def get_symbol_dict(symbol: QgsSymbol) -> Dict:
-    """Return dictionary with main elements of symbol"""
-    symbol_dict = dict()
-
-    symbol_dict["type"] = symbol.type()
-    symbol_dict["layers_list"] = []
-
-    for index in range(0, symbol.symbolLayerCount()):
-        symbol_dict["layers_list"].append(
-            {
-                "type_layer": symbol.symbolLayer(index).layerType().split(":")[0],
-                "properties_layer": symbol.symbolLayer(index).properties(),
-            }
-        )
-
-    return symbol_dict
-
-
-def path_data(file_name: str) -> Path:
-
-    return Path(__file__).parent / "data" / file_name
-
-
-def read_file_content(file_path: Path) -> str:
-
-    with open(file_path, "r") as file:
-        text = file.read()
-
-    return text
-
-
-def load_json(content: str) -> Dict:
-
-    return json.loads(content)
+    QgsMessageLog.logMessage(str(text), Texts.plugin_name, Qgis.MessageLevel.Info)
 
 
 def default_line_symbol() -> QgsLineSymbol:
+    """Return a default line symbol with specific properties."""
 
-    line_symbol = get_symbol_object(load_json(read_file_content(path_data("axis_line_symbol.json"))))
-    line_symbol.setColor(QColor(0, 0, 0))
+    symbol = QgsLineSymbol.createSimple({})
 
-    return line_symbol
+    assert symbol is not None
+
+    symbol.takeSymbolLayer(0)
+
+    symbol_layer = QgsArrowSymbolLayer.create(
+        {
+            "color": "0,0,0,255,rgb:0,0,0,1",
+            "arrow_start_width": "0.8",
+            "arrow_start_width_unit": "MM",
+            "arrow_start_width_unit_scale": "3x: 0, 0, 0, 0, 0, 0",
+            "arrow_type": "0",
+            "arrow_width": "0.8",
+            "arrow_width_unit": "MM",
+            "arrow_width_unit_scale": "3x: 0, 0, 0, 0, 0, 0",
+            "head_length": "3",
+            "head_length_unit": "MM",
+            "head_length_unit_scale": "3x: 0, 0, 0, 0, 0, 0",
+            "head_thickness": "2",
+            "head_thickness_unit": "MM",
+            "head_thickness_unit_scale": "3x: 0, 0, 0, 0, 0, 0",
+            "head_type": "0",
+            "is_curved": "1",
+            "is_repeated": "1",
+            "offset": "0",
+            "offset_unit": "MM",
+            "offset_unit_scale": "3x: 0, 0, 0, 0, 0, 0",
+            "ring_filter": "0",
+        }
+    )
+
+    assert symbol_layer is not None
+
+    symbol.insertSymbolLayer(0, symbol_layer)
+
+    return symbol
 
 
 def path_icon(file_name: str) -> Path:
@@ -88,31 +75,92 @@ def get_icon_path(file_name: str) -> str:
     return path.absolute().as_posix()
 
 
-def save_symbol_xml(symbol: QgsSymbol, file_name: Path) -> None:
+def default_fill_symbol() -> QgsFillSymbol:
+    """Return a default fill symbol with specific properties."""
 
-    doc = QDomDocument()
+    symbol = QgsFillSymbol.createSimple(
+        {
+            "color": "204,204,204,0,rgb:0.8,0.8,0.8,0",
+            "outline_width": "0.5",
+            "outline_width_unit": "MM",
+            "outline_color": "0,0,0,255,rgb:0,0,0,1",
+            "outline_style": "solid",
+        }
+    )
 
-    elem = QgsSymbolLayerUtils.saveSymbol("symbol", symbol, doc, QgsReadWriteContext())
+    if symbol is None:
+        raise ValueError("Failed to create a valid QgsFillSymbol.")
 
-    doc.appendChild(elem)
-
-    xml = doc.toString()
-
-    with open(file_name, "w+") as f:
-        f.write(xml)
+    return symbol
 
 
-def load_symbol_xml(file_name: Path) -> QgsSymbol:
+def symbol_layers_properties(layer: QgsVectorLayer) -> str:
+    """Return a string representation of the symbol layers properties of a given layer."""
 
-    with open(file_name) as file:
-        symbol_doc = file.read()
+    str_repr = ""
 
-    doc = QDomDocument()
-    doc.setContent(symbol_doc)
-    return QgsSymbolLayerUtils.loadSymbol(doc.documentElement(), QgsReadWriteContext())
+    renderer = layer.renderer()
+    assert renderer is not None
+
+    context = QgsRenderContext()
+
+    for symbol in renderer.symbols(context):
+        for symbol_layer in symbol.symbolLayers():
+            str_repr = f"{str_repr}{'-' * 10}{symbol_layer.layerType()}{'-' * 10}\n{symbol_layer.properties()}\n"
+        str_repr = f"{str_repr}{'*' * 50}\n"
+
+    return str_repr
+
+
+def only_color_fill_symbol() -> QgsFillSymbol:
+    """Return a fill symbol with only color set."""
+
+    symbol = QgsFillSymbol.createSimple({})
+
+    assert symbol is not None
+
+    symbol.takeSymbolLayer(0)
+
+    symbol_layer = QgsSimpleFillSymbolLayer.create({})
+
+    assert symbol_layer is not None
+
+    symbol_layer.setStrokeStyle(Qt.PenStyle.NoPen)
+    symbol.appendSymbolLayer(symbol_layer)
+
+    return symbol
+
+
+def default_missing_values_symbol() -> QgsFillSymbol:
+    """Return a fill symbol for missing values with a specific pattern."""
+
+    symbol = QgsFillSymbol.createSimple({})
+
+    assert symbol is not None
+
+    symbol_settings = {
+        "angle": "45",
+        "color": "0,0,0,255,rgb:0,0,0,1.0",
+        "distance": "2.5",
+        "distance_unit": "MM",
+        "line_width": "0.5",
+        "line_width_unit": "MM",
+    }
+
+    symbol_layer_1 = QgsLinePatternFillSymbolLayer.create(symbol_settings)
+    symbol_settings["angle"] = "-45"
+    symbol_layer_2 = QgsLinePatternFillSymbolLayer.create(symbol_settings)
+
+    symbol.takeSymbolLayer(0)
+
+    symbol.insertSymbolLayer(0, symbol_layer_1)
+    symbol.insertSymbolLayer(0, symbol_layer_2)
+
+    return symbol
 
 
 class Singleton(type):
+    """A metaclass for creating singleton classes."""
 
     _instances = {}
 
