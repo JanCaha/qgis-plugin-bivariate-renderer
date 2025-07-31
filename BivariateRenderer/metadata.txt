@@ -2,7 +2,7 @@
 name=Bivariate color polygon renderer
 qgisMinimumVersion=3.20
 description=Implementation of bivariate color renderer for polygon data.
-version=1.1.0
+version=1.2.0
 author=Jan Caha
 email=jan.caha@outlook.com
 
@@ -22,5 +22,7 @@ category=Vector
 server=False
 
 # Uncomment the following line and add your changelog:
-changelog=1.1.0
+changelog=1.2.0
+    - allow base symbol for features to set up polygon border or similar features (does not appear in legend only in map)
+<p>1.1.0
     - create proper legend as image 
