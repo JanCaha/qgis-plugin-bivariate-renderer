@@ -351,7 +351,6 @@ class LegendRenderer:
                 )
 
             else:
-
                 scale_factor = self.height / max_size
                 self._transform.scale(scale_factor, scale_factor)
                 self._transform.translate(0, self.axis_tick_last_value_max_width / 2)
