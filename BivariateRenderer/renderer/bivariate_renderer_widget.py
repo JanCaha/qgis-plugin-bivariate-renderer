@@ -84,7 +84,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.field_name_1 = fields.field(0).name()
         self.field_name_2 = fields.field(0).name()
 
-        self.cb_field1 = QgsFieldComboBox()
+        self.cb_field1 = QgsFieldComboBox(self)
         self.cb_field1.setFields(fields)
         self.cb_field1.setFilters(QgsFieldProxyModel.Numeric)
         self.cb_field1.currentIndexChanged.connect(self.setFieldName1)
@@ -96,7 +96,7 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.cb_field1.setCurrentIndex(1)
             self.cb_field1.setCurrentIndex(0)
 
-        self.cb_field2 = QgsFieldComboBox()
+        self.cb_field2 = QgsFieldComboBox(self)
         self.cb_field2.setFields(layer.fields())
         self.cb_field2.setFilters(QgsFieldProxyModel.Numeric)
         self.cb_field2.currentIndexChanged.connect(self.setFieldName2)
@@ -108,14 +108,14 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.cb_field2.setCurrentIndex(1)
             self.cb_field2.setCurrentIndex(0)
 
-        self.sb_number_classes = QgsDoubleSpinBox()
+        self.sb_number_classes = QgsDoubleSpinBox(self)
         self.sb_number_classes.setDecimals(0)
         self.sb_number_classes.setMinimum(2)
         self.sb_number_classes.setMaximum(5)
         self.sb_number_classes.setSingleStep(1)
         self.sb_number_classes.setValue(self.bivariate_renderer.bivariate_color_ramp.number_of_classes)
 
-        self.cb_classification_methods = QComboBox()
+        self.cb_classification_methods = QComboBox(self)
         self.cb_classification_methods.addItems(list(self.classification_methods.keys()))
 
         if self.bivariate_renderer.classification_method:
@@ -136,7 +136,7 @@ class BivariateRendererWidget(QgsRendererWidget):
             self.cb_classification_methods.setCurrentIndex(1)
             self.cb_classification_methods.setCurrentIndex(0)
 
-        self.cb_colormixing_methods = QComboBox()
+        self.cb_colormixing_methods = QComboBox(self)
 
         self.cb_colormixing_methods.addItems(self.register_color_mixing.names)
 
@@ -147,7 +147,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         else:
             self.cb_colormixing_methods.setCurrentIndex(1)
 
-        self.cb_color_ramps = QComboBox()
+        self.cb_color_ramps = QComboBox(self)
 
         self.cb_color_ramps.addItem("")
 
@@ -162,14 +162,14 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.cb_color_ramps.currentIndexChanged.connect(self.change_color_ramps)
 
-        self.bt_color_ramp1 = QgsColorRampButton()
+        self.bt_color_ramp1 = QgsColorRampButton(self)
 
         if self.bivariate_renderer.bivariate_color_ramp.color_ramp_1:
             self.bt_color_ramp1.setColorRamp(self.bivariate_renderer.bivariate_color_ramp.color_ramp_1)
         else:
             self.bt_color_ramp1.setColorRamp(self.default_color_ramp_1)
 
-        self.bt_color_ramp2 = QgsColorRampButton()
+        self.bt_color_ramp2 = QgsColorRampButton(self)
 
         if self.bivariate_renderer.bivariate_color_ramp.color_ramp_2:
             self.bt_color_ramp2.setColorRamp(self.bivariate_renderer.bivariate_color_ramp.color_ramp_2)
@@ -180,7 +180,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_changed.connect(self.update_legend)
 
-        self.rotate_color_palette = QComboBox()
+        self.rotate_color_palette = QComboBox(self)
         self.rotate_color_palette.addItem("Normal", 0)
         self.rotate_color_palette.addItem("90° clockwise", 1)
         self.rotate_color_palette.addItem("180° clockwise", 2)
@@ -193,7 +193,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.symbol_selector.setSymbol(self.base_symbol.clone())
         self.symbol_selector.changed.connect(self.update_base_symbol)
 
-        self.form_layout = QFormLayout()
+        self.form_layout = QFormLayout(self)
         self.form_layout.addRow("Default Symbol", self.symbol_selector)
         self.form_layout.addRow("Color ramps", self.cb_color_ramps)
         self.form_layout.addRow("Number of classes", self.sb_number_classes)
