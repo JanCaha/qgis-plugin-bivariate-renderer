@@ -4,7 +4,7 @@ import math
 from abc import ABC, abstractmethod
 from typing import List
 
-from qgis.core import QgsGradientColorRamp, QgsSymbolLayerUtils
+from qgis.core import QgsColorRamp, QgsGradientColorRamp, QgsSymbolLayerUtils
 from qgis.PyQt.QtGui import QColor, QIcon
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
@@ -17,21 +17,31 @@ from ..utils import get_icon_path
 class BivariateColorRamp(ABC):
     _name: str = "Default Bivariate Color Ramp"
     _icon: str
+    _color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp()
+    _color_ramp_2: QgsGradientColorRamp = QgsGradientColorRamp()
+    _colors: List[List[QColor]] = []
 
     def __init__(self, number_classes: int = 9) -> None:
         self._number_of_classes = number_classes
 
     @property
     def name(self) -> str:
+        """Name of the color ramp."""
         return self._name
 
     @property
     def icon(self) -> QIcon:
+        """Icon of the color ramp."""
         return QIcon(self._icon)
 
     @property
     def number_of_classes(self) -> int:
+        """Number of classes in the color ramp."""
         return self._number_of_classes
+
+    def set_name(self, name: str) -> None:
+        """Set the name of the color ramp."""
+        self._name = name
 
     @abstractmethod
     def get_color(self, position_value1: int, position_value2: int) -> QColor: ...
@@ -41,10 +51,18 @@ class BivariateColorRamp(ABC):
 
     @staticmethod
     @abstractmethod
-    def load(bivariate_element: QDomElement): ...
+    def load(bivariate_ramp_element: QDomElement) -> BivariateColorRamp: ...
 
     @abstractmethod
     def clone(self) -> BivariateColorRamp: ...
+
+    @property
+    def color_ramp_1(self) -> QgsGradientColorRamp:
+        return self._color_ramp_1
+
+    @property
+    def color_ramp_2(self) -> QgsGradientColorRamp:
+        return self._color_ramp_2
 
 
 class BivariateColorRampGradient(BivariateColorRamp):
@@ -57,22 +75,18 @@ class BivariateColorRampGradient(BivariateColorRamp):
         super().__init__(number_classes_per_ramp)
         self._color_mixing_method = color_mixing_method
 
-    @property
-    def color_ramp_1(self) -> QgsGradientColorRamp:
-        return self._color_ramp_1
-
-    @property
-    def color_ramp_2(self) -> QgsGradientColorRamp:
-        return self._color_ramp_2
-
     def set_number_of_classes(self, number_of_classes: int) -> None:
         self._number_of_classes = number_of_classes
 
-    def set_color_ramp_1(self, color_ramp: QgsGradientColorRamp) -> None:
-        self._color_ramp_1 = color_ramp
+    def set_color_ramp_1(self, color_ramp: QgsColorRamp) -> None:
+        """Set color ramp 1 if it is a QgsGradientColorRamp."""
+        if isinstance(color_ramp, QgsGradientColorRamp):
+            self._color_ramp_1 = color_ramp
 
-    def set_color_ramp_2(self, color_ramp: QgsGradientColorRamp) -> None:
-        self._color_ramp_2 = color_ramp
+    def set_color_ramp_2(self, color_ramp: QgsColorRamp) -> None:
+        """Set color ramp 2 if it is a QgsGradientColorRamp."""
+        if isinstance(color_ramp, QgsGradientColorRamp):
+            self._color_ramp_2 = color_ramp
 
     @property
     def color_mixing_method(self) -> ColorMixingMethod:
@@ -117,24 +131,28 @@ class BivariateColorRampGradient(BivariateColorRamp):
         if color_mixing_method:
             bivariate_color_ramp.set_color_mixing_method(color_mixing_method)
 
-        bivariate_color_ramp.set_color_ramp_1(
-            QgsSymbolLayerUtils.loadColorRamp(bivariate_ramp_element.firstChildElement("colorramp"))
-        )
+        ramp_1 = QgsSymbolLayerUtils.loadColorRamp(bivariate_ramp_element.firstChildElement("colorramp"))
+        if ramp_1 is not None:
+            bivariate_color_ramp.set_color_ramp_1(ramp_1)
 
-        bivariate_color_ramp.set_color_ramp_2(
-            QgsSymbolLayerUtils.loadColorRamp(bivariate_ramp_element.lastChildElement("colorramp"))
-        )
+        ramp_2 = QgsSymbolLayerUtils.loadColorRamp(bivariate_ramp_element.lastChildElement("colorramp"))
+        if ramp_2 is not None:
+            bivariate_color_ramp.set_color_ramp_2(ramp_2)
 
         return bivariate_color_ramp
 
     def clone(self) -> BivariateColorRampGradient:
         bivariate_color_ramp = BivariateColorRampGradient()
 
-        bivariate_color_ramp._name = self._name
+        bivariate_color_ramp.set_name(self._name)
         bivariate_color_ramp.set_number_of_classes(self.number_of_classes)
         bivariate_color_ramp.set_color_mixing_method(self.color_mixing_method)
-        bivariate_color_ramp.set_color_ramp_1(self.color_ramp_1.clone())
-        bivariate_color_ramp.set_color_ramp_2(self.color_ramp_2.clone())
+        ramp_1 = self.color_ramp_1.clone()
+        if ramp_1 is not None:
+            bivariate_color_ramp.set_color_ramp_1(ramp_1)
+        ramp_2 = self.color_ramp_2.clone()
+        if ramp_2 is not None:
+            bivariate_color_ramp.set_color_ramp_2(ramp_2)
 
         return bivariate_color_ramp
 
@@ -180,6 +198,10 @@ class BivariateColorRampManual(BivariateColorRamp):
     def load(bivariate_ramp_element: QDomElement) -> BivariateColorRampManual:
 
         number_of_classes = bivariate_ramp_element.attribute("number_of_classes")
+        try:
+            number_of_classes = int(number_of_classes)
+        except ValueError:
+            raise ValueError(f"Invalid number of classes: {number_of_classes}")
 
         squareColors = int(math.sqrt(number_of_classes))
 
@@ -210,7 +232,7 @@ class BivariateColorRampManual(BivariateColorRamp):
 
         bivariate_color_ramp = BivariateColorRampManual(cols)
 
-        bivariate_color_ramp._name = self._name
+        bivariate_color_ramp.set_name(self._name)
 
         return bivariate_color_ramp
 
