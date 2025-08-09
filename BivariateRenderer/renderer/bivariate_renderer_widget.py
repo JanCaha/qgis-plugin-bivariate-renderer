@@ -227,24 +227,23 @@ class BivariateRendererWidget(QgsRendererWidget):
         index = self.rotate_color_palette.currentIndex()
         rotation = self.rotate_color_palette.itemData(index, Qt.UserRole)
 
+        cr1 = self.bt_color_ramp1.colorRamp()
+        cr2 = self.bt_color_ramp2.colorRamp()
+        if cr1 is None or cr2 is None:
+            return
+
         if rotation == 0:
             pass
         elif rotation == 1:
-            cr1 = self.bt_color_ramp1.colorRamp()
-            cr2 = self.bt_color_ramp2.colorRamp()
             cr1.invert()
             self.bt_color_ramp1.setColorRamp(cr2)
             self.bt_color_ramp2.setColorRamp(cr1)
         elif rotation == 2:
-            cr1 = self.bt_color_ramp1.colorRamp()
-            cr2 = self.bt_color_ramp2.colorRamp()
             cr1.invert()
             cr2.invert()
             self.bt_color_ramp1.setColorRamp(cr1)
             self.bt_color_ramp2.setColorRamp(cr2)
         elif rotation == 3:
-            cr1 = self.bt_color_ramp1.colorRamp()
-            cr2 = self.bt_color_ramp2.colorRamp()
             cr2.invert()
             self.bt_color_ramp1.setColorRamp(cr2)
             self.bt_color_ramp2.setColorRamp(cr1)
