@@ -417,7 +417,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         size = 200
 
-        image = QImage(size, size, QImage.Format_ARGB32)
+        image = QImage(size, size, QImage.Format.Format_ARGB32)
         image.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(image)

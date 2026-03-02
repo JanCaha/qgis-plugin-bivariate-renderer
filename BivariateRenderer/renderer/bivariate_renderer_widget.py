@@ -225,7 +225,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
     def rotate_palette(self):
         index = self.rotate_color_palette.currentIndex()
-        rotation = self.rotate_color_palette.itemData(index, Qt.UserRole)
+        rotation = self.rotate_color_palette.itemData(index, Qt.ItemDataRole.UserRole)
 
         cr1 = self.bt_color_ramp1.colorRamp()
         cr2 = self.bt_color_ramp2.colorRamp()
@@ -265,7 +265,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.label_legend.clear()
 
-        image = QImage(self.legend_size, self.legend_size, QImage.Format_ARGB32)
+        image = QImage(self.legend_size, self.legend_size, QImage.Format.Format_ARGB32)
         image.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(image)

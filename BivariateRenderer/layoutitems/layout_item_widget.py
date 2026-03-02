@@ -66,7 +66,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.cb_layers.addItems(usable_layers)
 
         if self.layout_item.linked_layer_name:
-            index = self.cb_layers.findData(self.layout_item.linked_layer_name, Qt.DisplayRole)
+            index = self.cb_layers.findData(self.layout_item.linked_layer_name, Qt.ItemDataRole.DisplayRole)
             self.cb_layers.setCurrentIndex(index)
 
         self.form_layout = QVBoxLayout()
