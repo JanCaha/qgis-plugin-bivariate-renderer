@@ -33,11 +33,11 @@ jobs:
       - name: Install conda-build
         run: |
           conda install -n base pip qgis pytest pytest-cov pillow pytest-qt
-          pip install --no-cache-dir pytest-qgis pixelmatch
+          conda run -n base pip install --no-cache-dir pytest-qgis pixelmatch
 
       - name: Run tests
         run: |
-          pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
+          conda run -n base pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
 
       - name: Upload Artifact
         if: failure()
