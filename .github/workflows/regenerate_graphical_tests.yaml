@@ -4,63 +4,40 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-on:
-  workflow_dispatch
+on: workflow_dispatch
 
 env:
   DEBIAN_FRONTEND: noninteractive
   QT_QPA_PLATFORM: offscreen
   XDG_RUNTIME_DIR: /tmp
-  PYTHONPATH: /usr/share/qgis/python/plugins:/usr/share/qgis/python:./qgis-plugin-bivariate-renderer
   BIVARIATE_GENERATE: true
-  
+
 jobs:
-
   Generate-Tests-Graphical-Results-for-plugin-BivariateRenderer:
-
     runs-on: ubuntu-24.04
 
     steps:
-
       - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Prepare QGIS
-        run: |
-          sudo gpg -k && \
-          KEYRING=/usr/share/keyrings/qgis-archive-keyring.gpg && \
-          wget -O $KEYRING https://download.qgis.org/downloads/qgis-archive-keyring.gpg && \
-          sudo touch /etc/apt/sources.list.d/qgis.sources && \
-          echo 'Types: deb deb-src' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
-          echo 'URIs: https://qgis.org/ubuntugis' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
-          echo 'Suites: '$(lsb_release -c -s) | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
-          echo 'Architectures: '$(dpkg --print-architecture) | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
-          echo 'Components: main' | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
-          echo 'Signed-By: '$KEYRING | sudo tee -a /etc/apt/sources.list.d/qgis.sources && \
-          LASTSUPPORTED=focal && \
-          KEYRING=/usr/share/keyrings/ubuntugis-archive-keyring.gpg && \
-          sudo gpg --no-default-keyring --keyring $KEYRING --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 6B827C12C2D425E227EDCA75089EBE08314DF160 && \
-          sudo touch /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'Types: deb deb-src' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'URIs:https://ppa.launchpadcontent.net/ubuntugis/ubuntugis-unstable/ubuntu' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'Suites: '$(lsb_release -c -s)| sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'Architectures: '$(dpkg --print-architecture) | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'Components: main' | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources && \
-          echo 'Signed-By: '$KEYRING | sudo tee -a /etc/apt/sources.list.d/ubuntugis-unstable.sources
+        uses: actions/checkout@v6
 
-      - name: Install
-        run: | 
-          sudo apt-get update && \
-          sudo apt-get -y -q install --no-install-recommends qgis
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          use-mamba: true
+          channels: conda-forge,defaults
+          auto-activate-base: true
+          activate-environment: ""
 
-      - name: Install Python packages 
+      - name: Install conda-build
         run: |
-          pip install --no-cache-dir pytest pytest-qgis pytest-cov pillow flake8 mypy pycodestyle pb_tool pytest-qt pixelmatch --break-system-packages
+          conda install -n base pip qgis pytest pytest-cov pillow pytest-qt
+          conda run -n base pip install --no-cache-dir pytest-qgis pixelmatch
 
       - name: Run tests
         run: |
-          pytest tests/tests_visual_result_generation --cov=BivariateRenderer -rP -vv -s
-      
+          conda run -n base pytest tests/tests_visual_result_generation -rP -vv -s
+
       - name: Commit and push graphical test results
         if: success()
         run: |
