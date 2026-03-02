@@ -6,6 +6,7 @@ on:
       - "BivariateRenderer/**"
       - "tests/**"
       - ".github/workflows/test_plugin.yaml"
+  workflow_dispatch:
 
 env:
   DEBIAN_FRONTEND: noninteractive
