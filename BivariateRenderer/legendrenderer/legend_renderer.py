@@ -628,7 +628,7 @@ class LegendRenderer:
         if spacer_size % 2 == 0:
             spacer_size += 1
 
-        pen = QPen(self.color_separator_color, spacer_size, Qt.SolidLine)
+        pen = QPen(self.color_separator_color, spacer_size, Qt.PenStyle.SolidLine)
 
         self.painter.setPen(pen)
 
@@ -660,7 +660,7 @@ class LegendRenderer:
 
         self.painter.save()
 
-        pen = QPen(QColor(255, 0, 0, 255), 3, Qt.SolidLine)
+        pen = QPen(QColor(255, 0, 0, 255), 3, Qt.PenStyle.SolidLine)
 
         self.painter.setPen(pen)
 
@@ -675,7 +675,7 @@ class LegendRenderer:
         line.draw(self.painter)
 
         # Lines
-        pen = QPen(QColor(0, 255, 0, 255), 3, Qt.SolidLine)
+        pen = QPen(QColor(0, 255, 0, 255), 3, Qt.PenStyle.SolidLine)
 
         self.painter.setPen(pen)
 
@@ -727,7 +727,7 @@ class LegendRenderer:
 
         self._painter.save()
 
-        self._painter.setPen(Qt.NoPen)
+        self._painter.setPen(Qt.PenStyle.NoPen)
 
         self.set_text_height(self.axis_title_x.split("\n"), self.axis_title_y.split("\n"))
 
