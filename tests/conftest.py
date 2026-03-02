@@ -64,7 +64,7 @@ def nc_layer(nc_layer_path) -> QgsVectorLayer:
 def prepare_default_QImage():
 
     def return_QImage(size: int = 500) -> QImage:
-        image = QImage(size, size, QImage.Format_ARGB32)
+        image = QImage(size, size, QImage.Format.Format_ARGB32)
         image.fill(qRgba(254, 254, 254, 254))
         assert isinstance(image, QImage)
         return image

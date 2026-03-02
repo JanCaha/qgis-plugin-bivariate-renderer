@@ -1,6 +1,5 @@
-from PyQt5.QtXml import QDomElement
 from qgis.core import QgsProject, QgsReadWriteContext, QgsVectorLayer
-from qgis.PyQt.QtXml import QDomDocument
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
