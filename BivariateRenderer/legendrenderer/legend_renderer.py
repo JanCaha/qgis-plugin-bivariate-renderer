@@ -380,9 +380,11 @@ class LegendRenderer:
                 if self.use_rectangle_without_values_color_from_legend:
                     self.symbol_rectangle_without_values.setColor(polygon.symbol.color())
 
-                self.symbol_rectangle_without_values.startRender(self.context)
-                self.symbol_rectangle_without_values.renderPolygon(polygon_draw, None, None, self.context)
-                self.symbol_rectangle_without_values.stopRender(self.context)
+                symbol_without_values = self.symbol_rectangle_without_values.clone()
+
+                symbol_without_values.startRender(self.context)
+                symbol_without_values.renderPolygon(polygon_draw, None, None, self.context)
+                symbol_without_values.stopRender(self.context)
 
             else:
 
