@@ -413,11 +413,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         return QIcon(get_icon_path("legend_icon.png"))
 
-    def beginCommand(self, commandText: str, command) -> None:
-        if not isinstance(command, int):
-            command = command.value
-        return super().beginCommand(commandText, command)
-
 
 class BivariateRendererLayoutItemMetadata(QgsLayoutItemAbstractMetadata):
 
