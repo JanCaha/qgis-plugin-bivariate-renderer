@@ -115,26 +115,26 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.sb_number_classes.setSingleStep(1)
         self.sb_number_classes.setValue(self.bivariate_renderer.bivariate_color_ramp.number_of_classes)
 
-        self.cb_classification_methods = QComboBox(self)
-        self.cb_classification_methods.addItems(list(self.classification_methods.keys()))
+        # self.cb_classification_methods = QComboBox(self)
+        # self.cb_classification_methods.addItems(list(self.classification_methods.keys()))
 
-        if self.bivariate_renderer.classification_method:
+        # if self.bivariate_renderer.classification_method:
 
-            if self.bivariate_renderer.classification_method.name() in list(self.classification_methods.keys()):
+        #     if self.bivariate_renderer.classification_method.name() in list(self.classification_methods.keys()):
 
-                index = list(self.classification_methods.keys()).index(
-                    self.bivariate_renderer.classification_method.name()
-                )
+        #         index = list(self.classification_methods.keys()).index(
+        #             self.bivariate_renderer.classification_method.name()
+        #         )
 
-            else:
+        #     else:
 
-                index = 0
+        #         index = 0
 
-            self.cb_classification_methods.setCurrentIndex(index)
+        #     self.cb_classification_methods.setCurrentIndex(index)
 
-        else:
-            self.cb_classification_methods.setCurrentIndex(1)
-            self.cb_classification_methods.setCurrentIndex(0)
+        # else:
+        #     self.cb_classification_methods.setCurrentIndex(1)
+        #     self.cb_classification_methods.setCurrentIndex(0)
 
         self.cb_colormixing_methods = QComboBox(self)
 
@@ -213,7 +213,7 @@ class BivariateRendererWidget(QgsRendererWidget):
         self.setLayout(self.form_layout)
 
         self.sb_number_classes.valueChanged.connect(self.update_bivariate_color_ramp)
-        self.cb_classification_methods.currentIndexChanged.connect(self.update_bivariate_color_ramp)
+        # self.cb_classification_methods.currentIndexChanged.connect(self.update_bivariate_color_ramp)
         self.bt_color_ramp1.colorRampChanged.connect(self.update_bivariate_color_ramp)
         self.bt_color_ramp2.colorRampChanged.connect(self.update_bivariate_color_ramp)
         self.cb_colormixing_methods.currentIndexChanged.connect(self.update_bivariate_color_ramp)
@@ -304,7 +304,9 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.bivariate_renderer.set_bivariate_color_ramp(self.bivariate_color_ramp)
 
-        classification_method = self.classification_methods[self.cb_classification_methods.currentText()]
+        classification_method = self.classification_methods[
+            QgsClassificationEqualInterval().name()
+        ]  # self.classification_methods[self.cb_classification_methods.currentText()]
 
         self.bivariate_renderer.setClassificationMethod(classification_method)
 
