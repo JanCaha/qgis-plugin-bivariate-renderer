@@ -172,10 +172,18 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setFieldName1(self.field_name_1)
         r.setFieldName2(self.field_name_2)
         r.classification_method = self.classification_method.clone()
-        r.field_1_classes = self.field_1_classes
-        r.field_2_classes = self.field_2_classes
-        r.cached_symbols = self.cached_symbols
-        r.labels_existing = self.labels_existing
+
+        for field_1_class in self.field_1_classes:
+            r.field_1_classes.append(
+                QgsClassificationRange(field_1_class.label(), field_1_class.lowerBound(), field_1_class.upperBound())
+            )
+        for field_2_class in self.field_2_classes:
+            r.field_2_classes.append(
+                QgsClassificationRange(field_2_class.label(), field_2_class.lowerBound(), field_2_class.upperBound())
+            )
+
+        r.cached_symbols = {}
+        r.labels_existing = self.labels_existing.copy()
         r.bivariate_color_ramp = self.bivariate_color_ramp.clone()
         r.polygon_symbol = self.polygon_symbol.clone()
 
