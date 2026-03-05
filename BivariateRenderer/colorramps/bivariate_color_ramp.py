@@ -201,7 +201,7 @@ class BivariateColorRampManual(BivariateColorRamp):
         except ValueError:
             raise ValueError(f"Invalid number of classes: {number_of_classes}")
 
-        colors_elements = bivariate_ramp_element.childNodes()
+        colors_elements = bivariate_ramp_element.firstChildElement("colors").childNodes()
 
         colors: List[List[QColor]] = []
         for _ in range(number_of_classes):
