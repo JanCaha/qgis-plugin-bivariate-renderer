@@ -26,8 +26,8 @@ jobs:
           auto-update-conda: true
           use-mamba: true
           channels: conda-forge,defaults
-          auto-activate-base: true
-          activate-environment: ""
+          auto-activate: true
+          activate-environment: "base"
 
       - name: Install conda-build
         run: |
