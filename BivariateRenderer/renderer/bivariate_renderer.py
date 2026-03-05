@@ -375,21 +375,19 @@ class BivariateRenderer(QgsFeatureRenderer):
         if not isinstance(other, BivariateRenderer):
             return False
 
-        else:
-            if (
-                self.field_name_1 == other.field_name_1
-                and self.field_name_2 == other.field_name_2
-                and
-                # self.classification_method.id() == other.classification_method.id() and
-                self.field_1_min == other.field_1_min
-                and self.field_1_max == other.field_1_max
-                and self.field_2_min == other.field_2_min
-                and self.field_2_max == other.field_2_max
-            ):
-                return True
+        if self.field_name_1 != other.field_name_1 or self.field_name_2 != other.field_name_2:
+            return False
 
-            else:
-                return False
+        if not self.field_1_classes or not self.field_2_classes:
+            return not other.field_1_classes and not other.field_2_classes
+
+        return (
+            # self.classification_method.id() == other.classification_method.id() and
+            self.field_1_min == other.field_1_min
+            and self.field_1_max == other.field_1_max
+            and self.field_2_min == other.field_2_min
+            and self.field_2_max == other.field_2_max
+        )
 
     @property
     def field_2_min(self) -> float:
