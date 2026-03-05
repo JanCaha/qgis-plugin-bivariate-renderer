@@ -15,7 +15,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QLocale, QRectF, QSize
-from qgis.PyQt.QtGui import QImage, QPainter, qRgba
+from qgis.PyQt.QtGui import QFont, QImage, QPainter, qRgba
+from qgis.PyQt.QtWidgets import QApplication
 
 from BivariateRenderer.colorramps.color_ramps_register import (
     BivariateColorRamp,
@@ -30,6 +31,12 @@ from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRender
 def change_locale():
     """Sets locale to English, United Kingdom for all tests to ensure consistent results."""
     QLocale.setDefault(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_application_font():
+    """Sets a consistent application font for all tests to ensure reproducible visual results."""
+    QApplication.instance().setFont(QFont("Arial", 10))
 
 
 @pytest.fixture
