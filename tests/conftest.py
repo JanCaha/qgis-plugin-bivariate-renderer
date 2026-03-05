@@ -166,36 +166,6 @@ def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
 
 
 @pytest.fixture
-def save_layout_for_layer(qgs_layout, layout_page_a4, layout_space, export_page_to_image):
-
-    def function_to_run(
-        layer: QgsVectorLayer,
-        image_path: Union[str, Path],
-        qgs_layout: QgsLayout = qgs_layout,
-        page=layout_page_a4,
-        layout_space=layout_space,
-        export_page_to_image=export_page_to_image,
-    ) -> None:
-
-        canvas = QgsMapCanvas()
-
-        extent = layer.extent()
-        canvas.setExtent(extent)
-
-        map_item = QgsLayoutItemMap(qgs_layout)
-        map_item.attemptSetSceneRect(layout_space)
-
-        map_item.setCrs(layer.crs())
-        map_item.zoomToExtent(extent)
-
-        qgs_layout.addItem(map_item)
-
-        export_page_to_image(qgs_layout, page, image_path)
-
-    return function_to_run
-
-
-@pytest.fixture
 def export_page_to_image(layout_dpmm):
 
     def function_to_run(

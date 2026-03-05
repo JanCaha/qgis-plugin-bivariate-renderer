@@ -392,22 +392,6 @@ def test_legend_all_rotated(
 
 
 @skip_setting
-def test_layer_bivariate_render(
-    nc_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer, save_layout_for_layer
-):
-
-    bivariate_renderer = prepare_bivariate_renderer(
-        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
-    )
-
-    nc_layer.setRenderer(bivariate_renderer)
-
-    qgs_project.addMapLayer(nc_layer)
-
-    save_layout_for_layer(nc_layer, "tests/images/correct/layout_polygons_render.png")
-
-
-@skip_setting
 def test_generate_legend_white_spacer(
     qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
 ):
