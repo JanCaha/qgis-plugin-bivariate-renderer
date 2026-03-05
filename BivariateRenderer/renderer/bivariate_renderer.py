@@ -53,12 +53,18 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.polygon_symbol = default_fill_symbol()
 
     def __repr__(self) -> str:
+        if self.field_1_classes and self.field_2_classes:
+            range_info = (
+                f"field 1 vals {self.field_1_min};{self.field_1_max}, "
+                f"field 2 vals {self.field_2_min};{self.field_2_max}. "
+            )
+        else:
+            range_info = "no classification data. "
         return (
             f"BivariateRenderer "
             f"for fields `{self.field_name_1}` and `{self.field_name_2}`, "
-            f"with classification method `{self.classification_method.name()}`,"
-            f"field 1 vals {self.field_1_min};{self.field_1_max}, "
-            f"field 2 vals {self.field_2_min};{self.field_2_max}. "
+            f"with classification method `{self.classification_method.name()}`, "
+            f"{range_info}"
             f"With ramp {self.bivariate_color_ramp.name}."
         )
 
