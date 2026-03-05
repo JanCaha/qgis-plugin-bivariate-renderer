@@ -51,7 +51,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
             layer: QgsMapLayer = self.layers[layer_id]
 
-            if layer.type() == QgsMapLayerType.VectorLayer:
+            if layer.type() == Qgis.LayerType.Vector:
 
                 layer: QgsVectorLayer
 

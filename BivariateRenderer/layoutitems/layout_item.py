@@ -2,13 +2,13 @@ from pathlib import Path
 from typing import Optional
 
 from qgis.core import (
+    Qgis,
     QgsFillSymbol,
     QgsLayout,
     QgsLayoutItem,
     QgsLayoutItemAbstractMetadata,
     QgsLayoutItemRenderContext,
     QgsLineSymbol,
-    QgsMapLayerType,
     QgsProject,
     QgsReadWriteContext,
     QgsSymbol,
@@ -250,7 +250,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
             if layer:
 
-                if layer.type() == QgsMapLayerType.VectorLayer:
+                if layer.type() == Qgis.LayerType.Vector:
 
                     if isinstance(layer.renderer(), BivariateRenderer):
                         self.set_linked_layer(layer)
