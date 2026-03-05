@@ -167,7 +167,7 @@ class BivariateColorRampManual(BivariateColorRamp):
         self._colors = colors
 
         for row_colors in self._colors:
-            if not len(row_colors) != number_classes:
+            if not len(row_colors) == number_classes:
                 raise ValueError("Colors list do not create a square.")
 
     def get_color(self, position_value1: int, position_value2: int) -> QColor:
@@ -182,10 +182,8 @@ class BivariateColorRampManual(BivariateColorRamp):
 
         colors_element = doc.createElement("colors")
 
-        squareColors = int(math.sqrt(self.number_of_classes))
-
-        for i in range(squareColors):
-            for j in range(squareColors):
+        for i in range(self.number_of_classes):
+            for j in range(self.number_of_classes):
                 color_element = doc.createElement("color")
                 color_element.setAttribute("value", self._colors[i][j].name())
                 colors_element.appendChild(color_element)
@@ -203,17 +201,15 @@ class BivariateColorRampManual(BivariateColorRamp):
         except ValueError:
             raise ValueError(f"Invalid number of classes: {number_of_classes}")
 
-        squareColors = int(math.sqrt(number_of_classes))
-
         colors_elements = bivariate_ramp_element.childNodes()
 
         colors: List[List[QColor]] = []
-        for _ in range(squareColors):
-            colors.append([QColor("#000000") for _ in range(squareColors)])
+        for _ in range(number_of_classes):
+            colors.append([QColor("#000000") for _ in range(number_of_classes)])
 
-        for i in range(squareColors):
-            for j in range(squareColors):
-                color_element = colors_elements.at(i * squareColors + j)
+        for i in range(number_of_classes):
+            for j in range(number_of_classes):
+                color_element = colors_elements.at(i * number_of_classes + j)
                 if color_element.nodeName() != "color":
                     raise ValueError(f"Invalid child node name `{color_element.nodeName()}` element.")
                 else:
