@@ -1,5 +1,4 @@
 from qgis.core import (
-    Qgis,
     QgsClassificationEqualInterval,
     QgsClassificationJenks,
     QgsClassificationLogarithmic,
