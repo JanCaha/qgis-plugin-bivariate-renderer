@@ -4,7 +4,7 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp
 from tests import assert_images_equal
 
 
-def test_generate_legend_in_layout(
+def test_generate_map_in_layout(
     nc_layer: QgsVectorLayer,
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
@@ -34,4 +34,4 @@ def test_generate_legend_in_layout(
 
     export_page_to_image(qgs_layout, layout_page_a4, file)
 
-    assert_images_equal(file, "./tests/images/correct/layout_item_legend.png")
+    assert_images_equal(file, "./tests/images/correct/layout_item_map.png")
