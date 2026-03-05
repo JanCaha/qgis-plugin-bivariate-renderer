@@ -5,7 +5,7 @@ from qgis.PyQt.QtGui import QIcon
 from BivariateRenderer.colorramps.bivariate_color_ramp import (
     BivariateColorRamp,
     BivariateColorRampBlueGreen,
-    BivariateColorRampCyanBrow,
+    BivariateColorRampCyanBrown,
     BivariateColorRampCyanViolet,
     BivariateColorRampGreenPink,
     BivariateColorRampGreenPurple,
@@ -21,7 +21,7 @@ from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp
 
 color_ramps = [
     BivariateColorRampBlueGreen(),
-    BivariateColorRampCyanBrow(),
+    BivariateColorRampCyanBrown(),
     BivariateColorRampCyanViolet(),
     BivariateColorRampBlueGreen(),
     BivariateColorRampGreenPink(),

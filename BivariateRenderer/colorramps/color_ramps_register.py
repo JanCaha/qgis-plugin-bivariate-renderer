@@ -6,7 +6,7 @@ from ..utils import Singleton
 from .bivariate_color_ramp import (
     BivariateColorRamp,
     BivariateColorRampBlueGreen,
-    BivariateColorRampCyanBrow,
+    BivariateColorRampCyanBrown,
     BivariateColorRampCyanViolet,
     BivariateColorRampGreenPink,
     BivariateColorRampGreenPurple,
@@ -24,9 +24,8 @@ class BivariateColorRampsRegister(metaclass=Singleton):
 
     color_ramps = [
         BivariateColorRampBlueGreen(),
-        BivariateColorRampCyanBrow(),
+        BivariateColorRampCyanBrown(),
         BivariateColorRampCyanViolet(),
-        BivariateColorRampBlueGreen(),
         BivariateColorRampGreenPink(),
         BivariateColorRampOrangeBlue(),
         BivariateColorRampGreenPurple(),
