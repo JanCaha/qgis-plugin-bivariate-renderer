@@ -103,14 +103,14 @@ class BivariateRenderer(QgsFeatureRenderer):
 
     def setField1ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
         self.field_1_classes = self.classification_method.classes(
-            layer, attribute, self.bivariate_color_ramp.number_of_classes
+            layer.uniqueValues(layer.fields().indexFromName(attribute)), self.bivariate_color_ramp.number_of_classes
         )
 
         self._reset_cache()
 
     def setField2ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
         self.field_2_classes = self.classification_method.classes(
-            layer, attribute, self.bivariate_color_ramp.number_of_classes
+            layer.uniqueValues(layer.fields().indexFromName(attribute)), self.bivariate_color_ramp.number_of_classes
         )
 
         self._reset_cache()
