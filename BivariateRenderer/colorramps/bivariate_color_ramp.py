@@ -237,7 +237,7 @@ class BivariateColorRampManual(BivariateColorRamp):
         return bivariate_color_ramp
 
 
-class BivariateColorRampCyanBrow(BivariateColorRampGradient):
+class BivariateColorRampCyanBrown(BivariateColorRampGradient):
     def __init__(
         self, number_classes: int = 3, color_mixing_method: ColorMixingMethod = ColorMixingMethodMultiply()
     ) -> None:
