@@ -77,6 +77,9 @@ class LegendRenderer:
     _text_height_x: float
     _text_height_y: float
 
+    _render_previous_height: float = -1
+    _render_previous_width: float = -1
+
     def __init__(self):
 
         self._painter = None
@@ -719,6 +722,10 @@ class LegendRenderer:
 
     def render(self, context: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]) -> None:
 
+        # invalidate transform if size changed to avoid rendering problems when resizing legend
+        if self._render_previous_height != height or self._render_previous_width != width:
+            self._transform = None
+
         self.context = context
 
         self._polygons_count = len(polygons)
@@ -752,3 +759,6 @@ class LegendRenderer:
         # self.draw_debug_lines()
 
         self.painter.restore()
+
+        self._render_previous_height = height
+        self._render_previous_width = width
