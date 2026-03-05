@@ -15,8 +15,8 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QLocale, QRectF, QSize, Qt
-from qgis.PyQt.QtGui import QFont, QImage, QPainter, qRgba
-from qgis.PyQt.QtWidgets import QApplication, QGuiApplication
+from qgis.PyQt.QtGui import QFont, QGuiApplication, QImage, QPainter, qRgba
+from qgis.PyQt.QtWidgets import QApplication
 
 from BivariateRenderer.colorramps.color_ramps_register import (
     BivariateColorRamp,
