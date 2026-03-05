@@ -14,9 +14,9 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt.QtCore import QLocale, QRectF, QSize
+from qgis.PyQt.QtCore import QLocale, QRectF, QSize, Qt
 from qgis.PyQt.QtGui import QFont, QImage, QPainter, qRgba
-from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication, QGuiApplication
 
 from BivariateRenderer.colorramps.color_ramps_register import (
     BivariateColorRamp,
@@ -36,7 +36,13 @@ def change_locale():
 @pytest.fixture(autouse=True, scope="session")
 def set_application_font():
     """Sets a consistent application font for all tests to ensure reproducible visual results."""
-    QApplication.instance().setFont(QFont("Arial", 10))
+    QApplication.setAttribute(Qt.AA_Use96Dpi)
+    QApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
+
+    # QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.Round) # Qt6
+
+    QApplication.instance().setFont(QFont("DejaVu Sans", 12))
+    QApplication.instance().setStyle("Fusion")
 
 
 @pytest.fixture
