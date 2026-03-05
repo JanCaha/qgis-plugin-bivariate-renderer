@@ -360,8 +360,8 @@ class BivariateRenderer(QgsFeatureRenderer):
     def generate_legend_polygons(self) -> List[LegendPolygon]:
         polygons = []
 
-        for x, field_1_cat in enumerate(self.field_1_classes):
-            for y, field_2_cat in enumerate(self.field_2_classes):
+        for x in range(len(self.field_1_classes)):
+            for y in range(len(self.field_2_classes)):
                 exist = True
 
                 if self.getPositionValuesCombinationHash(x, y) not in self.labels_existing:
