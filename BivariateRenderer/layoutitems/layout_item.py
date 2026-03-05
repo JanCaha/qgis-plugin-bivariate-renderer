@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Optional
 
 from qgis.core import (
@@ -385,10 +384,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.use_rectangle_without_values_color_from_legend = color_from_legend
 
         self.refresh()
-
-    @property
-    def get_font(self):
-        return self.text_axis_x.font()
 
     @property
     def linked_layer(self) -> Optional[QgsVectorLayer]:
