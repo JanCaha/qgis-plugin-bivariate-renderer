@@ -97,6 +97,9 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
             field_1_value = feature.attribute(field1)
             field_2_value = feature.attribute(field2)
 
+            class_value_1 = None
+            class_value_2 = None
+
             for i, range_class in enumerate(classes_1):
 
                 if range_class.lowerBound() <= field_1_value <= range_class.upperBound():
@@ -107,7 +110,8 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
                 if range_class.lowerBound() <= field_2_value <= range_class.upperBound():
                     class_value_2 = i + 1
 
-            layer.changeAttributeValue(feature.id(), field_index, "{}-{}".format(class_value_1, class_value_2))
+            if class_value_1 is not None and class_value_2 is not None:
+                layer.changeAttributeValue(feature.id(), field_index, "{}-{}".format(class_value_1, class_value_2))
 
             feedback.setProgress((number / feature_count) * 100)
 
