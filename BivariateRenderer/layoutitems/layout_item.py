@@ -23,9 +23,6 @@ from ..renderer.bivariate_renderer import BivariateRenderer
 from ..text_constants import IDS, Texts
 from ..utils import default_line_symbol, default_missing_values_symbol, get_icon_path
 
-DEFAULT_AXIS_X_TEXT = "Axis X"
-DEFAULT_AXIS_Y_TEXT = "Axis Y"
-
 
 class BivariateRendererLayoutItem(QgsLayoutItem):
 
@@ -207,7 +204,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         text_elem = self.text_format.writeXml(doc, context)
 
-        symbol_elem.appendChild(text_elem)
+        bivariate_legend_element.appendChild(text_elem)
 
         text_axes_values_format = doc.createElement("axesValuesFormat")
 

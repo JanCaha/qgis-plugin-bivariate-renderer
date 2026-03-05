@@ -1,4 +1,4 @@
-from qgis.core import Qgis, QgsLayoutItem, QgsMapLayer, QgsMapLayerType, QgsProject, QgsVectorLayer
+from qgis.core import Qgis, QgsLayoutItem, QgsMapLayer, QgsProject, QgsVectorLayer
 from qgis.gui import (
     QgsCollapsibleGroupBoxBasic,
     QgsColorButton,
