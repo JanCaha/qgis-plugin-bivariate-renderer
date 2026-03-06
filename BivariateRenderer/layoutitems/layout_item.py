@@ -304,7 +304,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         symbolElem = empty_polygon_symbol_elem.firstChildElement("symbol")
         loaded_symbol = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
-        self.symbol_rectangle_without_values = loaded_symbol if loaded_symbol is not None else default_missing_values_symbol()
+        self.symbol_rectangle_without_values = (
+            loaded_symbol if loaded_symbol is not None else default_missing_values_symbol()
+        )
 
         return True
 
@@ -392,10 +394,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         return None
 
     @property
-    def linked_layer_name(self):
+    def linked_layer_id(self) -> Optional[str]:
 
         if self.layer is not None:
-            return self.layer.name()
+            return self.layer.id()
 
         return None
 

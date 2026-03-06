@@ -45,7 +45,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.layers = QgsProject.instance().mapLayers()
 
-        usable_layers = []
+        usable_layers = {}
 
         for layer_id in self.layers.keys():
 
@@ -57,14 +57,15 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                 if layer.renderer():
                     if layer.renderer().type() == Texts.bivariate_renderer_short_name:
-                        usable_layers.append(layer.name())
+                        usable_layers[layer.id()] = layer.name()
 
         self.cb_layers = QComboBox()
         self.cb_layers.addItem("")
-        self.cb_layers.addItems(usable_layers)
+        for layer_id, layer_name in usable_layers.items():
+            self.cb_layers.addItem(layer_name, layer_id)
 
-        if self.layout_item.linked_layer_name:
-            index = self.cb_layers.findData(self.layout_item.linked_layer_name, Qt.ItemDataRole.DisplayRole)
+        if self.layout_item.linked_layer_id:
+            index = self.cb_layers.findData(self.layout_item.linked_layer_id, Qt.ItemDataRole.UserRole)
             self.cb_layers.setCurrentIndex(index)
 
         self.form_layout = QVBoxLayout()
@@ -414,23 +415,19 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         if self.cb_layers.currentText() != "":
 
-            for layer_id in self.layers.keys():
+            layer: QgsVectorLayer = self.layers[self.cb_layers.currentData(Qt.ItemDataRole.UserRole)]
 
-                layer: QgsVectorLayer = self.layers[layer_id]
-
-                if layer.name() == self.cb_layers.currentText():
-
-                    if self.layout_item.linked_layer and self.layout_item.linked_layer.id() != layer.id():
-                        self.layout_item.beginCommand(
-                            self.tr("Bivariate Legend - Change layer"), QgsLayoutItem.UndoCommand.UndoExportLayerName
-                        )
-                        self.layout_item.blockSignals(True)
-                        self.layout_item.set_linked_layer(layer)
-                        self.layout_item.blockSignals(False)
-                        self.layout_item.endCommand()
-                        layer_switched = True
-
-                    break
+            if self.layout_item.linked_layer is None or (
+                self.layout_item.linked_layer and self.layout_item.linked_layer.id() != layer.id()
+            ):
+                self.layout_item.beginCommand(
+                    self.tr("Bivariate Legend - Change layer"), QgsLayoutItem.UndoCommand.UndoExportLayerName
+                )
+                self.layout_item.blockSignals(True)
+                self.layout_item.set_linked_layer(layer)
+                self.layout_item.blockSignals(False)
+                self.layout_item.endCommand()
+                layer_switched = True
 
         # if layer changed, update the fields names in the legend settings
         if self.layout_item.linked_layer and layer_switched:
