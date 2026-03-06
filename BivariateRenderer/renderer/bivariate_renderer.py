@@ -381,6 +381,11 @@ class BivariateRenderer(QgsFeatureRenderer):
         if not self.field_1_classes or not self.field_2_classes:
             return not other.field_1_classes and not other.field_2_classes
 
+        if len(self.field_1_classes) != len(other.field_1_classes) or len(self.field_2_classes) != len(
+            other.field_2_classes
+        ):
+            return False
+
         return (
             # self.classification_method.id() == other.classification_method.id() and
             self.field_1_min == other.field_1_min
