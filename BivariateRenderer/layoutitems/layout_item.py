@@ -292,7 +292,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
             self.text_values_format.readXml(text_format_elem, context)
 
         self.add_colors_separators = element.attribute("draw_colors_separators") == "True"
-        self.color_separator_width = int(element.attribute("color_separator_width"))
+        self.color_separator_width = float(element.attribute("color_separator_width"))
         self.color_separator_color = QColor(element.attribute("color_separator_color"))
 
         self.replace_rectangle_without_values = element.attribute("replace_empty_rectangles") == "True"
