@@ -1,16 +1,25 @@
-from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
+from pathlib import Path
+from typing import Callable, Optional, Union
+
+from qgis.core import QgsLayout, QgsLayoutItemPage, QgsProject, QgsReadWriteContext, QgsVectorLayer
+from qgis.PyQt.QtCore import QRectF
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtXml import QDomDocument
+
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp, BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
+from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from tests import assert_images_equal
 
 
 def test_generate_legend_in_layout(
-    qgis_countries_layer,
-    qgs_layout,
-    qgs_project,
-    layout_page_a4,
-    prepare_bivariate_renderer,
-    layout_space,
-    export_page_to_image,
+    qgis_countries_layer: QgsVectorLayer,
+    qgs_layout: QgsLayout,
+    qgs_project: QgsProject,
+    layout_page_a4: QgsLayoutItemPage,
+    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
+    layout_space: QRectF,
+    export_page_to_image: Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None],
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(
@@ -33,3 +42,67 @@ def test_generate_legend_in_layout(
     export_page_to_image(qgs_layout, layout_page_a4, file)
 
     assert_images_equal(file, "./tests/images/correct/layout_item_legend.png")
+
+
+def test_layout_item_xml_save_load(qgs_layout: QgsLayout):
+
+    bivariate_legend_item = BivariateRendererLayoutItem(qgs_layout)
+
+    bivariate_legend_item.text_axis_x = "Field A"
+    bivariate_legend_item.text_axis_y = "Field B"
+    bivariate_legend_item.legend_rotated = True
+    bivariate_legend_item.add_axes_arrows = False
+    bivariate_legend_item.add_axes_texts = True
+    bivariate_legend_item.add_axes_values_texts = True
+    bivariate_legend_item.add_colors_separators = True
+    bivariate_legend_item.color_separator_width = 3.0
+    bivariate_legend_item.color_separator_color = QColor("#ff0000")
+    bivariate_legend_item.arrows_common_start_point = True
+    bivariate_legend_item.arrow_width = 7.0
+    bivariate_legend_item.y_axis_rotation = 45.0
+    bivariate_legend_item.ticks_x_precision = 3
+    bivariate_legend_item.ticks_y_precision = 1
+    bivariate_legend_item.space_above_ticks = 5
+    bivariate_legend_item.ticks_use_category_midpoints = True
+    bivariate_legend_item.replace_rectangle_without_values = True
+    bivariate_legend_item.use_rectangle_without_values_color_from_legend = True
+
+    doc = QDomDocument("test")
+    elem = doc.createElement("BivariateRendererLayoutItem")
+    context = QgsReadWriteContext()
+
+    bivariate_legend_item.writePropertiesToElement(elem, doc, context)
+
+    bivariate_legend_item_restored = BivariateRendererLayoutItem(qgs_layout)
+    bivariate_legend_item_restored.readPropertiesFromElement(elem, doc, context)
+
+    assert bivariate_legend_item_restored.text_axis_x == bivariate_legend_item.text_axis_x
+    assert bivariate_legend_item_restored.text_axis_y == bivariate_legend_item.text_axis_y
+    assert bivariate_legend_item_restored.legend_rotated == bivariate_legend_item.legend_rotated
+    assert bivariate_legend_item_restored.add_axes_arrows == bivariate_legend_item.add_axes_arrows
+    assert bivariate_legend_item_restored.add_axes_texts == bivariate_legend_item.add_axes_texts
+    assert bivariate_legend_item_restored.add_axes_values_texts == bivariate_legend_item.add_axes_values_texts
+    assert bivariate_legend_item_restored.add_colors_separators == bivariate_legend_item.add_colors_separators
+    assert bivariate_legend_item_restored.color_separator_width == bivariate_legend_item.color_separator_width
+    assert (
+        bivariate_legend_item_restored.color_separator_color.name()
+        == bivariate_legend_item.color_separator_color.name()
+    )
+    assert bivariate_legend_item_restored.arrows_common_start_point == bivariate_legend_item.arrows_common_start_point
+    assert bivariate_legend_item_restored.arrow_width == bivariate_legend_item.arrow_width
+    assert bivariate_legend_item_restored.y_axis_rotation == bivariate_legend_item.y_axis_rotation
+    assert bivariate_legend_item_restored.ticks_x_precision == bivariate_legend_item.ticks_x_precision
+    assert bivariate_legend_item_restored.ticks_y_precision == bivariate_legend_item.ticks_y_precision
+    assert bivariate_legend_item_restored.space_above_ticks == bivariate_legend_item.space_above_ticks
+    assert (
+        bivariate_legend_item_restored.ticks_use_category_midpoints
+        == bivariate_legend_item.ticks_use_category_midpoints
+    )
+    assert (
+        bivariate_legend_item_restored.replace_rectangle_without_values
+        == bivariate_legend_item.replace_rectangle_without_values
+    )
+    assert (
+        bivariate_legend_item_restored.use_rectangle_without_values_color_from_legend
+        == bivariate_legend_item.use_rectangle_without_values_color_from_legend
+    )

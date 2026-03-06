@@ -1,9 +1,10 @@
 from qgis.core import QgsProject, QgsReadWriteContext, QgsVectorLayer
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampCyanViolet
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from tests import assert_images_equal
+
 
 def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
 
@@ -85,3 +86,80 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     assert bivariate_renderer == renderer_from_xml
 
     assert isinstance(bivariate_renderer.save(QDomDocument("doc"), QgsReadWriteContext()), QDomElement)
+
+
+def test_eq(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+
+    # same renderer
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    assert renderer == renderer
+
+    # compare two empty renderers
+    renderer1 = BivariateRenderer()
+    renderer2 = BivariateRenderer()
+
+    assert renderer1 == renderer2
+
+    # compare cloned renderer
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    cloned = renderer.clone()
+
+    assert cloned == renderer
+
+    # different field names
+    renderer1 = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    renderer2 = prepare_bivariate_renderer(nc_layer, field1="PERIMETER", field2="AREA")
+
+    assert renderer1 != renderer2
+
+    # compare not a renderer
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    assert renderer != "not a renderer"
+    assert renderer != 42
+    assert renderer != None
+
+    # one setup and one empty renderer
+    renderer_with_data = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    renderer_empty = BivariateRenderer()
+    renderer_empty.setFieldName1("AREA")
+    renderer_empty.setFieldName2("PERIMETER")
+
+    assert renderer_with_data != renderer_empty
+
+
+def test_clone(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+
+    # preserve field names
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    cloned = renderer.clone()
+
+    assert cloned.field_name_1 == renderer.field_name_1
+    assert cloned.field_name_2 == renderer.field_name_2
+
+    # preserve classification ranges
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    cloned = renderer.clone()
+
+    assert len(cloned.field_1_classes) == len(renderer.field_1_classes)
+    assert len(cloned.field_2_classes) == len(renderer.field_2_classes)
+
+    for orig, copy in zip(renderer.field_1_classes, cloned.field_1_classes):
+        assert orig.lowerBound() == copy.lowerBound()
+        assert orig.upperBound() == copy.upperBound()
+
+    # test cloned is independent of original
+    renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    cloned_renderer = renderer.clone()
+    cloned_renderer.setFieldName1("PERIMETER")
+    cloned_renderer.set_bivariate_color_ramp(BivariateColorRampCyanViolet())
+
+    assert renderer.field_name_1 == "AREA"
+    assert renderer.bivariate_color_ramp.name == BivariateColorRampGreenPink().name
