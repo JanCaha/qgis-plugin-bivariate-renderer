@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 
 import pytest
 from qgis.core import (
@@ -97,17 +97,17 @@ def prepare_painter():
 
 
 @pytest.fixture
-def layout_width():
+def layout_width() -> float:
     return 297
 
 
 @pytest.fixture
-def layout_height():
+def layout_height() -> float:
     return 210
 
 
 @pytest.fixture
-def layout_dpmm():
+def layout_dpmm() -> float:
     return 300 / 25.4
 
 
@@ -117,7 +117,9 @@ def layout_space(layout_height, layout_width) -> QRectF:
 
 
 @pytest.fixture
-def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height, layout_width) -> QgsLayoutItemPage:
+def layout_page_a4(
+    qgs_layout: QgsLayout, layout_dpmm: float, layout_height: float, layout_width: float
+) -> QgsLayoutItemPage:
 
     page = QgsLayoutItemPage(qgs_layout)
     page.setPageSize(QgsLayoutSize(layout_width, layout_height, QgsUnitTypes.LayoutMillimeters))
@@ -127,7 +129,9 @@ def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height, layout_wid
 
 
 @pytest.fixture
-def prepare_bivariate_renderer():
+def prepare_bivariate_renderer() -> (
+    Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer]
+):
 
     def return_bivariate_renderer(
         layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramp: Optional[BivariateColorRamp] = None
@@ -166,10 +170,10 @@ def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
 
 
 @pytest.fixture
-def export_page_to_image(layout_dpmm):
+def export_page_to_image(layout_dpmm) -> Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None]:
 
     def function_to_run(
-        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM=layout_dpmm
+        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM: float = layout_dpmm
     ) -> None:
 
         if isinstance(image_path, Path):
