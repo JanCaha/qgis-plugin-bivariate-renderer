@@ -145,7 +145,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.use_rectangle_without_values_color_from_legend = (
             self.use_rectangle_without_values_color_from_legend
         )
-        legend_render.symbol_rectangle_without_values = self.symbol_rectangle_without_values
+        legend_render.symbol_rectangle_without_values = self.symbol_rectangle_without_values.clone()
 
         return legend_render
 
@@ -303,7 +303,8 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         empty_polygon_symbol_elem = element.firstChildElement("emptyPolygonSymbol")
 
         symbolElem = empty_polygon_symbol_elem.firstChildElement("symbol")
-        self.symbol_rectangle_without_values = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
+        loaded_symbol = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
+        self.symbol_rectangle_without_values = loaded_symbol if loaded_symbol is not None else default_missing_values_symbol()
 
         return True
 
