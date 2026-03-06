@@ -316,7 +316,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.color_spacer_width = QSpinBox()
         self.color_spacer_width.setMinimum(1)
         self.color_spacer_width.setMaximum(10)
-        self.color_spacer_width.setValue(self.layout_item.color_separator_width)
+        self.color_spacer_width.setValue(int(self.layout_item.color_separator_width))
         self.color_spacer_width.setSuffix("%")
         self.color_spacer_width.valueChanged.connect(self.pass_color_spacer_settings)
 
