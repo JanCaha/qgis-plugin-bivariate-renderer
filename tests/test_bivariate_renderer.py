@@ -1,4 +1,4 @@
-from qgis.core import QgsProject, QgsReadWriteContext, QgsVectorLayer
+from qgis.core import QgsProject, QgsReadWriteContext, QgsRenderContext, QgsVectorLayer
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampCyanViolet
@@ -163,3 +163,52 @@ def test_clone(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
 
     assert renderer.field_name_1 == "AREA"
     assert renderer.bivariate_color_ramp.name == BivariateColorRampGreenPink().name
+
+
+def test_labels_existing_preserved_through_save_load(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    for feature in nc_layer.getFeatures():
+        renderer.symbolForFeature(feature, QgsRenderContext())
+
+    labels_before = set(renderer.labels_existing)
+
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = renderer.save(doc, context)
+
+    loaded = BivariateRenderer.create_render_from_element(elem, context)
+
+    assert set(loaded.labels_existing) == labels_before
+
+
+def test_labels_existing_not_inflated_by_legend_drawing(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    for feature in nc_layer.getFeatures():
+        renderer.symbolForFeature(feature, QgsRenderContext())
+
+    labels_before = set(renderer.labels_existing)
+
+    # generate_legend_polygons calls symbol_for_values for all combinations,
+    # which inflates cached_symbols — labels_existing must stay unchanged
+    renderer.generate_legend_polygons()
+
+    assert set(renderer.labels_existing) == labels_before
+
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = renderer.save(doc, context)
+
+    loaded = BivariateRenderer.create_render_from_element(elem, context)
+
+    # after save/load, only actual data combinations should be in labels_existing
+    all_combinations = {
+        renderer.getPositionValuesCombinationHash(x, y)
+        for x in range(len(renderer.field_1_classes))
+        for y in range(len(renderer.field_2_classes))
+    }
+    assert set(loaded.labels_existing) == labels_before
+    assert set(loaded.labels_existing) != all_combinations or len(labels_before) == len(all_combinations)
