@@ -410,6 +410,8 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     def update_layer_to_work_with(self):
 
+        layer_switched = False
+
         if self.cb_layers.currentText() != "":
 
             for layer_id in self.layers.keys():
@@ -418,21 +420,22 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                 if layer.name() == self.cb_layers.currentText():
 
-                    self.layout_item.beginCommand(
-                        self.tr("Bivariate Legend - Change layer"), QgsLayoutItem.UndoCommand.UndoExportLayerName
-                    )
+                    if self.layout_item.linked_layer.id() != layer.id():
+                        self.layout_item.beginCommand(
+                            self.tr("Bivariate Legend - Change layer"), QgsLayoutItem.UndoCommand.UndoExportLayerName
+                        )
+                        self.layout_item.blockSignals(True)
+                        self.layout_item.set_linked_layer(layer)
+                        self.layout_item.blockSignals(False)
+                        self.layout_item.endCommand()
+                        layer_switched = True
 
-                    self.layout_item.blockSignals(True)
-                    self.layout_item.set_linked_layer(layer)
-                    self.layout_item.blockSignals(False)
-                    self.layout_item.endCommand()
                     break
 
-        if self.layout_item.linked_layer:
-            if self.layout_item.are_labels_default():
-
-                self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
-                self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
+        # if layer changed, update the fields names in the legend settings
+        if self.layout_item.linked_layer and layer_switched:
+            self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
+            self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
