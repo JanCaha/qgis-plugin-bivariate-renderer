@@ -384,6 +384,27 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return polygons
 
+    def populate_labels_existing_from_layer(self, layer: QgsVectorLayer) -> None:
+        labels_existing: List[str] = []
+        seen_labels = set()
+
+        for feature in layer.getFeatures():
+            try:
+                value1, value2 = self.position_values(feature)
+            except (TypeError, ValueError):
+                continue
+
+            if value1 < 0 or value2 < 0:
+                continue
+
+            identifier = self.getPositionValuesCombinationHash(value1, value2)
+
+            if identifier not in seen_labels:
+                seen_labels.add(identifier)
+                labels_existing.append(identifier)
+
+        self.labels_existing = labels_existing
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BivariateRenderer):
             return False

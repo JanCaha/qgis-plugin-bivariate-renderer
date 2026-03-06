@@ -229,3 +229,18 @@ def test_labels_existing_not_inflated_by_legend_drawing(
     }
     assert set(loaded.labels_existing) == labels_before
     assert set(loaded.labels_existing) != all_combinations or len(labels_before) == len(all_combinations)
+
+
+def test_populate_labels_existing_from_layer_matches_feature_rendering(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+
+    renderer_from_symbol_for_feature = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    for feature in nc_layer.getFeatures():
+        renderer_from_symbol_for_feature.symbolForFeature(feature, QgsRenderContext())
+
+    renderer_from_layer_scan = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    renderer_from_layer_scan.populate_labels_existing_from_layer(nc_layer)
+
+    assert set(renderer_from_layer_scan.labels_existing) == set(renderer_from_symbol_for_feature.labels_existing)

@@ -318,6 +318,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def load_renderer_from_layer(self) -> None:
         self.renderer = self.layer.renderer().clone()
 
+        if isinstance(self.renderer, BivariateRenderer):
+            self.renderer.populate_labels_existing_from_layer(self.layer)
+
         self.refresh()
 
     def set_y_axis_rotation(self, rotation: float) -> None:
