@@ -43,11 +43,6 @@ def change_locale():
 @pytest.fixture(autouse=True, scope="session")
 def set_application_font():
     """Sets a consistent application font for all tests to ensure reproducible visual results."""
-    QApplication.setAttribute(Qt.AA_Use96Dpi)
-    QApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
-
-    # QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.Round) # Qt6
-
     QApplication.instance().setFont(QFont("DejaVu Sans", 12))
     QApplication.instance().setStyle("Fusion")
 
