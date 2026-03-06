@@ -1,4 +1,6 @@
-from qgis.core import QgsProject, QgsReadWriteContext, QgsRenderContext, QgsVectorLayer
+from typing import Callable
+
+from qgis.core import QgsReadWriteContext, QgsRenderContext, QgsVectorLayer
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampCyanViolet
@@ -6,7 +8,10 @@ from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
 
-def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+def test_functions(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
 
     bivariate_renderer = prepare_bivariate_renderer(
         nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
@@ -88,7 +93,10 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     assert isinstance(bivariate_renderer.save(QDomDocument("doc"), QgsReadWriteContext()), QDomElement)
 
 
-def test_eq(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+def test_eq(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
 
     # same renderer
     renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
@@ -130,7 +138,10 @@ def test_eq(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     assert renderer_with_data != renderer_empty
 
 
-def test_clone(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+def test_clone(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
 
     # preserve field names
     renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
@@ -165,7 +176,10 @@ def test_clone(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     assert renderer.bivariate_color_ramp.name == BivariateColorRampGreenPink().name
 
 
-def test_labels_existing_preserved_through_save_load(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+def test_labels_existing_preserved_through_save_load(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
 
     renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
 
@@ -183,7 +197,10 @@ def test_labels_existing_preserved_through_save_load(nc_layer: QgsVectorLayer, p
     assert set(loaded.labels_existing) == labels_before
 
 
-def test_labels_existing_not_inflated_by_legend_drawing(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
+def test_labels_existing_not_inflated_by_legend_drawing(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
 
     renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
 

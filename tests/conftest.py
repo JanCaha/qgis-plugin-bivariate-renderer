@@ -76,7 +76,7 @@ def nc_layer(nc_layer_path) -> QgsVectorLayer:
 
 
 @pytest.fixture
-def prepare_default_QImage():
+def prepare_default_QImage() -> Callable[[int], QImage]:
 
     def return_QImage(size: int = 500) -> QImage:
         image = QImage(size, size, QImage.Format.Format_ARGB32)
@@ -88,7 +88,7 @@ def prepare_default_QImage():
 
 
 @pytest.fixture
-def prepare_painter():
+def prepare_painter() -> Callable[[QImage], QPainter]:
 
     def return_painter(image: QImage) -> QPainter:
         painter = QPainter(image)

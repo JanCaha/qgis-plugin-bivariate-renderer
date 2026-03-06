@@ -22,9 +22,7 @@ def test_generate_legend_in_layout(
     export_page_to_image: Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None],
 ):
 
-    bivariate_renderer = prepare_bivariate_renderer(
-        qgis_countries_layer, field1="fid", field2="fid", color_ramp=BivariateColorRampGreenPink()
-    )
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, "fid", "fid", BivariateColorRampGreenPink())
 
     qgis_countries_layer.setRenderer(bivariate_renderer)
 
