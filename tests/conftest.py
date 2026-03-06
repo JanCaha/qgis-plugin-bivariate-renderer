@@ -27,6 +27,13 @@ from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
 
 
+def pytest_configure(config):
+    QApplication.setAttribute(Qt.AA_Use96Dpi)
+    QApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
+
+    # QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.Round) # Qt6
+
+
 @pytest.fixture(autouse=True, scope="session")
 def change_locale():
     """Sets locale to English, United Kingdom for all tests to ensure consistent results."""
