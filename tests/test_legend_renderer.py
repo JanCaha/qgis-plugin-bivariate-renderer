@@ -1,8 +1,10 @@
-from qgis.core import QgsLayoutUtils, QgsRenderContext
+from qgis.core import QgsLayoutUtils, QgsReadWriteContext, QgsRenderContext
 from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtXml import QDomDocument
 
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDirect
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
+from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
 from tests import assert_images_equal
 
@@ -416,6 +418,65 @@ def test_legend_empty_squares(
         bivariate_renderer.field_2_classes,
         bivariate_renderer.field_1_labels,
         bivariate_renderer.field_2_labels,
+    )
+
+    painter.end()
+
+    image.save("./tests/images/image.png", "PNG")
+
+    assert_images_equal("tests/images/correct/legend_replaced_missing_values.png", "tests/images/image.png")
+
+
+def test_legend_empty_squares_after_renderer_save_load(
+    qgis_countries_layer: QgsVectorLayer,
+    qgs_layout: QgsLayout,
+    prepare_default_QImage,
+    prepare_painter,
+    prepare_bivariate_renderer,
+):
+    legend_size = 500
+
+    image = prepare_default_QImage(legend_size)
+
+    painter = prepare_painter(image)
+
+    render_context = QgsLayoutUtils.createRenderContextForLayout(qgs_layout, painter)
+
+    assert render_context
+
+    bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, field1="fid", field2="fid")
+
+    for feature in qgis_countries_layer.getFeatures():
+        bivariate_renderer.symbolForFeature(feature, QgsRenderContext())
+
+    # simulate project save/load cycle
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = bivariate_renderer.save(doc, context)
+    loaded_renderer = BivariateRenderer.create_render_from_element(elem, context)
+
+    legend_polygons = loaded_renderer.generate_legend_polygons()
+
+    # after save/load, cells with no data must still be identified as missing
+    missing = [p for p in legend_polygons if not p.exist_in_map]
+    assert len(missing) > 0, "expected some legend cells to have exist_in_map=False after save/load"
+
+    legend_renderer = LegendRenderer()
+    legend_renderer.add_colors_separators = True
+    legend_renderer.color_separator_width_percent = 5
+    legend_renderer.replace_rectangle_without_values = True
+    legend_renderer.use_rectangle_without_values_color_from_legend = False
+    legend_renderer.symbol_rectangle_without_values.setColor(QColor("#ffffff"))
+
+    legend_renderer.render_legend(
+        render_context,
+        legend_size / render_context.scaleFactor(),
+        legend_size / render_context.scaleFactor(),
+        legend_polygons,
+        loaded_renderer.field_1_classes,
+        loaded_renderer.field_2_classes,
+        loaded_renderer.field_1_labels,
+        loaded_renderer.field_2_labels,
     )
 
     painter.end()
