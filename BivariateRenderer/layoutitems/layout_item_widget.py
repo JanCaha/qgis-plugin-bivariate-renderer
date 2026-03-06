@@ -420,7 +420,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
                 if layer.name() == self.cb_layers.currentText():
 
-                    if self.layout_item.linked_layer.id() != layer.id():
+                    if self.layout_item.linked_layer and self.layout_item.linked_layer.id() != layer.id():
                         self.layout_item.beginCommand(
                             self.tr("Bivariate Legend - Change layer"), QgsLayoutItem.UndoCommand.UndoExportLayerName
                         )
