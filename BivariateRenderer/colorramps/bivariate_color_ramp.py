@@ -215,7 +215,7 @@ class BivariateColorRampManual(BivariateColorRamp):
                 if color_element.nodeName() != "color":
                     raise ValueError(f"Invalid child node name `{color_element.nodeName()}` element.")
                 else:
-                    colors[i][j] = QColor(color_element.attribute("value"))
+                    colors[i][j] = QColor(color_element.toElement().attribute("value"))
 
         return BivariateColorRampManual(colors)
 
