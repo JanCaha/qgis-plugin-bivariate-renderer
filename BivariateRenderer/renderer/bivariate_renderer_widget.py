@@ -279,7 +279,7 @@ class BivariateRendererWidget(QgsRendererWidget):
 
         self.legend_renderer.text_format_ticks.setSize(self.text_ticks_size)
 
-        self.legend_renderer._text_rotation_y = -90
+        self.legend_renderer.set_text_rotation_y(-90)
 
         self.legend_renderer.set_space_above_ticks(self.text_ticks_size / 2)
 
