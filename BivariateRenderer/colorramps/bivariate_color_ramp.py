@@ -107,6 +107,7 @@ class BivariateColorRampGradient(BivariateColorRamp):
         main_element = doc.createElement("BivariateColorRamp")
 
         main_element.setAttribute("type", "Gradient")
+        main_element.setAttribute("name", self.name)
 
         main_element.setAttribute("number_of_classes", str(self.number_of_classes))
         main_element.setAttribute("color_mixing_method", self.color_mixing_method.name())
@@ -123,6 +124,7 @@ class BivariateColorRampGradient(BivariateColorRamp):
     def load(bivariate_ramp_element: QDomElement) -> BivariateColorRampGradient:
         bivariate_color_ramp = BivariateColorRampGradient()
 
+        bivariate_color_ramp.set_name(bivariate_ramp_element.attribute("name"))
         bivariate_color_ramp.set_number_of_classes(int(bivariate_ramp_element.attribute("number_of_classes")))
 
         color_mixing_method_name = bivariate_ramp_element.attribute("color_mixing_method")
