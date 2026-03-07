@@ -60,6 +60,7 @@ class BivariateRenderer(QgsFeatureRenderer):
             )
         else:
             range_info = "no classification data. "
+
         return (
             f"BivariateRenderer "
             f"for fields `{self.field_name_1}` and `{self.field_name_2}`, "
@@ -102,15 +103,15 @@ class BivariateRenderer(QgsFeatureRenderer):
         return values
 
     def setField1ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
-        self.field_1_classes = self.classification_method.classes(
-            layer.uniqueValues(layer.fields().indexFromName(attribute)), self.bivariate_color_ramp.number_of_classes
+        self.field_1_classes, _ = self.classification_method.classesV2(
+            layer, attribute, self.bivariate_color_ramp.number_of_classes
         )
 
         self._reset_cache()
 
     def setField2ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
-        self.field_2_classes = self.classification_method.classes(
-            layer.uniqueValues(layer.fields().indexFromName(attribute)), self.bivariate_color_ramp.number_of_classes
+        self.field_2_classes, _ = self.classification_method.classesV2(
+            layer, attribute, self.bivariate_color_ramp.number_of_classes
         )
 
         self._reset_cache()
