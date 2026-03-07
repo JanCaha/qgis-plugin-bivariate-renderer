@@ -1,6 +1,15 @@
 from typing import Callable
 
-from qgis.core import QgsReadWriteContext, QgsRenderContext, QgsVectorLayer
+import pytest
+from qgis.core import (
+    QgsClassificationRange,
+    QgsFeature,
+    QgsField,
+    QgsReadWriteContext,
+    QgsRenderContext,
+    QgsVectorLayer,
+)
+from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampCyanViolet
@@ -244,3 +253,104 @@ def test_populate_labels_existing_from_layer_matches_feature_rendering(
     renderer_from_layer_scan.populate_labels_existing_from_layer(nc_layer)
 
     assert set(renderer_from_layer_scan.labels_existing) == set(renderer_from_symbol_for_feature.labels_existing)
+
+
+def test_position_value():
+    renderer = BivariateRenderer()
+    renderer.field_1_classes = [
+        QgsClassificationRange("0-1", 0.0, 1.0),
+        QgsClassificationRange("1-2", 1.0, 2.0),
+        QgsClassificationRange("2-3", 2.0, 3.0),
+    ]
+
+    # within_range
+    assert renderer.positionValueField1(0.5) == 0
+    assert renderer.positionValueField1(1.5) == 1
+    assert renderer.positionValueField1(2.5) == 2
+
+    # below_range
+    assert renderer.positionValueField1(-0.5) == -1
+
+    # above_range
+    assert renderer.positionValueField1(2.5) == -1
+
+    # on lower boundary
+    assert renderer.positionValueField1(0.0) == 0
+
+    # on upper boundary of last class
+    assert renderer.positionValueField1(2.0) == 1
+
+    # on upper boundary of first class
+    assert renderer.positionValueField1(1.0) == 0
+
+
+def test_serialization_create_render_from_element(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+    renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = renderer.save(doc, context)
+
+    loaded = BivariateRenderer.create_render_from_element(elem, context)
+
+    assert loaded.field_name_1 == renderer.field_name_1
+    assert loaded.field_name_2 == renderer.field_name_2
+    assert loaded.bivariate_color_ramp.name == renderer.bivariate_color_ramp.name
+    assert loaded.classification_method.id() == renderer.classification_method.id()
+    assert len(loaded.field_1_classes) == len(renderer.field_1_classes)
+    assert len(loaded.field_2_classes) == len(renderer.field_2_classes)
+
+    for orig, loaded_class in zip(renderer.field_1_classes, loaded.field_1_classes):
+        assert orig.lowerBound() == pytest.approx(loaded_class.lowerBound())
+        assert orig.upperBound() == pytest.approx(loaded_class.upperBound())
+
+    for orig, loaded_class in zip(renderer.field_2_classes, loaded.field_2_classes):
+        assert orig.lowerBound() == pytest.approx(loaded_class.lowerBound())
+        assert orig.upperBound() == pytest.approx(loaded_class.upperBound())
+
+    assert (
+        loaded.bivariate_color_ramp.color_ramp_1.color1().name()
+        == renderer.bivariate_color_ramp.color_ramp_1.color1().name()
+    )
+    assert (
+        loaded.bivariate_color_ramp.color_ramp_2.color1().name()
+        == renderer.bivariate_color_ramp.color_ramp_2.color1().name()
+    )
+
+
+def test_populate_labels_existing_skips_null_values():
+    mem_layer = QgsVectorLayer("NoGeometry", "test", "memory")
+    provider = mem_layer.dataProvider()
+    provider.addAttributes(
+        [
+            QgsField("field1", QVariant.Double),
+            QgsField("field2", QVariant.Double),
+        ]
+    )
+    mem_layer.updateFields()
+
+    f_null = QgsFeature(mem_layer.fields())
+    f_null.setAttribute("field1", None)
+    f_null.setAttribute("field2", 1.0)
+
+    f_valid = QgsFeature(mem_layer.fields())
+    f_valid.setAttribute("field1", 0.5)
+    f_valid.setAttribute("field2", 0.5)
+
+    provider.addFeatures([f_null, f_valid])
+
+    renderer = BivariateRenderer()
+    renderer.setFieldName1("field1")
+    renderer.setFieldName2("field2")
+    renderer.field_1_classes = [QgsClassificationRange("Field-1-Class-1", 0.0, 1.0)]
+    renderer.field_2_classes = [QgsClassificationRange("Field-2-Class-1", 0.0, 1.0)]
+
+    renderer.populate_labels_existing_from_layer(mem_layer)
+
+    assert len(renderer.labels_existing) == 1
+    assert renderer.labels_existing[0] == "1-1"
