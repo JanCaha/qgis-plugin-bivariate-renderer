@@ -23,7 +23,10 @@ category=Vector
 server=False
 
 # Uncomment the following line and add your changelog:
-changelog=1.2.0
+changelog=1.3.0
+    - various bug fixes for complex use cases
+    - internal rewrite of key parts of the plugin
+    <p>1.2.0
     - allow base symbol for features to set up polygon border or similar features (does not appear in legend only in map)
     <p>1.1.0
     - create proper legend as image 
