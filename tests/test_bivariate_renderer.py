@@ -258,9 +258,9 @@ def test_populate_labels_existing_from_layer_matches_feature_rendering(
 def test_position_value():
     renderer = BivariateRenderer()
     renderer.field_1_classes = [
-        QgsClassificationRange("0-1", 0.0, 1.0),
-        QgsClassificationRange("1-2", 1.0, 2.0),
-        QgsClassificationRange("2-3", 2.0, 3.0),
+        QgsClassificationRange("Class-1", 0.0, 1.0),
+        QgsClassificationRange("Class-2", 1.0, 2.0),
+        QgsClassificationRange("Class-3", 2.0, 3.0),
     ]
 
     # within_range
@@ -272,13 +272,13 @@ def test_position_value():
     assert renderer.positionValueField1(-0.5) == -1
 
     # above_range
-    assert renderer.positionValueField1(2.5) == -1
+    assert renderer.positionValueField1(3.5) == -1
 
     # on lower boundary
     assert renderer.positionValueField1(0.0) == 0
 
     # on upper boundary of last class
-    assert renderer.positionValueField1(2.0) == 1
+    assert renderer.positionValueField1(3.0) == 2
 
     # on upper boundary of first class
     assert renderer.positionValueField1(1.0) == 0
