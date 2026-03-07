@@ -3,6 +3,9 @@ from qgis.core import (
     QgsField,
     QgsProcessing,
     QgsProcessingAlgorithm,
+    QgsProcessingContext,
+    QgsProcessingException,
+    QgsProcessingFeedback,
     QgsProcessingParameterField,
     QgsProcessingParameterNumber,
     QgsProcessingParameterString,
@@ -48,7 +51,7 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.NUMBER_CLASSES,
-                "Number of classes for each field (total number of classes is this nubmer times 2)",
+                "Number of classes for each field (total number of classes is this number times 2)",
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=2,
                 maxValue=5,
@@ -60,9 +63,12 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterString(self.RESULT_FIELD_NAME, "Result field name", defaultValue="Category")
         )
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedback: QgsProcessingFeedback):
 
         layer = self.parameterAsVectorLayer(parameters, self.INPUT_LAYER, context)
+        if layer is None:
+            raise QgsProcessingException("Input layer is not valid.")
+
         field1 = self.parameterAsString(parameters, self.FIELD_1, context)
         field2 = self.parameterAsString(parameters, self.FIELD_2, context)
         number_of_classes = self.parameterAsDouble(parameters, self.NUMBER_CLASSES, context)
@@ -91,6 +97,9 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
             field_1_value = feature.attribute(field1)
             field_2_value = feature.attribute(field2)
 
+            class_value_1 = None
+            class_value_2 = None
+
             for i, range_class in enumerate(classes_1):
 
                 if range_class.lowerBound() <= field_1_value <= range_class.upperBound():
@@ -101,7 +110,8 @@ class CalculateCategoriesAlgorithm(QgsProcessingAlgorithm):
                 if range_class.lowerBound() <= field_2_value <= range_class.upperBound():
                     class_value_2 = i + 1
 
-            layer.changeAttributeValue(feature.id(), field_index, "{}-{}".format(class_value_1, class_value_2))
+            if class_value_1 is not None and class_value_2 is not None:
+                layer.changeAttributeValue(feature.id(), field_index, "{}-{}".format(class_value_1, class_value_2))
 
             feedback.setProgress((number / feature_count) * 100)
 

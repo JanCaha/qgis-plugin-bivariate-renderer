@@ -53,12 +53,19 @@ class BivariateRenderer(QgsFeatureRenderer):
         self.polygon_symbol = default_fill_symbol()
 
     def __repr__(self) -> str:
+        if self.field_1_classes and self.field_2_classes:
+            range_info = (
+                f"field 1 vals {self.field_1_min};{self.field_1_max}, "
+                f"field 2 vals {self.field_2_min};{self.field_2_max}. "
+            )
+        else:
+            range_info = "no classification data. "
+
         return (
             f"BivariateRenderer "
             f"for fields `{self.field_name_1}` and `{self.field_name_2}`, "
-            f"with classification method `{self.classification_method.name()}`,"
-            f"field 1 vals {self.field_1_min};{self.field_1_max}, "
-            f"field 2 vals {self.field_2_min};{self.field_2_max}. "
+            f"with classification method `{self.classification_method.name()}`, "
+            f"{range_info}"
             f"With ramp {self.bivariate_color_ramp.name}."
         )
 
@@ -96,14 +103,14 @@ class BivariateRenderer(QgsFeatureRenderer):
         return values
 
     def setField1ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
-        self.field_1_classes = self.classification_method.classes(
+        self.field_1_classes, _ = self.classification_method.classesV2(
             layer, attribute, self.bivariate_color_ramp.number_of_classes
         )
 
         self._reset_cache()
 
     def setField2ClassificationData(self, layer: QgsVectorLayer, attribute: str) -> None:
-        self.field_2_classes = self.classification_method.classes(
+        self.field_2_classes, _ = self.classification_method.classesV2(
             layer, attribute, self.bivariate_color_ramp.number_of_classes
         )
 
@@ -114,6 +121,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         for i, range_class in enumerate(classes):
             if range_class.lowerBound() <= value <= range_class.upperBound():
                 class_value = i
+                break
 
         return class_value
 
@@ -172,10 +180,18 @@ class BivariateRenderer(QgsFeatureRenderer):
         r.setFieldName1(self.field_name_1)
         r.setFieldName2(self.field_name_2)
         r.classification_method = self.classification_method.clone()
-        r.field_1_classes = self.field_1_classes
-        r.field_2_classes = self.field_2_classes
-        r.cached_symbols = self.cached_symbols
-        r.labels_existing = self.labels_existing
+
+        for field_1_class in self.field_1_classes:
+            r.field_1_classes.append(
+                QgsClassificationRange(field_1_class.label(), field_1_class.lowerBound(), field_1_class.upperBound())
+            )
+        for field_2_class in self.field_2_classes:
+            r.field_2_classes.append(
+                QgsClassificationRange(field_2_class.label(), field_2_class.lowerBound(), field_2_class.upperBound())
+            )
+
+        r.cached_symbols = {}
+        r.labels_existing = self.labels_existing.copy()
         r.bivariate_color_ramp = self.bivariate_color_ramp.clone()
         r.polygon_symbol = self.polygon_symbol.clone()
 
@@ -240,6 +256,13 @@ class BivariateRenderer(QgsFeatureRenderer):
             symbols_elem.appendChild(symbol_elem)
 
         renderer_elem.appendChild(symbols_elem)
+
+        labels_existing_elem = doc.createElement("labels_existing")
+        for label in self.labels_existing:
+            label_elem = doc.createElement("label")
+            label_elem.setAttribute("id", label)
+            labels_existing_elem.appendChild(label_elem)
+        renderer_elem.appendChild(labels_existing_elem)
 
         renderer_elem.appendChild(self.bivariate_color_ramp.save(doc))
 
@@ -311,9 +334,15 @@ class BivariateRenderer(QgsFeatureRenderer):
                 symbol.setColor(color)
 
                 r.cached_symbols[label] = symbol
-                r.labels_existing.append(label)
 
             symbol_elem = symbol_elem.nextSiblingElement()
+
+        labels_existing_elem = element.firstChildElement("labels_existing")
+        if not labels_existing_elem.isNull():
+            label_elem = labels_existing_elem.firstChildElement("label")
+            while not label_elem.isNull():
+                r.labels_existing.append(label_elem.attribute("id"))
+                label_elem = label_elem.nextSiblingElement()
 
         bivariate_ramp_elem = element.firstChildElement("BivariateColorRamp")
         bivariate_ramp = None
@@ -346,8 +375,8 @@ class BivariateRenderer(QgsFeatureRenderer):
     def generate_legend_polygons(self) -> List[LegendPolygon]:
         polygons = []
 
-        for x, field_1_cat in enumerate(self.field_1_classes):
-            for y, field_2_cat in enumerate(self.field_2_classes):
+        for x in range(len(self.field_1_classes)):
+            for y in range(len(self.field_2_classes)):
                 exist = True
 
                 if self.getPositionValuesCombinationHash(x, y) not in self.labels_existing:
@@ -357,25 +386,49 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         return polygons
 
+    def populate_labels_existing_from_layer(self, layer: QgsVectorLayer) -> None:
+        labels_existing: List[str] = []
+        seen_labels = set()
+
+        for feature in layer.getFeatures():
+            try:
+                value1, value2 = self.position_values(feature)
+            except (TypeError, ValueError):
+                continue
+
+            if value1 < 0 or value2 < 0:
+                continue
+
+            identifier = self.getPositionValuesCombinationHash(value1, value2)
+
+            if identifier not in seen_labels:
+                seen_labels.add(identifier)
+                labels_existing.append(identifier)
+
+        self.labels_existing = labels_existing
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BivariateRenderer):
             return False
 
-        else:
-            if (
-                self.field_name_1 == other.field_name_1
-                and self.field_name_2 == other.field_name_2
-                and
-                # self.classification_method.id() == other.classification_method.id() and
-                self.field_1_min == other.field_1_min
-                and self.field_1_max == other.field_1_max
-                and self.field_2_min == other.field_2_min
-                and self.field_2_max == other.field_2_max
-            ):
-                return True
+        if self.field_name_1 != other.field_name_1 or self.field_name_2 != other.field_name_2:
+            return False
 
-            else:
-                return False
+        if not self.field_1_classes or not self.field_2_classes:
+            return not other.field_1_classes and not other.field_2_classes
+
+        if len(self.field_1_classes) != len(other.field_1_classes) or len(self.field_2_classes) != len(
+            other.field_2_classes
+        ):
+            return False
+
+        return (
+            self.classification_method.id() == other.classification_method.id()
+            and self.field_1_min == other.field_1_min
+            and self.field_1_max == other.field_1_max
+            and self.field_2_min == other.field_2_min
+            and self.field_2_max == other.field_2_max
+        )
 
     @property
     def field_2_min(self) -> float:
@@ -417,7 +470,7 @@ class BivariateRenderer(QgsFeatureRenderer):
 
         size = 200
 
-        image = QImage(size, size, QImage.Format_ARGB32)
+        image = QImage(size, size, QImage.Format.Format_ARGB32)
         image.fill(QColor(0, 0, 0, 0))
 
         painter = QPainter(image)

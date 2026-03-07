@@ -1,7 +1,16 @@
 import os
 
 import pytest
-from qgis.core import QgsLayoutUtils, QgsRenderContext
+from qgis.core import (
+    Qgis,
+    QgsLayout,
+    QgsLayoutItemMap,
+    QgsLayoutItemPage,
+    QgsLayoutUtils,
+    QgsProject,
+    QgsRenderContext,
+    QgsVectorLayer,
+)
 from qgis.PyQt.QtGui import QColor, QPainter
 
 from BivariateRenderer.colormixing.color_mixing_method import ColorMixingMethodDarken, ColorMixingMethodDirect
@@ -383,22 +392,6 @@ def test_legend_all_rotated(
 
 
 @skip_setting
-def test_layer_bivariate_render(
-    nc_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer, save_layout_for_layer
-):
-
-    bivariate_renderer = prepare_bivariate_renderer(
-        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
-    )
-
-    nc_layer.setRenderer(bivariate_renderer)
-
-    qgs_project.addMapLayer(nc_layer)
-
-    save_layout_for_layer(nc_layer, "tests/images/correct/layout_polygons_render.png")
-
-
-@skip_setting
 def test_generate_legend_white_spacer(
     qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
 ):
@@ -514,3 +507,34 @@ def test_generate_legend_empty_squares(
     painter.end()
 
     image.save("./tests/images/correct/legend_replaced_missing_values.png", "PNG")
+
+
+@skip_setting
+def test_generate_map_in_layout(
+    nc_layer: QgsVectorLayer,
+    qgs_layout: QgsLayout,
+    qgs_project: QgsProject,
+    layout_page_a4: QgsLayoutItemPage,
+    prepare_bivariate_renderer,
+    layout_space,
+    export_page_to_image,
+):
+
+    bivariate_renderer = prepare_bivariate_renderer(
+        nc_layer, field1="PERIMETER", field2="AREA", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    nc_layer.setRenderer(bivariate_renderer)
+
+    qgs_project.addMapLayer(nc_layer)
+
+    qgs_project.addMapLayer(nc_layer)
+
+    layout_item_map = QgsLayoutItemMap(qgs_layout)
+    layout_item_map.setLayers([nc_layer])
+    layout_item_map.attemptSetSceneRect(layout_space)
+    layout_item_map.setCrs(nc_layer.crs())
+    layout_item_map.zoomToExtent(nc_layer.extent())
+
+    qgs_layout.addItem(layout_item_map)
+    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map.png")

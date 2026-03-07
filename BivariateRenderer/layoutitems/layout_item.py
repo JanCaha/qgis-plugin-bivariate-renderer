@@ -1,14 +1,13 @@
-from pathlib import Path
 from typing import Optional
 
 from qgis.core import (
+    Qgis,
     QgsFillSymbol,
     QgsLayout,
     QgsLayoutItem,
     QgsLayoutItemAbstractMetadata,
     QgsLayoutItemRenderContext,
     QgsLineSymbol,
-    QgsMapLayerType,
     QgsProject,
     QgsReadWriteContext,
     QgsSymbol,
@@ -23,9 +22,6 @@ from ..legendrenderer.legend_renderer import LegendRenderer
 from ..renderer.bivariate_renderer import BivariateRenderer
 from ..text_constants import IDS, Texts
 from ..utils import default_line_symbol, default_missing_values_symbol, get_icon_path
-
-DEFAULT_AXIS_X_TEXT = "Axis X"
-DEFAULT_AXIS_Y_TEXT = "Axis Y"
 
 
 class BivariateRendererLayoutItem(QgsLayoutItem):
@@ -149,7 +145,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         legend_render.use_rectangle_without_values_color_from_legend = (
             self.use_rectangle_without_values_color_from_legend
         )
-        legend_render.symbol_rectangle_without_values = self.symbol_rectangle_without_values
+        legend_render.symbol_rectangle_without_values = self.symbol_rectangle_without_values.clone()
 
         return legend_render
 
@@ -208,7 +204,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
         text_elem = self.text_format.writeXml(doc, context)
 
-        symbol_elem.appendChild(text_elem)
+        bivariate_legend_element.appendChild(text_elem)
 
         text_axes_values_format = doc.createElement("axesValuesFormat")
 
@@ -250,7 +246,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
             if layer:
 
-                if layer.type() == QgsMapLayerType.VectorLayer:
+                if layer.type() == Qgis.LayerType.Vector:
 
                     if isinstance(layer.renderer(), BivariateRenderer):
                         self.set_linked_layer(layer)
@@ -296,7 +292,7 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
             self.text_values_format.readXml(text_format_elem, context)
 
         self.add_colors_separators = element.attribute("draw_colors_separators") == "True"
-        self.color_separator_width = int(element.attribute("color_separator_width"))
+        self.color_separator_width = float(element.attribute("color_separator_width"))
         self.color_separator_color = QColor(element.attribute("color_separator_color"))
 
         self.replace_rectangle_without_values = element.attribute("replace_empty_rectangles") == "True"
@@ -307,7 +303,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         empty_polygon_symbol_elem = element.firstChildElement("emptyPolygonSymbol")
 
         symbolElem = empty_polygon_symbol_elem.firstChildElement("symbol")
-        self.symbol_rectangle_without_values = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
+        loaded_symbol = QgsSymbolLayerUtils.loadSymbol(symbolElem, context)
+        self.symbol_rectangle_without_values = (
+            loaded_symbol if loaded_symbol is not None else default_missing_values_symbol()
+        )
 
         return True
 
@@ -318,6 +317,9 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
 
     def load_renderer_from_layer(self) -> None:
         self.renderer = self.layer.renderer().clone()
+
+        if isinstance(self.renderer, BivariateRenderer):
+            self.renderer.populate_labels_existing_from_layer(self.layer)
 
         self.refresh()
 
@@ -387,10 +389,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         self.refresh()
 
     @property
-    def get_font(self):
-        return self.text_axis_x.font()
-
-    @property
     def linked_layer(self) -> Optional[QgsVectorLayer]:
 
         if self.layer is not None:
@@ -399,10 +397,10 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
         return None
 
     @property
-    def linked_layer_name(self):
+    def linked_layer_id(self) -> Optional[str]:
 
         if self.layer is not None:
-            return self.layer.name()
+            return self.layer.id()
 
         return None
 
@@ -412,11 +410,6 @@ class BivariateRendererLayoutItem(QgsLayoutItem):
     def icon(self) -> QIcon:
 
         return QIcon(get_icon_path("legend_icon.png"))
-
-    def beginCommand(self, commandText: str, command) -> None:
-        if not isinstance(command, int):
-            command = command.value
-        return super().beginCommand(commandText, command)
 
 
 class BivariateRendererLayoutItemMetadata(QgsLayoutItemAbstractMetadata):

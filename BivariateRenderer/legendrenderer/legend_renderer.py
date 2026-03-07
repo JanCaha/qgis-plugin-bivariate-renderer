@@ -77,6 +77,9 @@ class LegendRenderer:
     _text_height_x: float
     _text_height_y: float
 
+    _render_previous_height: float = -1
+    _render_previous_width: float = -1
+
     def __init__(self):
 
         self._painter = None
@@ -351,7 +354,6 @@ class LegendRenderer:
                 )
 
             else:
-
                 scale_factor = self.height / max_size
                 self._transform.scale(scale_factor, scale_factor)
                 self._transform.translate(0, self.axis_tick_last_value_max_width / 2)
@@ -381,9 +383,11 @@ class LegendRenderer:
                 if self.use_rectangle_without_values_color_from_legend:
                     self.symbol_rectangle_without_values.setColor(polygon.symbol.color())
 
-                self.symbol_rectangle_without_values.startRender(self.context)
-                self.symbol_rectangle_without_values.renderPolygon(polygon_draw, None, None, self.context)
-                self.symbol_rectangle_without_values.stopRender(self.context)
+                symbol_without_values = self.symbol_rectangle_without_values.clone()
+
+                symbol_without_values.startRender(self.context)
+                symbol_without_values.renderPolygon(polygon_draw, None, None, self.context)
+                symbol_without_values.stopRender(self.context)
 
             else:
 
@@ -629,7 +633,7 @@ class LegendRenderer:
         if spacer_size % 2 == 0:
             spacer_size += 1
 
-        pen = QPen(self.color_separator_color, spacer_size, Qt.SolidLine)
+        pen = QPen(self.color_separator_color, spacer_size, Qt.PenStyle.SolidLine)
 
         self.painter.setPen(pen)
 
@@ -661,7 +665,7 @@ class LegendRenderer:
 
         self.painter.save()
 
-        pen = QPen(QColor(255, 0, 0, 255), 3, Qt.SolidLine)
+        pen = QPen(QColor(255, 0, 0, 255), 3, Qt.PenStyle.SolidLine)
 
         self.painter.setPen(pen)
 
@@ -676,7 +680,7 @@ class LegendRenderer:
         line.draw(self.painter)
 
         # Lines
-        pen = QPen(QColor(0, 255, 0, 255), 3, Qt.SolidLine)
+        pen = QPen(QColor(0, 255, 0, 255), 3, Qt.PenStyle.SolidLine)
 
         self.painter.setPen(pen)
 
@@ -718,6 +722,10 @@ class LegendRenderer:
 
     def render(self, context: QgsRenderContext, width: float, height: float, polygons: List[LegendPolygon]) -> None:
 
+        # invalidate transform if size changed to avoid rendering problems when resizing legend
+        if self._render_previous_height != height or self._render_previous_width != width:
+            self._transform = None
+
         self.context = context
 
         self._polygons_count = len(polygons)
@@ -728,7 +736,7 @@ class LegendRenderer:
 
         self._painter.save()
 
-        self._painter.setPen(Qt.NoPen)
+        self._painter.setPen(Qt.PenStyle.NoPen)
 
         self.set_text_height(self.axis_title_x.split("\n"), self.axis_title_y.split("\n"))
 
@@ -751,3 +759,6 @@ class LegendRenderer:
         # self.draw_debug_lines()
 
         self.painter.restore()
+
+        self._render_previous_height = height
+        self._render_previous_width = width

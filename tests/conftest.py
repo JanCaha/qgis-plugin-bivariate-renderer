@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 
 import pytest
 from qgis.core import (
@@ -14,8 +14,9 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt.QtCore import QLocale, QRectF, QSize
-from qgis.PyQt.QtGui import QImage, QPainter, qRgba
+from qgis.PyQt.QtCore import QLocale, QRectF, QSize, Qt
+from qgis.PyQt.QtGui import QFont, QGuiApplication, QImage, QPainter, qRgba
+from qgis.PyQt.QtWidgets import QApplication
 
 from BivariateRenderer.colorramps.color_ramps_register import (
     BivariateColorRamp,
@@ -26,10 +27,24 @@ from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
 
 
+def pytest_configure(config):
+    QApplication.setAttribute(Qt.AA_Use96Dpi)
+    QApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
+
+    # QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.Round) # Qt6
+
+
 @pytest.fixture(autouse=True, scope="session")
 def change_locale():
     """Sets locale to English, United Kingdom for all tests to ensure consistent results."""
     QLocale.setDefault(QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
+
+
+@pytest.fixture(autouse=True, scope="session")
+def set_application_font():
+    """Sets a consistent application font for all tests to ensure reproducible visual results."""
+    QApplication.instance().setFont(QFont("DejaVu Sans", 12))
+    QApplication.instance().setStyle("Fusion")
 
 
 @pytest.fixture
@@ -61,10 +76,10 @@ def nc_layer(nc_layer_path) -> QgsVectorLayer:
 
 
 @pytest.fixture
-def prepare_default_QImage():
+def prepare_default_QImage() -> Callable[[int], QImage]:
 
     def return_QImage(size: int = 500) -> QImage:
-        image = QImage(size, size, QImage.Format_ARGB32)
+        image = QImage(size, size, QImage.Format.Format_ARGB32)
         image.fill(qRgba(254, 254, 254, 254))
         assert isinstance(image, QImage)
         return image
@@ -73,7 +88,7 @@ def prepare_default_QImage():
 
 
 @pytest.fixture
-def prepare_painter():
+def prepare_painter() -> Callable[[QImage], QPainter]:
 
     def return_painter(image: QImage) -> QPainter:
         painter = QPainter(image)
@@ -84,17 +99,17 @@ def prepare_painter():
 
 
 @pytest.fixture
-def layout_width():
+def layout_width() -> float:
     return 297
 
 
 @pytest.fixture
-def layout_height():
+def layout_height() -> float:
     return 210
 
 
 @pytest.fixture
-def layout_dpmm():
+def layout_dpmm() -> float:
     return 300 / 25.4
 
 
@@ -104,7 +119,9 @@ def layout_space(layout_height, layout_width) -> QRectF:
 
 
 @pytest.fixture
-def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height, layout_width) -> QgsLayoutItemPage:
+def layout_page_a4(
+    qgs_layout: QgsLayout, layout_dpmm: float, layout_height: float, layout_width: float
+) -> QgsLayoutItemPage:
 
     page = QgsLayoutItemPage(qgs_layout)
     page.setPageSize(QgsLayoutSize(layout_width, layout_height, QgsUnitTypes.LayoutMillimeters))
@@ -114,7 +131,9 @@ def layout_page_a4(qgs_layout: QgsLayout, layout_dpmm, layout_height, layout_wid
 
 
 @pytest.fixture
-def prepare_bivariate_renderer():
+def prepare_bivariate_renderer() -> (
+    Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer]
+):
 
     def return_bivariate_renderer(
         layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramp: Optional[BivariateColorRamp] = None
@@ -153,40 +172,10 @@ def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
 
 
 @pytest.fixture
-def save_layout_for_layer(qgs_layout, layout_page_a4, layout_space, export_page_to_image):
+def export_page_to_image(layout_dpmm) -> Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None]:
 
     def function_to_run(
-        layer: QgsVectorLayer,
-        image_path: Union[str, Path],
-        qgs_layout: QgsLayout = qgs_layout,
-        page=layout_page_a4,
-        layout_space=layout_space,
-        export_page_to_image=export_page_to_image,
-    ) -> None:
-
-        canvas = QgsMapCanvas()
-
-        extent = layer.extent()
-        canvas.setExtent(extent)
-
-        map_item = QgsLayoutItemMap(qgs_layout)
-        map_item.attemptSetSceneRect(layout_space)
-
-        map_item.setCrs(layer.crs())
-        map_item.zoomToExtent(extent)
-
-        qgs_layout.addItem(map_item)
-
-        export_page_to_image(qgs_layout, page, image_path)
-
-    return function_to_run
-
-
-@pytest.fixture
-def export_page_to_image(layout_dpmm):
-
-    def function_to_run(
-        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM=layout_dpmm
+        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM: float = layout_dpmm
     ) -> None:
 
         if isinstance(image_path, Path):

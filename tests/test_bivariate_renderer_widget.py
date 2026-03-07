@@ -34,7 +34,7 @@ def test_widget_values(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widg
 
     assert widget.cb_field1.fields() == nc_layer.fields()
     assert widget.cb_field2.fields() == nc_layer.fields()
-    assert len(widget.cb_color_ramps) == 14
+    assert len(widget.cb_color_ramps) == 13
     assert len(widget.cb_colormixing_methods) == 3
 
     color_ramp = BivariateColorRampGreenPink()

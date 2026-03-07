@@ -1,32 +1,26 @@
-from PyQt5.QtXml import QDomElement
-from qgis.core import QgsProject, QgsReadWriteContext, QgsVectorLayer
-from qgis.PyQt.QtXml import QDomDocument
+from typing import Callable
 
+import pytest
+from qgis.core import (
+    QgsClassificationRange,
+    QgsFeature,
+    QgsField,
+    QgsReadWriteContext,
+    QgsRenderContext,
+    QgsVectorLayer,
+)
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtXml import QDomDocument, QDomElement
+
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampCyanViolet
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRampGreenPink
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from tests import assert_images_equal
 
 
-def test_layer_bivariate_render(
-    nc_layer: QgsVectorLayer, qgs_project: QgsProject, prepare_bivariate_renderer, save_layout_for_layer
+def test_functions(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
 ):
-
-    bivariate_renderer = prepare_bivariate_renderer(
-        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
-    )
-
-    nc_layer.setRenderer(bivariate_renderer)
-
-    qgs_project.addMapLayer(nc_layer)
-
-    rendered_layout = "./tests/images/image.png"
-
-    save_layout_for_layer(nc_layer, rendered_layout)
-
-    assert_images_equal("tests/images/correct/layout_polygons_render.png", rendered_layout)
-
-
-def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
 
     bivariate_renderer = prepare_bivariate_renderer(
         nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
@@ -106,3 +100,257 @@ def test_functions(nc_layer: QgsVectorLayer, prepare_bivariate_renderer):
     assert bivariate_renderer == renderer_from_xml
 
     assert isinstance(bivariate_renderer.save(QDomDocument("doc"), QgsReadWriteContext()), QDomElement)
+
+
+def test_eq(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+
+    # same renderer
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    assert renderer == renderer
+
+    # compare two empty renderers
+    renderer1 = BivariateRenderer()
+    renderer2 = BivariateRenderer()
+
+    assert renderer1 == renderer2
+
+    # compare cloned renderer
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    cloned = renderer.clone()
+
+    assert cloned == renderer
+
+    # different field names
+    renderer1 = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    renderer2 = prepare_bivariate_renderer(nc_layer, field1="PERIMETER", field2="AREA")
+
+    assert renderer1 != renderer2
+
+    # compare not a renderer
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    assert renderer != "not a renderer"
+    assert renderer != 42
+    assert renderer != None
+
+    # one setup and one empty renderer
+    renderer_with_data = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    renderer_empty = BivariateRenderer()
+    renderer_empty.setFieldName1("AREA")
+    renderer_empty.setFieldName2("PERIMETER")
+
+    assert renderer_with_data != renderer_empty
+
+
+def test_clone(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+
+    # preserve field names
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    cloned = renderer.clone()
+
+    assert cloned.field_name_1 == renderer.field_name_1
+    assert cloned.field_name_2 == renderer.field_name_2
+
+    # preserve classification ranges
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    cloned = renderer.clone()
+
+    assert len(cloned.field_1_classes) == len(renderer.field_1_classes)
+    assert len(cloned.field_2_classes) == len(renderer.field_2_classes)
+
+    for orig, copy in zip(renderer.field_1_classes, cloned.field_1_classes):
+        assert orig.lowerBound() == copy.lowerBound()
+        assert orig.upperBound() == copy.upperBound()
+
+    # test cloned is independent of original
+    renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    cloned_renderer = renderer.clone()
+    cloned_renderer.setFieldName1("PERIMETER")
+    cloned_renderer.set_bivariate_color_ramp(BivariateColorRampCyanViolet())
+
+    assert renderer.field_name_1 == "AREA"
+    assert renderer.bivariate_color_ramp.name == BivariateColorRampGreenPink().name
+
+
+def test_labels_existing_preserved_through_save_load(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    for feature in nc_layer.getFeatures():
+        renderer.symbolForFeature(feature, QgsRenderContext())
+
+    labels_before = set(renderer.labels_existing)
+
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = renderer.save(doc, context)
+
+    loaded = BivariateRenderer.create_render_from_element(elem, context)
+
+    assert set(loaded.labels_existing) == labels_before
+
+
+def test_labels_existing_not_inflated_by_legend_drawing(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+
+    renderer = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+
+    for feature in nc_layer.getFeatures():
+        renderer.symbolForFeature(feature, QgsRenderContext())
+
+    labels_before = set(renderer.labels_existing)
+
+    # generate_legend_polygons calls symbol_for_values for all combinations,
+    # which inflates cached_symbols — labels_existing must stay unchanged
+    renderer.generate_legend_polygons()
+
+    assert set(renderer.labels_existing) == labels_before
+
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = renderer.save(doc, context)
+
+    loaded = BivariateRenderer.create_render_from_element(elem, context)
+
+    # after save/load, only actual data combinations should be in labels_existing
+    all_combinations = {
+        renderer.getPositionValuesCombinationHash(x, y)
+        for x in range(len(renderer.field_1_classes))
+        for y in range(len(renderer.field_2_classes))
+    }
+    assert set(loaded.labels_existing) == labels_before
+    assert set(loaded.labels_existing) != all_combinations or len(labels_before) == len(all_combinations)
+
+
+def test_populate_labels_existing_from_layer_matches_feature_rendering(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+
+    renderer_from_symbol_for_feature = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    for feature in nc_layer.getFeatures():
+        renderer_from_symbol_for_feature.symbolForFeature(feature, QgsRenderContext())
+
+    renderer_from_layer_scan = prepare_bivariate_renderer(nc_layer, field1="AREA", field2="PERIMETER")
+    renderer_from_layer_scan.populate_labels_existing_from_layer(nc_layer)
+
+    assert set(renderer_from_layer_scan.labels_existing) == set(renderer_from_symbol_for_feature.labels_existing)
+
+
+def test_position_value():
+    renderer = BivariateRenderer()
+    renderer.field_1_classes = [
+        QgsClassificationRange("Class-1", 0.0, 1.0),
+        QgsClassificationRange("Class-2", 1.0, 2.0),
+        QgsClassificationRange("Class-3", 2.0, 3.0),
+    ]
+
+    # within_range
+    assert renderer.positionValueField1(0.5) == 0
+    assert renderer.positionValueField1(1.5) == 1
+    assert renderer.positionValueField1(2.5) == 2
+
+    # below_range
+    assert renderer.positionValueField1(-0.5) == -1
+
+    # above_range
+    assert renderer.positionValueField1(3.5) == -1
+
+    # on lower boundary
+    assert renderer.positionValueField1(0.0) == 0
+
+    # on upper boundary of last class
+    assert renderer.positionValueField1(3.0) == 2
+
+    # on upper boundary of first class
+    assert renderer.positionValueField1(1.0) == 0
+
+
+def test_serialization_create_render_from_element(
+    nc_layer: QgsVectorLayer,
+    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+):
+    renderer = prepare_bivariate_renderer(
+        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    doc = QDomDocument("doc")
+    context = QgsReadWriteContext()
+    elem = renderer.save(doc, context)
+
+    loaded = BivariateRenderer.create_render_from_element(elem, context)
+
+    assert loaded.field_name_1 == renderer.field_name_1
+    assert loaded.field_name_2 == renderer.field_name_2
+    assert loaded.bivariate_color_ramp.name == renderer.bivariate_color_ramp.name
+    assert loaded.classification_method.id() == renderer.classification_method.id()
+    assert len(loaded.field_1_classes) == len(renderer.field_1_classes)
+    assert len(loaded.field_2_classes) == len(renderer.field_2_classes)
+
+    for orig, loaded_class in zip(renderer.field_1_classes, loaded.field_1_classes):
+        assert orig.lowerBound() == pytest.approx(loaded_class.lowerBound())
+        assert orig.upperBound() == pytest.approx(loaded_class.upperBound())
+
+    for orig, loaded_class in zip(renderer.field_2_classes, loaded.field_2_classes):
+        assert orig.lowerBound() == pytest.approx(loaded_class.lowerBound())
+        assert orig.upperBound() == pytest.approx(loaded_class.upperBound())
+
+    assert (
+        loaded.bivariate_color_ramp.color_ramp_1.color1().name()
+        == renderer.bivariate_color_ramp.color_ramp_1.color1().name()
+    )
+    assert (
+        loaded.bivariate_color_ramp.color_ramp_2.color1().name()
+        == renderer.bivariate_color_ramp.color_ramp_2.color1().name()
+    )
+
+
+def test_populate_labels_existing_skips_null_values():
+    mem_layer = QgsVectorLayer("NoGeometry", "test", "memory")
+    provider = mem_layer.dataProvider()
+    provider.addAttributes(
+        [
+            QgsField("field1", QVariant.Double),
+            QgsField("field2", QVariant.Double),
+        ]
+    )
+    mem_layer.updateFields()
+
+    f_null = QgsFeature(mem_layer.fields())
+    f_null.setAttribute("field1", None)
+    f_null.setAttribute("field2", 1.0)
+
+    f_valid = QgsFeature(mem_layer.fields())
+    f_valid.setAttribute("field1", 0.5)
+    f_valid.setAttribute("field2", 0.5)
+
+    provider.addFeatures([f_null, f_valid])
+
+    renderer = BivariateRenderer()
+    renderer.setFieldName1("field1")
+    renderer.setFieldName2("field2")
+    renderer.field_1_classes = [QgsClassificationRange("Field-1-Class-1", 0.0, 1.0)]
+    renderer.field_2_classes = [QgsClassificationRange("Field-2-Class-1", 0.0, 1.0)]
+
+    renderer.populate_labels_existing_from_layer(mem_layer)
+
+    assert len(renderer.labels_existing) == 1
+    assert renderer.labels_existing[0] == "1-1"

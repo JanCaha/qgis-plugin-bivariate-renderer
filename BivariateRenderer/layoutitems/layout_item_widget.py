@@ -1,6 +1,4 @@
-from enum import Enum
-
-from qgis.core import Qgis, QgsLayoutItem, QgsMapLayer, QgsMapLayerType, QgsProject, QgsVectorLayer
+from qgis.core import Qgis, QgsLayoutItem, QgsMapLayer, QgsProject, QgsVectorLayer
 from qgis.gui import (
     QgsCollapsibleGroupBoxBasic,
     QgsColorButton,
@@ -47,26 +45,27 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
         self.layers = QgsProject.instance().mapLayers()
 
-        usable_layers = []
+        usable_layers = {}
 
         for layer_id in self.layers.keys():
 
             layer: QgsMapLayer = self.layers[layer_id]
 
-            if layer.type() == QgsMapLayerType.VectorLayer:
+            if layer.type() == Qgis.LayerType.Vector:
 
                 layer: QgsVectorLayer
 
                 if layer.renderer():
                     if layer.renderer().type() == Texts.bivariate_renderer_short_name:
-                        usable_layers.append(layer.name())
+                        usable_layers[layer.id()] = layer.name()
 
         self.cb_layers = QComboBox()
         self.cb_layers.addItem("")
-        self.cb_layers.addItems(usable_layers)
+        for layer_id, layer_name in usable_layers.items():
+            self.cb_layers.addItem(layer_name, layer_id)
 
-        if self.layout_item.linked_layer_name:
-            index = self.cb_layers.findData(self.layout_item.linked_layer_name, Qt.DisplayRole)
+        if self.layout_item.linked_layer_id:
+            index = self.cb_layers.findData(self.layout_item.linked_layer_id, Qt.ItemDataRole.UserRole)
             self.cb_layers.setCurrentIndex(index)
 
         self.form_layout = QVBoxLayout()
@@ -318,7 +317,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.color_spacer_width = QSpinBox()
         self.color_spacer_width.setMinimum(1)
         self.color_spacer_width.setMaximum(10)
-        self.color_spacer_width.setValue(self.layout_item.color_separator_width)
+        self.color_spacer_width.setValue(int(self.layout_item.color_separator_width))
         self.color_spacer_width.setSuffix("%")
         self.color_spacer_width.valueChanged.connect(self.pass_color_spacer_settings)
 
@@ -340,7 +339,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
     def pass_rectangle_without_values_settings(self):
 
         self.layout_item.beginCommand(
-            self.tr("Bivariate Legend - Rectangle without values settings"), UndoBivariateLegend.RectanglesWithoutValues
+            self.tr("Bivariate Legend - Rectangle without values settings"), QgsLayoutItem.UndoCommand.UndoLegendText
         )
 
         self.layout_item.set_rectangle_without_values_settings(
@@ -352,7 +351,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.endCommand()
 
     def pass_arrow_settings(self):
-        self.layout_item.beginCommand(self.tr("Bivariate Legend - Arrows settings"), UndoBivariateLegend.Arrows)
+        self.layout_item.beginCommand(
+            self.tr("Bivariate Legend - Arrows settings"), QgsLayoutItem.UndoCommand.UndoShapeStyle
+        )
         self.layout_item.set_arrows_settings(
             self.add_arrows.isChecked(),
             self.b_line_symbol.symbol().clone(),
@@ -363,7 +364,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     def pass_color_spacer_settings(self):
         self.layout_item.beginCommand(
-            self.tr("Bivariate Legend - Change color spacer settings"), UndoBivariateLegend.ColorSpacer
+            self.tr("Bivariate Legend - Change color spacer settings"), QgsLayoutItem.UndoCommand.UndoOpacity
         )
         self.layout_item.set_color_separator_settings(
             self.add_color_spacer.isChecked(), self.color_spacer_color.color(), self.color_spacer_width.value()
@@ -372,7 +373,7 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     def pass_axis_ticks_settings(self):
         self.layout_item.beginCommand(
-            self.tr("Bivariate Legend - Axis numeric values settings"), UndoBivariateLegend.AxisNumericTexts
+            self.tr("Bivariate Legend - Axis numeric values settings"), QgsLayoutItem.UndoCommand.UndoLegendGroupFont
         )
         self.layout_item.set_ticks_settings(
             self.add_axes_values_text.isChecked(),
@@ -385,7 +386,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.endCommand()
 
     def pass_axis_texts_settings(self):
-        self.layout_item.beginCommand(self.tr("Bivariate Legend - Axis texts settings"), UndoBivariateLegend.AxisTexts)
+        self.layout_item.beginCommand(
+            self.tr("Bivariate Legend - Axis texts settings"), QgsLayoutItem.UndoCommand.UndoLegendItemFont
+        )
         self.layout_item.set_axis_texts_settings(
             self.add_axes_text.isChecked(),
             self.b_font.textFormat(),
@@ -395,7 +398,9 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
         self.layout_item.endCommand()
 
     def update_rotate_legend(self):
-        self.layout_item.beginCommand(self.tr("Bivariate Legend - Rotated legend"), UndoBivariateLegend.Rotate)
+        self.layout_item.beginCommand(
+            self.tr("Bivariate Legend - Rotated legend"), QgsLayoutItem.UndoCommand.UndoRotation
+        )
         self.layout_item.set_legend_rotated(self.rotate_legend.isChecked())
         self.layout_item.endCommand()
 
@@ -406,29 +411,28 @@ class BivariateRendererLayoutItemWidget(QgsLayoutItemBaseWidget):
 
     def update_layer_to_work_with(self):
 
+        layer_switched = False
+
         if self.cb_layers.currentText() != "":
 
-            for layer_id in self.layers.keys():
+            layer: QgsVectorLayer = self.layers[self.cb_layers.currentData(Qt.ItemDataRole.UserRole)]
 
-                layer: QgsVectorLayer = self.layers[layer_id]
+            if self.layout_item.linked_layer is None or (
+                self.layout_item.linked_layer and self.layout_item.linked_layer.id() != layer.id()
+            ):
+                self.layout_item.beginCommand(
+                    self.tr("Bivariate Legend - Change layer"), QgsLayoutItem.UndoCommand.UndoExportLayerName
+                )
+                self.layout_item.blockSignals(True)
+                self.layout_item.set_linked_layer(layer)
+                self.layout_item.blockSignals(False)
+                self.layout_item.endCommand()
+                layer_switched = True
 
-                if layer.name() == self.cb_layers.currentText():
-
-                    self.layout_item.beginCommand(
-                        self.tr("Bivariate Legend - Change layer"), UndoBivariateLegend.ChangeLayer
-                    )
-
-                    self.layout_item.blockSignals(True)
-                    self.layout_item.set_linked_layer(layer)
-                    self.layout_item.blockSignals(False)
-                    self.layout_item.endCommand()
-                    break
-
-        if self.layout_item.linked_layer:
-            if self.layout_item.are_labels_default():
-
-                self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
-                self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
+        # if layer changed, update the fields names in the legend settings
+        if self.layout_item.linked_layer and layer_switched:
+            self.axis_x_name.setPlainText(self.layout_item.renderer.field_name_1)
+            self.axis_y_name.setPlainText(self.layout_item.renderer.field_name_2)
 
     def type(self):
         return IDS.plot_item_bivariate_renderer_legend
@@ -447,14 +451,3 @@ class BivariateRendererLayoutItemGuiMetadata(QgsLayoutItemAbstractGuiMetadata):
 
     def creationIcon(self) -> QIcon:
         return QIcon(get_icon_path("add_legend_icon.png"))
-
-
-class UndoBivariateLegend(Enum):
-    _baseUndoId = 846415
-    Rotate = _baseUndoId + 1
-    ChangeLayer = _baseUndoId + 2
-    AxisTexts = _baseUndoId + 3
-    AxisNumericTexts = _baseUndoId + 4
-    ColorSpacer = _baseUndoId + 5
-    Arrows = _baseUndoId + 6
-    RectanglesWithoutValues = _baseUndoId + 7
