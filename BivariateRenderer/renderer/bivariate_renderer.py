@@ -120,6 +120,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         for i, range_class in enumerate(classes):
             if range_class.lowerBound() <= value <= range_class.upperBound():
                 class_value = i
+                break
 
         return class_value
 
@@ -421,8 +422,8 @@ class BivariateRenderer(QgsFeatureRenderer):
             return False
 
         return (
-            # self.classification_method.id() == other.classification_method.id() and
-            self.field_1_min == other.field_1_min
+            self.classification_method.id() == other.classification_method.id()
+            and self.field_1_min == other.field_1_min
             and self.field_1_max == other.field_1_max
             and self.field_2_min == other.field_2_min
             and self.field_2_max == other.field_2_max
