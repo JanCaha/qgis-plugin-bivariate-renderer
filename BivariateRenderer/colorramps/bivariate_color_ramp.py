@@ -15,14 +15,14 @@ from ..utils import get_icon_path
 
 
 class BivariateColorRamp(ABC):
-    _name: str = "Default Bivariate Color Ramp"
-    _icon: str
-    _color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp()
-    _color_ramp_2: QgsGradientColorRamp = QgsGradientColorRamp()
-    _colors: List[List[QColor]] = []
 
     def __init__(self, number_classes: int = 9) -> None:
         self._number_of_classes = number_classes
+        self._name: str = "Default Bivariate Color Ramp"
+        self._icon: str = ""
+        self._color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp()
+        self._color_ramp_2: QgsGradientColorRamp = QgsGradientColorRamp()
+        self._colors: List[List[QColor]] = []
 
     @property
     def name(self) -> str:
@@ -66,14 +66,14 @@ class BivariateColorRamp(ABC):
 
 
 class BivariateColorRampGradient(BivariateColorRamp):
-    _color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#000000"), QColor("#ffffff"))
-    _color_ramp_2: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#ffffff"), QColor("#000000"))
 
     def __init__(
         self, number_classes_per_ramp: int = 3, color_mixing_method: ColorMixingMethod = ColorMixingMethodMultiply()
     ) -> None:
         super().__init__(number_classes_per_ramp)
         self._color_mixing_method = color_mixing_method
+        self._color_ramp_1: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#000000"), QColor("#ffffffff"))
+        self._color_ramp_2: QgsGradientColorRamp = QgsGradientColorRamp(QColor("#ffffff"), QColor("#000000"))
 
     def set_number_of_classes(self, number_of_classes: int) -> None:
         self._number_of_classes = number_of_classes
@@ -160,16 +160,14 @@ class BivariateColorRampGradient(BivariateColorRamp):
 
 
 class BivariateColorRampManual(BivariateColorRamp):
-    _colors: List[List[QColor]] = []
 
     def __init__(self, colors: List[List[QColor]]) -> None:
-        number_classes = len(colors)
-
-        super().__init__(number_classes)
+        super().__init__(len(colors))
+        self._colors: List[List[QColor]] = []
         self._colors = colors
 
         for row_colors in self._colors:
-            if not len(row_colors) == number_classes:
+            if not len(row_colors) == len(colors):
                 raise ValueError("Colors list do not create a square.")
 
     def get_color(self, position_value1: int, position_value2: int) -> QColor:

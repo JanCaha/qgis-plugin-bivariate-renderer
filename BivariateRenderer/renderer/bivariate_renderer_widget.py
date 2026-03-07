@@ -24,25 +24,6 @@ from .bivariate_renderer import BivariateRenderer
 
 class BivariateRendererWidget(QgsRendererWidget):
 
-    # objects
-    field_name_1: str
-    field_name_2: str
-
-    register_color_mixing = ColorMixingMethodsRegister()
-
-    register_color_ramps = BivariateColorRampsRegister()
-
-    default_color_ramp_1 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
-    default_color_ramp_2 = register_color_ramps.get_by_name("Violet - Blue").color_ramp_2
-
-    bivariate_color_ramp = BivariateColorRampGradient(9)
-    bivariate_color_ramp.set_color_ramp_1(default_color_ramp_1)
-    bivariate_color_ramp.set_color_ramp_2(default_color_ramp_2)
-
-    bivariate_renderer: BivariateRenderer
-
-    legend_renderer: LegendRenderer
-
     classification_methods = {
         QgsClassificationEqualInterval().name(): QgsClassificationEqualInterval(),
         QgsClassificationJenks().name(): QgsClassificationJenks(),
@@ -51,15 +32,33 @@ class BivariateRendererWidget(QgsRendererWidget):
         QgsClassificationLogarithmic().name(): QgsClassificationLogarithmic(),
     }
 
-    scale_factor = 1
-
     legend_changed = pyqtSignal()
-
-    base_symbol: QgsSymbol = default_fill_symbol()
 
     def __init__(self, layer, style, renderer: BivariateRenderer):
 
         super().__init__(layer, style)
+
+        self.field_name_1: str = ""
+        self.field_name_2: str = ""
+
+        self.register_color_mixing = ColorMixingMethodsRegister()
+
+        self.register_color_ramps = BivariateColorRampsRegister()
+
+        self.default_color_ramp_1 = self.register_color_ramps.get_by_name("Violet - Blue").color_ramp_1
+        self.default_color_ramp_2 = self.register_color_ramps.get_by_name("Violet - Blue").color_ramp_2
+
+        self.bivariate_color_ramp = BivariateColorRampGradient(9)
+        self.bivariate_color_ramp.set_color_ramp_1(self.default_color_ramp_1)
+        self.bivariate_color_ramp.set_color_ramp_2(self.default_color_ramp_2)
+
+        self.bivariate_renderer = BivariateRenderer()
+
+        self.legend_renderer = LegendRenderer()
+
+        self.scale_factor = 1
+
+        self.base_symbol: QgsSymbol = default_fill_symbol()
 
         if renderer is None or renderer.type() != Texts.bivariate_renderer_short_name:
             self.bivariate_renderer = BivariateRenderer()
