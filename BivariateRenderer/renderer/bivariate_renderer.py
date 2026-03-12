@@ -152,7 +152,7 @@ class BivariateRenderer(QgsFeatureRenderer):
         identifier = self.getPositionValuesCombinationHash(position_value1, position_value2)
 
         if identifier not in self.cached_symbols:
-            feature_symbol = default_fill_symbol()
+            feature_symbol = self.polygon_symbol.clone()
             feature_symbol.setColor(self.getFeatureColor(position_value1, position_value2))
 
             self.cached_symbols[identifier] = feature_symbol.clone()
