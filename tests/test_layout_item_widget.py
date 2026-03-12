@@ -6,11 +6,14 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.layoutitems.layout_item_widget import BivariateRendererLayoutItemWidget
 from BivariateRenderer.utils import default_line_symbol
-from tests import assert_images_equal
+from tests import assert_images_equal, prepare_bivariate_renderer
 
 
 def test_layout_item_widget(
-    qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, qgs_project, prepare_bivariate_renderer
+    qgis_countries_layer: QgsVectorLayer,
+    qgs_layout,
+    qgis_parent,
+    qgs_project,
 ):
 
     qgs_project.addMapLayer(qgis_countries_layer)
@@ -49,7 +52,7 @@ def test_layout_item_widget(
     assert isinstance(widget.layout_item, BivariateRendererLayoutItem)
 
 
-def test_visual(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgis_parent, qgs_project, prepare_bivariate_renderer):
+def test_visual(qgis_countries_layer: QgsVectorLayer, qgs_layout, qgs_project):
 
     qgs_project.addMapLayer(qgis_countries_layer)
 

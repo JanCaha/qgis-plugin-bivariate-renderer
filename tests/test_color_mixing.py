@@ -8,7 +8,7 @@ from BivariateRenderer.colormixing.color_mixing_method import (
 )
 from BivariateRenderer.colormixing.color_mixing_methods_register import ColorMixingMethodsRegister
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
-from tests import assert_images_equal
+from tests import assert_images_equal, prepare_bivariate_renderer, prepare_QImage
 
 
 def test_color_mixing_register():
@@ -27,13 +27,11 @@ def test_color_mixing_register():
     assert register.get_by_name("does not exist") is None
 
 
-def test_color_mixing_direct_mixing(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_color_mixing_direct_mixing(qgis_countries_layer, qgs_layout):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -59,13 +57,11 @@ def test_color_mixing_direct_mixing(
     assert_images_equal("./tests/images/correct/legend_only_direct_mixing.png", "./tests/images/image.png")
 
 
-def test_color_mixing_darken(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_color_mixing_darken(qgis_countries_layer, qgs_project, qgs_layout):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 

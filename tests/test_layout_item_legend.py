@@ -1,15 +1,14 @@
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 from qgis.core import QgsLayout, QgsLayoutItemPage, QgsProject, QgsReadWriteContext, QgsVectorLayer
 from qgis.PyQt.QtCore import QRectF
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtXml import QDomDocument
 
-from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp, BivariateColorRampGreenPink
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from tests import assert_images_equal
+from tests import assert_images_equal, export_page_to_image, prepare_bivariate_renderer
 
 
 def test_generate_legend_in_layout(
@@ -17,9 +16,8 @@ def test_generate_legend_in_layout(
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
-    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
     layout_space: QRectF,
-    export_page_to_image: Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None],
+    layout_dpmm: float,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, "fid", "fid", BivariateColorRampGreenPink())
@@ -37,7 +35,7 @@ def test_generate_legend_in_layout(
 
     file = "./tests/images/image.png"
 
-    export_page_to_image(qgs_layout, layout_page_a4, file)
+    export_page_to_image(qgs_layout, layout_page_a4, file, layout_dpmm)
 
     assert_images_equal(file, "./tests/images/correct/layout_item_legend.png")
 

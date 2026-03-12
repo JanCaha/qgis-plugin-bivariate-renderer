@@ -2,7 +2,7 @@ import os
 
 import pytest
 from qgis.core import (
-    Qgis,
+    QgsFillSymbol,
     QgsLayout,
     QgsLayoutItemMap,
     QgsLayoutItemPage,
@@ -18,6 +18,7 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
+from tests import export_page_to_image, prepare_bivariate_renderer, prepare_QImage
 
 env_value = os.getenv("BIVARIATE_GENERATE")
 
@@ -30,13 +31,11 @@ skip_setting = pytest.mark.skipif(not generate_images, reason="do not generate w
 
 
 @skip_setting
-def test_generate_just_legend(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_just_legend(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -60,13 +59,11 @@ def test_generate_just_legend(
 
 
 @skip_setting
-def test_generate_legend_with_arrows(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_with_arrows(qgis_countries_layer, qgs_project, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -91,13 +88,11 @@ def test_generate_legend_with_arrows(
 
 
 @skip_setting
-def test_generate_legend_with_arrows_common_origin(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_with_arrows_common_origin(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -123,13 +118,11 @@ def test_generate_legend_with_arrows_common_origin(
 
 
 @skip_setting
-def test_generate_legend_with_arrows_text(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_with_arrows_text(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -155,13 +148,11 @@ def test_generate_legend_with_arrows_text(
 
 
 @skip_setting
-def test_generate_legend_with_arrows_text_rotated(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_with_arrows_text_rotated(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -188,13 +179,11 @@ def test_generate_legend_with_arrows_text_rotated(
 
 
 @skip_setting
-def test_generate_legend_darken(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_darken(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -219,13 +208,11 @@ def test_generate_legend_darken(
 
 
 @skip_setting
-def test_generate_legend_direct_mixing(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_direct_mixing(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -255,9 +242,8 @@ def test_generate_legend_in_layout(
     qgs_layout,
     qgs_project,
     layout_page_a4,
-    prepare_bivariate_renderer,
     layout_space,
-    export_page_to_image,
+    layout_dpmm,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(
@@ -275,17 +261,15 @@ def test_generate_legend_in_layout(
 
     qgs_layout.addItem(layout_item)
 
-    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_legend.png")
+    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_legend.png", layout_dpmm)
 
 
 @skip_setting
-def test_legend_ticks(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_legend_ticks(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -318,11 +302,11 @@ def test_legend_ticks(
 
 
 @skip_setting
-def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer):
+def test_legend_all(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -353,13 +337,11 @@ def test_legend_all(qgis_countries_layer, qgs_project, qgs_layout, prepare_defau
 
 
 @skip_setting
-def test_legend_all_rotated(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_legend_all_rotated(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -392,13 +374,11 @@ def test_legend_all_rotated(
 
 
 @skip_setting
-def test_generate_legend_white_spacer(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_white_spacer(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -426,13 +406,11 @@ def test_generate_legend_white_spacer(
 
 
 @skip_setting
-def test_legend_ticks_midpoints(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_legend_ticks_midpoints(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -466,13 +444,11 @@ def test_legend_ticks_midpoints(
 
 
 @skip_setting
-def test_generate_legend_empty_squares(
-    qgis_countries_layer, qgs_project, qgs_layout, prepare_default_QImage, prepare_bivariate_renderer
-):
+def test_generate_legend_empty_squares(qgis_countries_layer, qgs_layout, prepare_bivariate_renderer):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = QPainter(image)
 
@@ -515,9 +491,8 @@ def test_generate_map_in_layout(
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
-    prepare_bivariate_renderer,
     layout_space,
-    export_page_to_image,
+    layout_dpmm,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(
@@ -537,4 +512,37 @@ def test_generate_map_in_layout(
     layout_item_map.zoomToExtent(nc_layer.extent())
 
     qgs_layout.addItem(layout_item_map)
-    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map.png")
+    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map.png", layout_dpmm)
+
+
+@skip_setting
+def test_generate_map_in_layout_custom_polygon_symbol(
+    nc_layer: QgsVectorLayer,
+    qgs_layout: QgsLayout,
+    qgs_project: QgsProject,
+    layout_page_a4: QgsLayoutItemPage,
+    layout_space,
+    layout_dpmm,
+    custom_polygon_symbol: QgsFillSymbol,
+):
+
+    bivariate_renderer = prepare_bivariate_renderer(
+        nc_layer, field1="PERIMETER", field2="AREA", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    bivariate_renderer.polygon_symbol = custom_polygon_symbol
+
+    nc_layer.setRenderer(bivariate_renderer)
+
+    qgs_project.addMapLayer(nc_layer)
+
+    layout_item_map = QgsLayoutItemMap(qgs_layout)
+    layout_item_map.setLayers([nc_layer])
+    layout_item_map.attemptSetSceneRect(layout_space)
+    layout_item_map.setCrs(nc_layer.crs())
+    layout_item_map.zoomToExtent(nc_layer.extent())
+
+    qgs_layout.addItem(layout_item_map)
+    export_page_to_image(
+        qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map_custom_symbol.png", layout_dpmm
+    )

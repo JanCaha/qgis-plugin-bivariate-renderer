@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 from qgis.core import QgsLayout, QgsLayoutUtils, QgsProject, QgsReadWriteContext, QgsRenderContext, QgsVectorLayer
 from qgis.PyQt.QtGui import QColor, QImage, QPainter
@@ -9,23 +9,20 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
-from tests import assert_images_equal
+from tests import assert_images_equal, prepare_bivariate_renderer, prepare_painter, prepare_QImage
 
 
 def test_just_legend(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[[int], QImage],
-    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
-    prepare_painter: QPainter,
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -54,16 +51,13 @@ def test_legend_with_arrows(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -93,16 +87,13 @@ def test_legend_with_arrows_texts(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -133,16 +124,13 @@ def test_legend_with_arrows_texts_rotated(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -174,16 +162,13 @@ def test_legend_ticks(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -221,16 +206,13 @@ def test_legend_all(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -266,16 +248,13 @@ def test_legend_all_rotated(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -313,16 +292,13 @@ def test_legend_with_spacer(
     qgis_countries_layer: QgsVectorLayer,
     qgs_project: QgsProject,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     assert qgis_countries_layer
     assert qgs_project
     assert qgs_layout
 
-    image = prepare_default_QImage()
+    image = prepare_QImage()
 
     painter = prepare_painter(image)
 
@@ -354,14 +330,11 @@ def test_legend_with_spacer(
 def test_legend_with_arrows_common_origin(
     qgis_countries_layer: QgsVectorLayer,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = prepare_painter(image)
 
@@ -391,14 +364,11 @@ def test_legend_with_arrows_common_origin(
 def test_legend_ticks_midpoints(
     qgis_countries_layer: QgsVectorLayer,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = prepare_painter(image)
 
@@ -436,14 +406,11 @@ def test_legend_ticks_midpoints(
 def test_legend_empty_squares(
     qgis_countries_layer: QgsVectorLayer,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
 
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = prepare_painter(image)
 
@@ -485,13 +452,10 @@ def test_legend_empty_squares(
 def test_legend_empty_squares_after_renderer_save_load(
     qgis_countries_layer: QgsVectorLayer,
     qgs_layout: QgsLayout,
-    prepare_default_QImage: Callable[..., QImage],
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
-    prepare_painter: Callable[[QImage], QPainter],
 ):
     legend_size = 500
 
-    image = prepare_default_QImage(legend_size)
+    image = prepare_QImage(legend_size)
 
     painter = prepare_painter(image)
 

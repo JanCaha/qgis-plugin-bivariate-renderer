@@ -1,30 +1,20 @@
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 import pytest
 from qgis.core import (
+    QgsFillSymbol,
     QgsLayout,
     QgsLayoutExporter,
-    QgsLayoutItemMap,
     QgsLayoutItemPage,
     QgsLayoutSize,
     QgsProject,
-    QgsStyle,
     QgsUnitTypes,
     QgsVectorLayer,
 )
-from qgis.gui import QgsMapCanvas
 from qgis.PyQt.QtCore import QLocale, QRectF, QSize, Qt
-from qgis.PyQt.QtGui import QFont, QGuiApplication, QImage, QPainter, qRgba
+from qgis.PyQt.QtGui import QFont, QImage, QPainter
 from qgis.PyQt.QtWidgets import QApplication
-
-from BivariateRenderer.colorramps.color_ramps_register import (
-    BivariateColorRamp,
-    BivariateColorRampGreenPink,
-    BivariateColorRampsRegister,
-)
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
 
 
 def pytest_configure(config):
@@ -76,29 +66,6 @@ def nc_layer(nc_layer_path) -> QgsVectorLayer:
 
 
 @pytest.fixture
-def prepare_default_QImage() -> Callable[[int], QImage]:
-
-    def return_QImage(size: int = 500) -> QImage:
-        image = QImage(size, size, QImage.Format.Format_ARGB32)
-        image.fill(qRgba(254, 254, 254, 254))
-        assert isinstance(image, QImage)
-        return image
-
-    return return_QImage
-
-
-@pytest.fixture
-def prepare_painter() -> Callable[[QImage], QPainter]:
-
-    def return_painter(image: QImage) -> QPainter:
-        painter = QPainter(image)
-        assert painter
-        return painter
-
-    return return_painter
-
-
-@pytest.fixture
 def layout_width() -> float:
     return 297
 
@@ -131,65 +98,13 @@ def layout_page_a4(
 
 
 @pytest.fixture
-def prepare_bivariate_renderer() -> (
-    Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer]
-):
-
-    def return_bivariate_renderer(
-        layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramp: Optional[BivariateColorRamp] = None
-    ) -> BivariateRenderer:
-
-        color_ramp_bivariate = BivariateColorRampsRegister().get_by_name("Violet - Blue")
-
-        if color_ramp:
-            color_ramp_bivariate = color_ramp
-
-        bivariate_renderer = BivariateRenderer()
-        bivariate_renderer.setFieldName1(field1)
-        bivariate_renderer.setFieldName2(field2)
-        bivariate_renderer.set_bivariate_color_ramp(color_ramp_bivariate)
-        bivariate_renderer.setField1ClassificationData(layer, bivariate_renderer.field_name_1)
-        bivariate_renderer.setField2ClassificationData(layer, bivariate_renderer.field_name_2)
-
-        return bivariate_renderer
-
-    return return_bivariate_renderer
-
-
-@pytest.fixture
-def prepare_bivariate_renderer_widget(prepare_bivariate_renderer):
-
-    def return_bivariate_renderer_widget(layer: QgsVectorLayer) -> BivariateRendererWidget:
-        bivariate_renderer = prepare_bivariate_renderer(
-            layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
-        )
-
-        widget = BivariateRendererWidget(layer=layer, style=QgsStyle(), renderer=bivariate_renderer)
-
-        return widget
-
-    return return_bivariate_renderer_widget
-
-
-@pytest.fixture
-def export_page_to_image(layout_dpmm) -> Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None]:
-
-    def function_to_run(
-        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM: float = layout_dpmm
-    ) -> None:
-
-        if isinstance(image_path, Path):
-            image_path = image_path.as_posix()
-
-        width = int(DPMM * page.pageSize().width())
-        height = int(DPMM * page.pageSize().height())
-
-        size = QSize(width, height)
-
-        exporter = QgsLayoutExporter(qgs_layout)
-
-        image: QImage = exporter.renderPageToImage(0, size)
-
-        image.save(image_path, "PNG")
-
-    return function_to_run
+def custom_polygon_symbol() -> QgsFillSymbol:
+    custom_symbol = QgsFillSymbol.createSimple(
+        {
+            "outline_width": "1.0",
+            "outline_width_unit": "MM",
+            "outline_color": "255,0,0,255",
+            "outline_style": "dot",
+        }
+    )
+    return custom_symbol

@@ -146,7 +146,9 @@ def test_manual_ramp_clone_independence():
 
 def test_manual_ramp_requires_square_colors():
     with pytest.raises(ValueError, match="square"):
-        BivariateColorRampManual([
-            [QColor("#ff0000"), QColor("#00ff00")],
-            [QColor("#0000ff")],
-        ])
+        BivariateColorRampManual(
+            [
+                [QColor("#ff0000"), QColor("#00ff00")],
+                [QColor("#0000ff")],
+            ]
+        )
