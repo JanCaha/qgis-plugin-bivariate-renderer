@@ -8,7 +8,7 @@ from qgis.PyQt.QtXml import QDomDocument
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
-from tests import assert_images_equal, prepare_bivariate_renderer
+from tests import assert_images_equal, export_page_to_image, prepare_bivariate_renderer
 
 
 def test_generate_legend_in_layout(
@@ -17,7 +17,7 @@ def test_generate_legend_in_layout(
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
     layout_space: QRectF,
-    export_page_to_image: Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None],
+    layout_dpmm: float,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(qgis_countries_layer, "fid", "fid", BivariateColorRampGreenPink())
@@ -35,7 +35,7 @@ def test_generate_legend_in_layout(
 
     file = "./tests/images/image.png"
 
-    export_page_to_image(qgs_layout, layout_page_a4, file)
+    export_page_to_image(qgs_layout, layout_page_a4, file, layout_dpmm)
 
     assert_images_equal(file, "./tests/images/correct/layout_item_legend.png")
 

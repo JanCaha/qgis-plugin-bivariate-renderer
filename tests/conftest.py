@@ -66,17 +66,6 @@ def nc_layer(nc_layer_path) -> QgsVectorLayer:
 
 
 @pytest.fixture
-def prepare_painter() -> Callable[[QImage], QPainter]:
-
-    def return_painter(image: QImage) -> QPainter:
-        painter = QPainter(image)
-        assert painter
-        return painter
-
-    return return_painter
-
-
-@pytest.fixture
 def layout_width() -> float:
     return 297
 
@@ -106,30 +95,6 @@ def layout_page_a4(
     collection = qgs_layout.pageCollection()
     collection.addPage(page)
     return page
-
-
-@pytest.fixture
-def export_page_to_image(layout_dpmm) -> Callable[[QgsLayout, QgsLayoutItemPage, Union[Path, str], float], None]:
-
-    def function_to_run(
-        qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM: float = layout_dpmm
-    ) -> None:
-
-        if isinstance(image_path, Path):
-            image_path = image_path.as_posix()
-
-        width = int(DPMM * page.pageSize().width())
-        height = int(DPMM * page.pageSize().height())
-
-        size = QSize(width, height)
-
-        exporter = QgsLayoutExporter(qgs_layout)
-
-        image: QImage = exporter.renderPageToImage(0, size)
-
-        image.save(image_path, "PNG")
-
-    return function_to_run
 
 
 @pytest.fixture

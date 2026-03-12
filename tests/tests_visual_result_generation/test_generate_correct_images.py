@@ -18,7 +18,7 @@ from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.renderer.bivariate_renderer_utils import classes_to_legend_midpoints
-from tests import prepare_bivariate_renderer, prepare_QImage
+from tests import export_page_to_image, prepare_bivariate_renderer, prepare_QImage
 
 env_value = os.getenv("BIVARIATE_GENERATE")
 
@@ -243,7 +243,7 @@ def test_generate_legend_in_layout(
     qgs_project,
     layout_page_a4,
     layout_space,
-    export_page_to_image,
+    layout_dpmm,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(
@@ -261,7 +261,7 @@ def test_generate_legend_in_layout(
 
     qgs_layout.addItem(layout_item)
 
-    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_legend.png")
+    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_legend.png", layout_dpmm)
 
 
 @skip_setting
@@ -492,7 +492,7 @@ def test_generate_map_in_layout(
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
     layout_space,
-    export_page_to_image,
+    layout_dpmm,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(
@@ -512,7 +512,7 @@ def test_generate_map_in_layout(
     layout_item_map.zoomToExtent(nc_layer.extent())
 
     qgs_layout.addItem(layout_item_map)
-    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map.png")
+    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map.png", layout_dpmm)
 
 
 @skip_setting
@@ -522,7 +522,7 @@ def test_generate_map_in_layout_custom_polygon_symbol(
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
     layout_space,
-    export_page_to_image,
+    layout_dpmm,
     custom_polygon_symbol: QgsFillSymbol,
 ):
 
@@ -543,4 +543,6 @@ def test_generate_map_in_layout_custom_polygon_symbol(
     layout_item_map.zoomToExtent(nc_layer.extent())
 
     qgs_layout.addItem(layout_item_map)
-    export_page_to_image(qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map_custom_symbol.png")
+    export_page_to_image(
+        qgs_layout, layout_page_a4, "./tests/images/correct/layout_item_map_custom_symbol.png", layout_dpmm
+    )

@@ -7,8 +7,17 @@ import numpy as np
 import pytest
 from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
-from qgis.core import QgsReadWriteContext, QgsStyle, QgsTextFormat, QgsVectorLayer
-from qgis.PyQt.QtGui import QImage, qRgba
+from qgis.core import (
+    QgsLayout,
+    QgsLayoutExporter,
+    QgsLayoutItemPage,
+    QgsReadWriteContext,
+    QgsStyle,
+    QgsTextFormat,
+    QgsVectorLayer,
+)
+from qgis.PyQt.QtCore import QSize
+from qgis.PyQt.QtGui import QImage, QPainter, qRgba
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
@@ -116,3 +125,28 @@ def prepare_QImage(size: int = 500) -> QImage:
     image.fill(qRgba(254, 254, 254, 254))
     assert isinstance(image, QImage)
     return image
+
+
+def prepare_painter(image: QImage) -> QPainter:
+    painter = QPainter(image)
+    assert painter
+    return painter
+
+
+def export_page_to_image(
+    qgs_layout: QgsLayout, page: QgsLayoutItemPage, image_path: Union[Path, str], DPMM: float
+) -> None:
+
+    if isinstance(image_path, Path):
+        image_path = image_path.as_posix()
+
+    width = int(DPMM * page.pageSize().width())
+    height = int(DPMM * page.pageSize().height())
+
+    size = QSize(width, height)
+
+    exporter = QgsLayoutExporter(qgs_layout)
+
+    image: QImage = exporter.renderPageToImage(0, size)
+
+    image.save(image_path, "PNG")
