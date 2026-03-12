@@ -1,6 +1,9 @@
+from typing import Callable, Optional
+
 from qgis.core import QgsLayout, QgsLayoutItemMap, QgsLayoutItemPage, QgsProject, QgsVectorLayer
 
-from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp, BivariateColorRampGreenPink
+from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 from tests import assert_images_equal
 
 
@@ -9,7 +12,7 @@ def test_generate_map_in_layout(
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
-    prepare_bivariate_renderer,
+    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
     layout_space,
     export_page_to_image,
 ):
@@ -39,7 +42,7 @@ def test_generate_map_in_layout(
 
 def test_polygon_symbol_used_in_feature_rendering(
     nc_layer: QgsVectorLayer,
-    prepare_bivariate_renderer: Callable[..., BivariateRenderer],
+    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
