@@ -7,11 +7,14 @@ import numpy as np
 import pytest
 from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
-from qgis.core import QgsReadWriteContext, QgsTextFormat, QgsVectorLayer
+from qgis.core import QgsReadWriteContext, QgsStyle, QgsTextFormat, QgsVectorLayer
+from qgis.PyQt.QtGui import QImage, qRgba
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp, BivariateColorRampsRegister
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
+from BivariateRenderer.renderer.bivariate_renderer_widget import BivariateRendererWidget
 
 
 def xml_string(element: Union[QDomElement, QgsTextFormat, BivariateRenderer]) -> str:
@@ -96,3 +99,20 @@ def prepare_bivariate_renderer(
     bivariate_renderer.setField2ClassificationData(layer, bivariate_renderer.field_name_2)
 
     return bivariate_renderer
+
+
+def prepare_bivariate_renderer_widget(layer: QgsVectorLayer) -> BivariateRendererWidget:
+    bivariate_renderer = prepare_bivariate_renderer(
+        layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+    )
+
+    widget = BivariateRendererWidget(layer=layer, style=QgsStyle(), renderer=bivariate_renderer)
+
+    return widget
+
+
+def prepare_QImage(size: int = 500) -> QImage:
+    image = QImage(size, size, QImage.Format.Format_ARGB32)
+    image.fill(qRgba(254, 254, 254, 254))
+    assert isinstance(image, QImage)
+    return image

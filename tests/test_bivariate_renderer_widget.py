@@ -1,14 +1,14 @@
-from qgis.core import QgsClassificationMethod, QgsTextFormat, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 from qgis.gui import QgsColorRampButton, QgsDoubleSpinBox, QgsFieldComboBox
 from qgis.PyQt.QtWidgets import QComboBox, QFormLayout, QLabel
 
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.legendrenderer.legend_renderer import LegendRenderer
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from tests import assert_images_equal
+from tests import assert_images_equal, prepare_bivariate_renderer_widget
 
 
-def test_widget_elements(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
+def test_widget_elements(nc_layer: QgsVectorLayer):
 
     widget = prepare_bivariate_renderer_widget(nc_layer)
 
@@ -28,7 +28,7 @@ def test_widget_elements(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_wi
     assert isinstance(widget.form_layout, QFormLayout)
 
 
-def test_widget_values(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
+def test_widget_values(nc_layer: QgsVectorLayer):
 
     widget = prepare_bivariate_renderer_widget(nc_layer)
 
@@ -43,7 +43,7 @@ def test_widget_values(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widg
     assert widget.bt_color_ramp2.colorRamp().properties() == color_ramp.color_ramp_2.properties()
 
 
-def test_visual(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
+def test_visual(nc_layer: QgsVectorLayer):
 
     widget = prepare_bivariate_renderer_widget(nc_layer)
 

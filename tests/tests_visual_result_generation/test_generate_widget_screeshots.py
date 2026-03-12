@@ -6,7 +6,7 @@ from qgis.core import QgsVectorLayer
 from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
 from BivariateRenderer.layoutitems.layout_item import BivariateRendererLayoutItem
 from BivariateRenderer.layoutitems.layout_item_widget import BivariateRendererLayoutItemWidget
-from BivariateRenderer.utils import default_line_symbol
+from tests import prepare_bivariate_renderer_widget
 
 env_value = os.getenv("BIVARIATE_GENERATE")
 
@@ -19,7 +19,7 @@ skip_setting = pytest.mark.skipif(not generate_images, reason="do not generate w
 
 
 @skip_setting
-def test_generate_widget_renderer(nc_layer: QgsVectorLayer, prepare_bivariate_renderer_widget):
+def test_generate_widget_renderer(nc_layer: QgsVectorLayer):
 
     widget = prepare_bivariate_renderer_widget(nc_layer)
 
