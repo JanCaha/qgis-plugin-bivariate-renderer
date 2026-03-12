@@ -1,10 +1,7 @@
-from typing import Callable, Optional
+from qgis.core import QgsFillSymbol, QgsLayout, QgsLayoutItemMap, QgsLayoutItemPage, QgsProject, QgsVectorLayer
 
-from qgis.core import QgsLayout, QgsLayoutItemMap, QgsLayoutItemPage, QgsProject, QgsVectorLayer
-
-from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRamp, BivariateColorRampGreenPink
-from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
-from tests import assert_images_equal
+from BivariateRenderer.colorramps.bivariate_color_ramp import BivariateColorRampGreenPink
+from tests import assert_images_equal, prepare_bivariate_renderer
 
 
 def test_generate_map_in_layout(
@@ -12,13 +9,12 @@ def test_generate_map_in_layout(
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
-    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
     layout_space,
     export_page_to_image,
 ):
 
     bivariate_renderer = prepare_bivariate_renderer(
-        nc_layer, field1="PERIMETER", field2="AREA", color_ramp=BivariateColorRampGreenPink()
+        layer=nc_layer, field1="PERIMETER", field2="AREA", color_ramp=BivariateColorRampGreenPink()
     )
 
     nc_layer.setRenderer(bivariate_renderer)
@@ -42,7 +38,6 @@ def test_generate_map_in_layout(
 
 def test_polygon_symbol_used_in_feature_rendering(
     nc_layer: QgsVectorLayer,
-    prepare_bivariate_renderer: Callable[[QgsVectorLayer, str, str, Optional[BivariateColorRamp]], BivariateRenderer],
     qgs_layout: QgsLayout,
     qgs_project: QgsProject,
     layout_page_a4: QgsLayoutItemPage,
@@ -51,9 +46,8 @@ def test_polygon_symbol_used_in_feature_rendering(
     custom_polygon_symbol: QgsFillSymbol,
 ):
     bivariate_renderer = prepare_bivariate_renderer(
-        nc_layer, field1="AREA", field2="PERIMETER", color_ramp=BivariateColorRampGreenPink()
+        layer=nc_layer, field1="PERIMETER", field2="AREA", color_ramp=BivariateColorRampGreenPink()
     )
-
     bivariate_renderer.polygon_symbol = custom_polygon_symbol
 
     nc_layer.setRenderer(bivariate_renderer)

@@ -1,15 +1,16 @@
 import inspect
 import tempfile
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 import pytest
 from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
-from qgis.core import QgsReadWriteContext, QgsTextFormat
+from qgis.core import QgsReadWriteContext, QgsTextFormat, QgsVectorLayer
 from qgis.PyQt.QtXml import QDomDocument, QDomElement
 
+from BivariateRenderer.colorramps.color_ramps_register import BivariateColorRamp, BivariateColorRampsRegister
 from BivariateRenderer.renderer.bivariate_renderer import BivariateRenderer
 
 
@@ -76,3 +77,22 @@ def diff_image_name(frame: inspect.FrameInfo) -> Path:
         diff_dir.mkdir(exist_ok=True)
     filename = diff_dir / f"{Path(frame.filename).stem}-{frame.function}.png"
     return filename
+
+
+def prepare_bivariate_renderer(
+    layer: QgsVectorLayer, field1: str = "", field2: str = "", color_ramp: Optional[BivariateColorRamp] = None
+) -> BivariateRenderer:
+
+    color_ramp_bivariate = BivariateColorRampsRegister().get_by_name("Violet - Blue")
+
+    if color_ramp:
+        color_ramp_bivariate = color_ramp
+
+    bivariate_renderer = BivariateRenderer()
+    bivariate_renderer.setFieldName1(field1)
+    bivariate_renderer.setFieldName2(field2)
+    bivariate_renderer.set_bivariate_color_ramp(color_ramp_bivariate)
+    bivariate_renderer.setField1ClassificationData(layer, bivariate_renderer.field_name_1)
+    bivariate_renderer.setField2ClassificationData(layer, bivariate_renderer.field_name_2)
+
+    return bivariate_renderer
