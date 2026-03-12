@@ -200,10 +200,10 @@ def export_page_to_image(layout_dpmm) -> Callable[[QgsLayout, QgsLayoutItemPage,
 def custom_polygon_symbol() -> QgsFillSymbol:
     custom_symbol = QgsFillSymbol.createSimple(
         {
-            "outline_width": "3.0",
+            "outline_width": "1.0",
             "outline_width_unit": "MM",
             "outline_color": "255,0,0,255",
-            "outline_style": "dashed",
+            "outline_style": "dot",
         }
     )
     return custom_symbol
