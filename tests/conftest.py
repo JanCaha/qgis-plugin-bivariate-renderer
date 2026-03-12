@@ -3,6 +3,7 @@ from typing import Callable, Optional, Union
 
 import pytest
 from qgis.core import (
+    QgsFillSymbol,
     QgsLayout,
     QgsLayoutExporter,
     QgsLayoutItemMap,
@@ -193,3 +194,16 @@ def export_page_to_image(layout_dpmm) -> Callable[[QgsLayout, QgsLayoutItemPage,
         image.save(image_path, "PNG")
 
     return function_to_run
+
+
+@pytest.fixture
+def custom_polygon_symbol() -> QgsFillSymbol:
+    custom_symbol = QgsFillSymbol.createSimple(
+        {
+            "outline_width": "3.0",
+            "outline_width_unit": "MM",
+            "outline_color": "255,0,0,255",
+            "outline_style": "dashed",
+        }
+    )
+    return custom_symbol
