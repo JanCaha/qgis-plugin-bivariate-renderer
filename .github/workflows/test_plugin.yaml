@@ -21,6 +21,11 @@ jobs:
   Tests-plugin-BivariateRenderer:
     runs-on: ubuntu-24.04
 
+    strategy:
+      fail-fast: false
+      matrix:
+        qgis-version: ["3.36", "3.40", "3.42", "3.44"]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -36,7 +41,7 @@ jobs:
 
       - name: Install conda-build
         run: |
-          conda install -n base pip qgis pytest pytest-cov pillow pytest-qt
+          conda install -n base pip qgis=${{ matrix.qgis-version }} pytest pytest-cov pillow pytest-qt
           conda run -n base pip install --no-cache-dir pytest-qgis pixelmatch
 
       - name: Run tests
@@ -48,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           if-no-files-found: warn
-          name: artifacts
+          name: artifacts-qgis-${{ matrix.qgis-version }}
           path: /tmp/images_diff
