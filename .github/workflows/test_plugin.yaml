@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/conda_pkgs_dir
-          key: conda-pkgs-${{ runner.os }}
+          key: conda-pkgs-${{ runner.os }}-${{ matrix.qgis-version }}
 
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
