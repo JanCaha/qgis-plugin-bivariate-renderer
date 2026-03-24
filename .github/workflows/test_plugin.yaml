@@ -44,7 +44,6 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-update-conda: true
           use-mamba: true
           channels: conda-forge,defaults
 
