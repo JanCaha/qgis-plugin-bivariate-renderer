@@ -36,17 +36,18 @@ jobs:
           auto-update-conda: true
           use-mamba: true
           channels: conda-forge,defaults
-          auto-activate: true
-          activate-environment: "base"
 
-      - name: Install conda-build
+      - name: Create environment
+        run: conda create -n qgis_env --no-default-packages --yes
+
+      - name: Install QGIS and test dependencies
         run: |
-          conda install -n base pip qgis=${{ matrix.qgis-version }} pytest pytest-cov pillow pytest-qt
-          conda run -n base pip install --no-cache-dir pytest-qgis pixelmatch
+          conda install -n qgis_env qgis=${{ matrix.qgis-version }} pytest pytest-cov pillow pytest-qt --yes
+          conda run -n qgis_env pip install --no-cache-dir pytest-qgis pixelmatch
 
       - name: Run tests
         run: |
-          conda run -n base pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
+          conda run -n qgis_env pytest tests --cov=BivariateRenderer --cov-report=term-missing:skip-covered -rP -vv -s --ignore=tests/tests_visual_result_generation
 
       - name: Upload Artifact
         if: failure()
