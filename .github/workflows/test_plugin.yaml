@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 
 env:
+  CONDA_PKGS_DIRS: ~/conda_pkgs_dir
   DEBIAN_FRONTEND: noninteractive
   QT_QPA_PLATFORM: offscreen
   XDG_RUNTIME_DIR: /tmp
@@ -29,6 +30,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Cache conda packages
+        uses: actions/cache@v4
+        with:
+          path: ~/conda_pkgs_dir
+          key: conda-pkgs-${{ runner.os }}
 
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
